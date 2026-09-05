@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090b">
+<title>MOGG BATTLE</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<style>
+:root{
+  --bg:#09090b;--card:#111216;--card2:#15161a;--line:#272830;
+  --text:#f5f5f5;--muted:#8f9098;--accent:#d78da6;--accent2:#f1d7df;
+  --cream:#d8c4ae;--good:#8bc7a2;--bad:#d88181;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(circle at 50% -10%,#1a1418 0,#0b0b0e 36%,#09090b 65%)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:540px;margin:auto;padding:16px 14px calc(92px + env(safe-area-inset-bottom))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{font-weight:900;font-size:22px;letter-spacing:.06em}
+.logo span{color:var(--accent)}
+.kicker{font-size:8px;letter-spacing:.18em;color:var(--muted);margin-bottom:2px}
+.scorePill{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:9px 11px;font-size:11px;white-space:nowrap}
+.card{background:linear-gradient(180deg,#121318,#0e0f12);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
+.row,.sectionHead,.profileTop,.battleRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sectionHead h2{font-size:15px;margin:0}
+.sectionHead span{font-size:9px;color:var(--muted)}
+.avatar{width:64px;height:64px;border-radius:50%;background:#1c1d22;border:1px solid #34353d;display:grid;place-items:center;font-weight:800;font-size:23px;overflow:hidden;flex:0 0 auto}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profileInfo{flex:1;min-width:0}
+.name{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user{font-size:9px;color:var(--muted);margin-top:2px}
+.rankRow{display:flex;align-items:center;gap:8px;margin-top:9px}
+.rank{font-size:10px;font-weight:800;border:1px solid #544539;color:var(--cream);padding:5px 8px;border-radius:8px}
+.rank.f{border-color:#613442;color:#f0a7bc}
+.rankBtn{background:transparent;cursor:pointer}
+.rankBtn:active{transform:scale(.97)}
+.rankModal{position:fixed;inset:0;background:#06070aeb;z-index:95;display:none;align-items:flex-end;justify-content:center;padding:14px}
+.rankModal.show{display:flex}
+.rankSheet{width:min(520px,100%);max-height:78%;overflow:auto;background:#101116;border:1px solid var(--line);border-radius:22px;padding:16px}
+.rankCurrent{padding:14px;border:1px solid #40313a;background:#161116;border-radius:14px;margin-top:10px}
+.rankCurrent b{font-size:26px}
+.rankCurrent small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.ladder{margin-top:12px}
+.ladderRow{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #202126}
+.ladderRow:last-child{border-bottom:0}
+.ladderRow .dot{width:10px;height:10px;border-radius:50%;background:#34363d;margin:auto}
+.ladderRow.current .dot{background:var(--accent);box-shadow:0 0 0 4px #d78da61f}
+.ladderRow.current{color:var(--accent2)}
+.ladderRow b{font-size:11px}
+.ladderRow span{font-size:9px;color:var(--muted)}
+.modalClose{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:10px;padding:9px 12px;font-size:10px}
+.progress{height:5px;border-radius:99px;background:#222329;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--accent);width:0%}
+.miniStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat{background:#0d0e11;border:1px solid #222329;border-radius:12px;padding:11px;text-align:center}
+.stat b{font-size:14px;display:block} .stat small{font-size:7px;color:var(--muted)}
+.primary{width:100%;border:0;border-radius:12px;background:#f3f1f1;color:#0b0b0d;padding:13px;font-weight:800;font-size:11px}
+.primary.pink{background:var(--accent);color:#160f12}
+.secondary{width:100%;border:1px solid var(--line);border-radius:12px;background:#14151a;color:#fff;padding:12px;font-size:10px}
+.primary:disabled,.secondary:disabled{opacity:.45;cursor:default}
+.feedTabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:10px}
+.feedTabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:#0e0f12;color:var(--muted);border-radius:9px;padding:8px 11px;font-size:9px;white-space:nowrap}
+.tab.active{color:#fff;border-color:#555761}
+.battleCard{padding:12px;border:1px solid #25262c;background:#0e0f12;border-radius:14px;margin-top:9px}
+.battleFaces{display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;margin-top:10px}
+.face{text-align:center;min-width:0}
+.facePhoto{height:128px;border-radius:12px;background:#1a1b20;overflow:hidden;display:grid;place-items:center;font-size:28px;font-weight:900}
+.facePhoto img{width:100%;height:100%;object-fit:cover}
+.face b{display:block;font-size:11px;margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.face small{font-size:8px;color:var(--muted)}
+.vs{text-align:center;font-weight:900;color:#777}
+.voteBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.vote{border:1px solid var(--line);background:#14151a;color:#fff;border-radius:10px;padding:10px;font-size:10px}
+.vote.selected{border-color:var(--accent);color:var(--accent2)}
+.liveDot{color:#97c8a6}
+.timer{font-size:10px;color:var(--muted)}
+.matchBox{text-align:center;padding:18px 12px}
+.matchIcon{width:86px;height:86px;border-radius:50%;margin:4px auto 12px;border:1px solid #3a3b43;display:grid;place-items:center;font-size:30px;background:#131419}
+.tapZone{text-align:center;padding:18px 0 10px}
+.tapCircle{width:190px;height:190px;border-radius:50%;border:1px solid #393a41;background:radial-gradient(circle at 42% 35%,#272830,#111216 68%);margin:auto;display:grid;place-items:center;transition:.08s}
+.tapCircle:active{transform:scale(.95)}
+.claw{font-size:56px;letter-spacing:-.18em;transform:rotate(-8deg);margin-left:-7px}
+.tapText{font-size:10px;letter-spacing:.14em;margin-top:13px}
+.muted{color:var(--muted);font-size:9px;line-height:1.55}
+.reward{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #202126}
+.reward:last-child{border:0}
+.reward b{font-size:11px} .reward small{display:block;color:var(--muted);font-size:8px;margin-top:3px}
+.rewardValue{color:var(--accent2);font-size:10px;white-space:nowrap}
+.inventory{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.item{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:12px}
+.item .rarity{font-size:7px;text-transform:uppercase;color:var(--muted)} .item b{display:block;font-size:10px;margin-top:4px}
+.item button{margin-top:9px}
+.onboard{position:fixed;inset:0;background:#08090bf5;z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
+.onboard.show{display:flex}
+.sheet{width:min(460px,100%);border:1px solid var(--line);background:#101116;border-radius:20px;padding:18px}
+.genderGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.gender{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:14px;padding:18px 10px;font-weight:800}
+.gender.f{border-color:#5b3441;color:#eca2b7}
+.fileLabel{display:block;border:1px dashed #454650;border-radius:14px;padding:18px;text-align:center;margin-top:12px;font-size:10px;color:var(--muted)}
+.fileLabel input{display:none}
+.preview{width:110px;height:110px;border-radius:50%;overflow:hidden;background:#1b1c21;margin:10px auto;display:none}
+.preview img{width:100%;height:100%;object-fit:cover}
+.toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-20px);opacity:0;background:#f4f2f2;color:#0c0c0e;border-radius:10px;padding:9px 13px;font-size:10px;font-weight:800;z-index:100;transition:.2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.view{display:none} .view.active{display:block}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#0b0c0feF;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:8px 7px calc(8px + env(safe-area-inset-bottom));z-index:50}
+.nav button{border:0;background:none;color:#72747c;font-size:16px;padding:4px 0}
+.nav button.active{color:#fff}
+.nav small{display:block;font-size:7px;margin-top:3px}
+.sponsor{border:1px solid #51313c;background:#171115;border-radius:12px;padding:12px;margin-top:10px}
+.refbox{background:#0d0e11;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;font-size:9px;word-break:break-word;color:#c9c9ca}
+.chest{border:1px solid #4b3d44;background:linear-gradient(135deg,#181217,#101115);border-radius:14px;padding:15px;text-align:center}
+.chestIcon{font-size:32px;margin-bottom:6px}
+@media(max-width:360px){.facePhoto{height:112px}.tapCircle{width:165px;height:165px}}
+
+.walletCard{background:linear-gradient(180deg,#121318,#0d0e11);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
+.walletTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.walletMeta{min-width:0}.walletMeta b{font-size:12px}
+.walletAddress{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.walletBalance{font-size:24px;font-weight:900;margin-top:14px}
+.walletBalance small{font-size:10px;color:var(--accent2);margin-left:4px}
+.walletNet{font-size:8px;color:var(--muted);margin-top:3px;letter-spacing:.08em}
+#ton-connect{display:flex;justify-content:flex-end}
+
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div id="onboard" class="onboard">
+  <div class="sheet">
+    <div class="kicker">WELCOME TO MOGG BATTLE</div>
+    <h2 style="margin:5px 0 0;font-size:20px">Создай профиль</h2>
+    <p class="muted">Сначала выбери пол и загрузи фото для баттлов. Рейтинг начинается с 0.</p>
+
+    <div id="genderStep">
+      <div class="genderGrid">
+        <button class="gender" data-g="male">MALE<br><small class="muted">MTN · CHAD · GIGACHAD</small></button>
+        <button class="gender f" data-g="female">FEMALE<br><small class="muted">MTB · STACY · TRUE STACY</small></button>
+      </div>
+    </div>
+
+    <div id="photoStep" style="display:none">
+      <div id="preview" class="preview"><img id="previewImg" alt=""></div>
+      <label class="fileLabel">
+        <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp">
+        Нажми, чтобы выбрать фото<br><span style="font-size:8px">JPEG / PNG / WEBP · до 5 MB</span>
+      </label>
+      <button id="uploadBtn" class="primary pink" style="margin-top:10px" disabled>СОХРАНИТЬ ФОТО</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="rankModal" class="rankModal">
+  <div class="rankSheet">
+    <div class="sectionHead">
+      <div><div class="kicker">MOGG RANK LADDER</div><h2 style="margin-top:4px">Твой путь</h2></div>
+      <button id="closeRankModal" class="modalClose" type="button">ЗАКРЫТЬ</button>
+    </div>
+    <div class="rankCurrent">
+      <small>CURRENT</small>
+      <b id="modalRank">SUB3</b>
+      <small><span id="modalScore">0</span> MOGG · до следующего ранга <span id="modalNeed">700</span></small>
+      <div class="progress"><i id="modalRankProgress"></i></div>
+    </div>
+    <div id="rankLadder" class="ladder"></div>
+  </div>
+</div>
+
+<main class="app">
+  <header class="top">
+    <div><div class="kicker">LOOKSMAXING COMPETITION</div><div class="logo">MOGG <span>BATTLE</span></div></div>
+    <div class="scorePill"><b id="score">0</b> MOGG</div>
+  </header>
+
+  <section id="homeView" class="view active">
+    <div class="card">
+      <div class="profileTop">
+        <div class="avatar" id="avatar">?</div>
+        <div class="profileInfo">
+          <div class="name" id="name">Loading...</div>
+          <div class="user" id="username">@telegram</div>
+          <div class="rankRow"><button id="rank" class="rank rankBtn" type="button">SUB3</button><span class="timer"><b id="homeScore">0</b> MOGG</span></div>
+          <div class="progress"><i id="rankProgress"></i></div>
+        </div>
+      </div>
+      <div class="miniStats">
+        <div class="stat"><b id="seasonPeak">0</b><small>SEASON PEAK</small></div>
+        <div class="stat"><b id="allPeak">0</b><small>ALL-TIME</small></div>
+        <div class="stat"><b id="battleCount">0</b><small>BATTLES</small></div>
+        <div class="stat"><b id="pointsBalance">0</b><small>POINTS</small></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Live battles</h2><span><span class="liveDot">●</span> LIVE</span></div>
+      <div class="feedTabs">
+        <button class="tab active" data-feed="all">LIVE</button>
+        <button class="tab" data-feed="promotion">PROMOTION</button>
+        <button class="tab" data-feed="high">HIGH ELO</button>
+      </div>
+      <div id="homeFeed"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Daily in app</h2><span>SPONSOR</span></div>
+      <div class="sponsor">
+        <b style="font-size:11px">@mbgbchannel</b>
+        <p class="muted">Подпишись на официальный канал и забери усиленный дневной бонус.</p>
+        <div class="row">
+          <button class="secondary" id="openChannel" style="width:auto">ОТКРЫТЬ КАНАЛ</button>
+          <span class="rewardValue">+150 POINTS</span>
+        </div>
+      </div>
+      <button id="appDailyBtn" class="primary pink">ПРОВЕРИТЬ И ЗАБРАТЬ</button>
+    </div>
+  </section>
+
+  <section id="battleView" class="view">
+    <div class="card matchBox">
+      <div class="matchIcon">⚔</div>
+      <h2 style="font-size:18px;margin:0 0 6px">CHOOSE BATTLE MODE</h2>
+      <p class="muted">Выбери рейтинговый бой или играй без ограничений.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">MOGG SCORE · NO COOLDOWN</span></button>
+        <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">NO SCORE · UNLIMITED</span></button>
+      </div>
+      <div id="matchStatus" class="muted" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Active</h2><span id="feedCount">0 BATTLES</span></div>
+      <div id="battleFeed"></div>
+    </div>
+  </section>
+
+  <section id="tapView" class="view">
+    <div class="card">
+      <div class="row"><span class="kicker">ENERGY</span><span class="timer"><b id="energy">100</b>/<span id="maxEnergy">100</span></span></div>
+      <div class="tapZone">
+        <button id="tapBtn" class="tapCircle"><span class="claw">///</span></button>
+        <div class="tapText">TAP TO ASCEND</div>
+        <div class="muted">1 tap = +1 POINT · энергия восстанавливается</div>
+      </div>
+      <div class="progress"><i id="energyProgress"></i></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>MOGG Points</h2><span><b id="tapPoints">0</b> PTS</span></div>
+      <p class="muted">Тапай → копи Points → покупай оформление, эффекты и коллекционные предметы. MOGG Score растёт в Ranked и немного за оценки чужих баттлов.</p>
+    </div>
+  </section>
+
+  <section id="rewardsView" class="view">
+    <div class="card">
+      <div class="sectionHead"><h2>Ascension Drop</h2><span>RANK REWARD</span></div>
+      <div class="chest">
+        <div class="chestIcon">◇</div>
+        <b id="dropTitle">Первый drop после SUB5</b>
+        <p class="muted" id="dropText">Рамки, фоны и титулы разной редкости. Косметика остаётся после сезонного отката.</p>
+        <button id="dropBtn" class="secondary">OPEN DROP</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Cosmetics Shop</h2><span><b id="shopPoints">0</b> PTS</span></div>
+      <p class="muted">Собирай оформление профиля и баттлов. Предметы не дают преимущества в Ranked.</p>
+      <div id="shop" class="inventory"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Inventory</h2><span id="inventoryCount">0 ITEMS</span></div>
+      <div id="inventory" class="inventory"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Referrals</h2><span>INVITE</span></div>
+      <p class="muted">Приглашай друзей. Награда начисляется после того, как приглашённый выберет пол и загрузит фото.</p>
+      <div class="refbox">Открой бота и используй команду <b>/ref</b> — он выдаст персональную ссылку.</div>
+    </div>
+  </section>
+
+  <section id="profileView" class="view">
+    <div class="card" style="text-align:center">
+      <div class="avatar" id="bigAvatar" style="width:92px;height:92px;margin:auto;font-size:32px">?</div>
+      <h2 id="bigName" style="font-size:19px;margin:10px 0 2px">Player</h2>
+      <div class="user" id="bigUsername">@telegram</div>
+      <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> MOGG</span></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Profile</h2><span>SYNCED</span></div>
+      <div class="reward"><div><b>Photo</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
+      <div class="reward"><div><b>Gender</b><small>Влияет только на названия рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
+      <div class="reward"><div><b>Referrals</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
+      <button id="changePhotoBtn" class="secondary" style="margin-top:10px">СМЕНИТЬ ФОТО</button>
+    </div>
+
+    <div class="walletCard">
+      <div class="walletTop">
+        <div class="walletMeta">
+          <b>TON WALLET</b>
+          <div id="walletAddress" class="walletAddress">Не подключён</div>
+        </div>
+        <div id="ton-connect"></div>
+      </div>
+      <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
+      <div class="walletNet">TON TESTNET · ON-CHAIN BALANCE</div>
+    </div>
+  </section>
+</main>
+
+<nav class="nav">
+  <button class="active" data-view="home">⌂<small>HOME</small></button>
+  <button data-view="battle">⚔<small>BATTLES</small></button>
+  <button data-view="tap">///<small>TAP</small></button>
+  <button data-view="rewards">◇<small>REWARDS</small></button>
+  <button data-view="profile">○<small>PROFILE</small></button>
+</nav>
+
+<script>
+const API="https://zjznmcydpngceiblqtwj.supabase.co/functions/v1/player-api";
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+
+const TONCONNECT_MANIFEST="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/tonconnect-manifest.json";
+const MOGG_JETTON_MASTER="kQAvdrlh1cc-Kt-9jfHQwgg2yexvrgKJ8MYFHf4Kr73fLJ7r";
+const TONCENTER_TESTNET="https://testnet.toncenter.com/api/v3";
+let tonConnectUi=null;
+
+function shortAddress(a){
+  if(!a)return "Не подключён";
+  return a.length>16 ? a.slice(0,8)+"…"+a.slice(-6) : a;
+}
+
+async function loadChainMogg(owner){
+  const out=$("chainMogg");
+  if(!owner){out.textContent="—";return}
+  out.textContent="...";
+  try{
+    const url=TONCENTER_TESTNET+"/jetton/wallets?owner_address="+encodeURIComponent(owner)
+      +"&jetton_address="+encodeURIComponent(MOGG_JETTON_MASTER)+"&limit=1";
+    const r=await fetch(url);
+    if(!r.ok)throw new Error("balance_fetch_failed");
+    const d=await r.json();
+    const w=d.jetton_wallets?.[0];
+    const nano=w?.balance ? BigInt(w.balance) : 0n;
+    const whole=nano/1000000000n;
+    const frac=(nano%1000000000n).toString().padStart(9,"0").replace(/0+$/,"");
+    out.textContent=frac ? whole.toString()+"."+frac.slice(0,4) : whole.toString();
+  }catch(e){
+    console.error(e);
+    out.textContent="—";
+  }
+}
+
+function initTonConnect(){
+  try{
+    if(!window.TON_CONNECT_UI?.TonConnectUI)return;
+    tonConnectUi=new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl:TONCONNECT_MANIFEST,
+      buttonRootId:"ton-connect",
+      restoreConnection:true,
+      uiPreferences:{theme:"DARK"}
+    });
+    tonConnectUi.onStatusChange(wallet=>{
+      const address=wallet?.account?.address||"";
+      $("walletAddress").textContent=shortAddress(address);
+      $("walletAddress").title=address;
+      loadChainMogg(address);
+    });
+    const current=tonConnectUi.account?.address||"";
+    if(current){
+      $("walletAddress").textContent=shortAddress(current);
+      $("walletAddress").title=current;
+      loadChainMogg(current);
+    }
+  }catch(e){console.error("TON Connect:",e)}
+}
+
+
+let state={player:null,feed:[],inventory:[],shop:[],sponsors:[],gender:null,photoFile:null};
+const $=id=>document.getElementById(id);
+const toast=m=>{const e=$("toast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1500)};
+
+const maleRanks=["SUB3","SUB5","LLTN","LTN","HLTN","LMTN","MTN","HMTN","LHTN","HTN","HHTN","CHAD","GIGACHAD"];
+const femaleRanks=["SUB3","SUB5","LLTB","LTB","HLTB","LMTB","MTB","HMTB","LHTB","HTB","HHTB","STACY","TRUE STACY"];
+const cuts=[0,700,900,1100,1300,1500,1700,1900,2100,2350,2600,2900,3300];
+
+function rankIndex(score){let i=0;cuts.forEach((x,n)=>{if(score>=x)i=n});return i}
+function rankFor(score,g){return (g==="female"?femaleRanks:maleRanks)[rankIndex(score)]}
+function nextCut(score){const i=rankIndex(score);return cuts[Math.min(i+1,cuts.length-1)]||3300}
+function initials(name){return (name||"?").trim().charAt(0).toUpperCase()||"?"}
+
+async function call(action,extra={}){
+  if(!tg?.initData)throw new Error("open_in_telegram");
+  const r=await fetch(API,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({initData:tg.initData,action,...extra})
+  });
+  const d=await r.json();
+  if(!r.ok||d.error){const e=new Error(d.error||"request_failed");e.data=d;throw e}
+  return d;
+}
+
+function avatarInto(el,p){
+  if(p?.profile_photo_url)el.innerHTML=`<img src="${p.profile_photo_url}" alt="">`;
+  else el.textContent=initials(p?.first_name||p?.username);
+}
+
+function renderPlayer(){
+  const p=state.player;if(!p)return;
+  const score=Number(p.mogg_score||0), name=p.first_name||p.username||"Player", rank=rankFor(score,p.gender);
+  $("score").textContent=score.toLocaleString();$("homeScore").textContent=score.toLocaleString();$("bigScore").textContent=score.toLocaleString();
+  $("name").textContent=name;$("bigName").textContent=name;
+  $("username").textContent=p.username?"@"+p.username:"";$("bigUsername").textContent=p.username?"@"+p.username:"";
+  $("rank").textContent=rank;$("bigRank").textContent=rank;
+  $("rank").classList.toggle("f",p.gender==="female");$("bigRank").classList.toggle("f",p.gender==="female");
+  avatarInto($("avatar"),p);avatarInto($("bigAvatar"),p);
+  $("seasonPeak").textContent=Number(p.season_peak||0).toLocaleString();
+  $("allPeak").textContent=Number(p.all_time_peak||0).toLocaleString();
+  $("battleCount").textContent=p.battles_played||0;
+  const pts=Number(p.mogg_points||0);
+  $("pointsBalance").textContent=pts.toLocaleString();
+  $("tapPoints").textContent=pts.toLocaleString();
+  $("shopPoints").textContent=pts.toLocaleString();
+  $("energy").textContent=p.energy??100;$("maxEnergy").textContent=p.max_energy??100;
+  $("energyProgress").style.width=Math.max(0,Math.min(100,(Number(p.energy||0)/Number(p.max_energy||100))*100))+"%";
+  const n=nextCut(score), base=cuts[rankIndex(score)]||0;
+  const pct=n===base?100:Math.max(0,Math.min(100,(score-base)/(n-base)*100));
+  $("rankProgress").style.width=pct+"%";
+  $("genderState").textContent=p.gender==="female"?"FEMALE":"MALE";
+  $("photoState").textContent=p.profile_photo_url?"✓":"MISSING";
+  $("refCount").textContent=p.referral_count||0;
+}
+
+function nameOf(p){return p?.first_name||p?.username||"Player"}
+function battleHtml(b){
+  const a=b.a||{}, bb=b.b||{};
+  const total=Number(b.votes_a||0)+Number(b.votes_b||0);
+  const pa=total?Math.round(Number(b.votes_a||0)/total*100):50;
+  const pb=100-pa;
+  const ms=Math.max(0,new Date(b.ends_at).getTime()-Date.now());
+  const sec=Math.ceil(ms/1000);
+  return `<div class="battleCard" data-battle="${b.id}">
+    <div class="row"><span class="timer">${b.is_promotion?"PROMOTION":"LIVE BATTLE"}</span><span class="timer">${sec}s</span></div>
+    <div class="battleFaces">
+      <div class="face">
+        <div class="facePhoto">${a.profile_photo_url?`<img src="${a.profile_photo_url}" alt="">`:initials(nameOf(a))}</div>
+        <b>${nameOf(a)}</b><small>${rankFor(Number(a.mogg_score||0),a.gender)} · ${a.mogg_score||0}</small>
+      </div>
+      <div class="vs">VS</div>
+      <div class="face">
+        <div class="facePhoto">${bb.profile_photo_url?`<img src="${bb.profile_photo_url}" alt="">`:initials(nameOf(bb))}</div>
+        <b>${nameOf(bb)}</b><small>${rankFor(Number(bb.mogg_score||0),bb.gender)} · ${bb.mogg_score||0}</small>
+      </div>
+    </div>
+    <div class="row timer"><span>${pa}%</span><span>${pb}%</span></div>
+    <div class="voteBar">
+      <button class="vote" data-side="a" data-id="${b.id}">VOTE A</button>
+      <button class="vote" data-side="b" data-id="${b.id}">VOTE B</button>
+    </div>
+  </div>`;
+}
+
+function renderFeed(){
+  const valid=state.feed.filter(b=>new Date(b.ends_at).getTime()>Date.now());
+  $("feedCount").textContent=valid.length+" BATTLES";
+  $("homeFeed").innerHTML=valid.length?valid.slice(0,3).map(battleHtml).join(""):`<p class="muted">Сейчас активных баттлов нет. Запусти первый.</p>`;
+  $("battleFeed").innerHTML=valid.length?valid.map(battleHtml).join(""):`<p class="muted">Активных баттлов пока нет.</p>`;
+  document.querySelectorAll(".vote").forEach(btn=>btn.addEventListener("click",()=>vote(btn.dataset.id,btn.dataset.side,btn)));
+}
+
+function renderShop(){
+  const owned=new Set(state.inventory.map(x=>x.cosmetics?.id).filter(Boolean));
+  $("shop").innerHTML=state.shop.length?state.shop.map(c=>`<div class="item">
+    <div class="rarity">${c.rarity||"item"} · ${c.kind||""}</div>
+    <b>${c.name||"Cosmetic"}</b>
+    <div class="muted">${Number(c.price_points||0).toLocaleString()} PTS</div>
+    <button class="secondary buy" data-id="${c.id}" ${owned.has(c.id)?"disabled":""}>${owned.has(c.id)?"OWNED":"BUY"}</button>
+  </div>`).join(""):`<p class="muted">Магазин скоро появится.</p>`;
+  document.querySelectorAll(".buy").forEach(b=>b.addEventListener("click",()=>buyCosmetic(b.dataset.id)));
+}
+
+function renderInventory(){
+  $("inventoryCount").textContent=state.inventory.length+" ITEMS";
+  $("inventory").innerHTML=state.inventory.length?state.inventory.map(x=>{
+    const c=x.cosmetics||{};
+    return `<div class="item"><div class="rarity">${c.rarity||"item"}</div><b>${c.name||"Cosmetic"}</b><div class="muted">${c.kind||""}</div><button class="secondary equip" data-id="${c.id}">EQUIP</button></div>`;
+  }).join(""):`<p class="muted">Пока пусто. Первый drop откроется после SUB5.</p>`;
+  document.querySelectorAll(".equip").forEach(b=>b.addEventListener("click",()=>equip(b.dataset.id)));
+}
+
+
+function openRankModal(){
+  const p=state.player;if(!p)return;
+  const score=Number(p.mogg_score||0);
+  const idx=rankIndex(score);
+  const ranks=p.gender==="female"?femaleRanks:maleRanks;
+  const current=ranks[idx];
+  const next=idx<cuts.length-1?cuts[idx+1]:null;
+  const base=cuts[idx]||0;
+  const pct=next===null?100:Math.max(0,Math.min(100,(score-base)/(next-base)*100));
+
+  $("modalRank").textContent=current;
+  $("modalScore").textContent=score.toLocaleString();
+  $("modalNeed").textContent=next===null?"MAX":Math.max(0,next-score).toLocaleString();
+  $("modalRankProgress").style.width=pct+"%";
+
+  $("rankLadder").innerHTML=ranks.map((r,i)=>{
+    const low=cuts[i];
+    const high=i<cuts.length-1?cuts[i+1]-1:"∞";
+    return `<div class="ladderRow ${i===idx?"current":""}">
+      <div class="dot"></div>
+      <div><b>${r}</b><br><span>${low.toLocaleString()}${high==="∞"?"+":" – "+Number(high).toLocaleString()} MOGG</span></div>
+      <span>${i===idx?"YOU":i<idx?"✓":""}</span>
+    </div>`;
+  }).join("");
+
+  $("rankModal").classList.add("show");
+}
+
+async function init(){
+  try{
+    const d=await call("me");
+    state.player=d.player;state.feed=d.feed||[];state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];
+    renderPlayer();renderFeed();renderShop();renderInventory();
+
+    const start=tg?.initDataUnsafe?.start_param||"";
+    if(start.startsWith("ref_")){
+      const id=Number(start.slice(4));if(id)call("apply_ref",{ref_telegram_id:id}).catch(()=>{});
+    }
+
+    if(!state.player.gender || !state.player.profile_photo_url){
+      $("onboard").classList.add("show");
+      if(state.player.gender){state.gender=state.player.gender;$("genderStep").style.display="none";$("photoStep").style.display="block"}
+    }
+  }catch(e){console.error(e);toast("Ошибка подключения")}
+}
+
+document.querySelectorAll(".gender").forEach(b=>b.addEventListener("click",async()=>{
+  try{
+    state.gender=b.dataset.g;
+    const d=await call("set_gender",{gender:state.gender});
+    state.player=d.player;renderPlayer();
+    $("genderStep").style.display="none";$("photoStep").style.display="block";
+  }catch(e){toast("Не удалось сохранить")}
+}));
+
+$("photoInput").addEventListener("change",()=>{
+  const f=$("photoInput").files?.[0];state.photoFile=f||null;
+  $("uploadBtn").disabled=!f;
+  if(f){$("preview").style.display="block";$("previewImg").src=URL.createObjectURL(f)}
+});
+
+async function uploadPhoto(){
+  const f=state.photoFile;if(!f)return;
+  if(f.size>5*1024*1024)return toast("Фото больше 5 MB");
+  $("uploadBtn").disabled=true;$("uploadBtn").textContent="UPLOADING...";
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    try{
+      const base64=String(reader.result).split(",")[1];
+      const d=await call("upload_photo",{mime:f.type,base64});
+      state.player=d.player;renderPlayer();
+      $("onboard").classList.remove("show");
+      $("uploadBtn").textContent="СОХРАНИТЬ ФОТО";
+      toast("Профиль готов ✓");
+    }catch(e){toast("Ошибка загрузки");$("uploadBtn").disabled=false;$("uploadBtn").textContent="СОХРАНИТЬ ФОТО"}
+  };
+  reader.readAsDataURL(f);
+}
+$("uploadBtn").addEventListener("click",uploadPhoto);
+$("changePhotoBtn").addEventListener("click",()=>{state.photoFile=null;$("photoStep").style.display="block";$("genderStep").style.display="none";$("onboard").classList.add("show")});
+
+$("tapBtn").addEventListener("click",async()=>{
+  try{const d=await call("tap");state.player=d.player;renderPlayer();tg?.HapticFeedback?.impactOccurred("light")}
+  catch(e){toast(String(e.message).includes("no_energy")?"Нет энергии":"Ошибка")}
+});
+
+$("openChannel").addEventListener("click",()=>{tg?.openTelegramLink?.("https://t.me/mbgbchannel")||window.open("https://t.me/mbgbchannel","_blank")});
+
+$("appDailyBtn").addEventListener("click",async()=>{
+  try{
+    const d=await call("app_daily");state.player=d.player;renderPlayer();$("appDailyBtn").disabled=true;$("appDailyBtn").textContent="CLAIMED";toast("+"+d.reward+" POINTS");
+  }catch(e){
+    if(e.message==="subscription_required")toast("Сначала подпишись на @"+(e.data?.channel||"mbgbchannel"));
+    else if(String(e.message).includes("already"))toast("Уже получено сегодня");
+    else toast("Не удалось проверить подписку");
+  }
+});
+
+async function startMatchmaking(mode){
+  const ranked=$("rankedBtn"),quick=$("quickBtn");
+  ranked.disabled=true;quick.disabled=true;
+  $("matchStatus").textContent=mode==="ranked"?"Ищем рейтингового соперника...":"Ищем быстрый баттл...";
+  try{
+    const d=await call("open_matchmaking",{mode});
+    if(d.matched){
+      $("matchStatus").textContent=mode==="ranked"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
+      toast(mode==="ranked"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");setTimeout(refresh,800);
+    }else{
+      $("matchStatus").textContent=mode==="ranked"?"Ты в Ranked очереди. Ждём соперника.":"Ты в Quick очереди. Ждём соперника.";
+      toast("Поиск запущен");
+    }
+  }catch(e){
+    $("matchStatus").textContent="";
+    if(e.message==="photo_required")toast("Сначала загрузи фото");
+    else toast("Не удалось начать поиск");
+  }finally{ranked.disabled=false;quick.disabled=false}
+}
+$("rankedBtn").addEventListener("click",()=>startMatchmaking("ranked"));
+$("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
+
+async function vote(id,side,btn){
+  try{
+    const d=await call("vote",{battle_id:id,side});
+    document.querySelectorAll(`[data-id="${id}"]`).forEach(x=>x.disabled=true);
+    btn.classList.add("selected");toast("Голос принят ✓");await refresh();
+  }catch(e){
+    if(e.message==="already_voted")toast("Ты уже голосовал");
+    else if(e.message==="fighters_cannot_vote")toast("Участники не голосуют за себя");
+    else toast("Баттл закрыт");
+  }
+}
+
+async function buyCosmetic(id){
+  try{
+    const d=await call("buy_cosmetic",{cosmetic_id:id});
+    state.player=d.player;renderPlayer();toast("Предмет куплен ✓");await refresh();
+  }catch(e){
+    if(String(e.message).includes("not_enough_points"))toast("Недостаточно Points");
+    else if(String(e.message).includes("already_owned"))toast("Уже в коллекции");
+    else toast("Не удалось купить");
+  }
+}
+
+async function equip(id){
+  try{const d=await call("equip",{cosmetic_id:id});state.player=d.player;toast("Оформление применено")}
+  catch(e){toast("Не удалось применить")}
+}
+
+$("dropBtn").addEventListener("click",async()=>{
+  try{
+    const d=await call("open_drop");
+    const c=d.drop?.cosmetics||{};
+    $("dropTitle").textContent=c.name||"UNLOCKED";
+    $("dropText").textContent=(c.rarity||"").toUpperCase()+" · "+(c.kind||"");
+    toast("ASCENSION UNLOCKED");
+    await refresh();
+  }catch(e){
+    if(e.message==="no_drop_available")toast("Первый drop после SUB5");
+    else toast("Drop пока недоступен");
+  }
+});
+
+async function refresh(){
+  try{
+    const d=await call("me");state.player=d.player;state.feed=d.feed||[];state.inventory=d.inventory||[];state.shop=d.shop||[];renderPlayer();renderFeed();renderShop();renderInventory();
+  }catch(e){}
+}
+
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));btn.classList.add("active");
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(btn.dataset.view+"View").classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}));
+
+
+$("rank").addEventListener("click",openRankModal);
+$("bigRank").addEventListener("click",openRankModal);
+$("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove("show"));
+$("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
+
+setInterval(refresh,15000);
+initTonConnect();
+init();
+</script>
+</body>
+</html>
