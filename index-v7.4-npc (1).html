@@ -1,0 +1,986 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#09090b">
+<title>MOGG BATTLE · V7.4</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+<style>
+:root{
+  --bg:#09090b;--card:#111216;--card2:#15161a;--line:#272830;
+  --text:#f5f5f5;--muted:#8f9098;--accent:#d78da6;--accent2:#f1d7df;
+  --cream:#d8c4ae;--good:#8bc7a2;--bad:#d88181;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{background:radial-gradient(circle at 50% -10%,#1a1418 0,#0b0b0e 36%,#09090b 65%)}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:540px;margin:auto;padding:16px 14px calc(92px + env(safe-area-inset-bottom))}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.logo{font-weight:900;font-size:22px;letter-spacing:.06em}
+.logo span{color:var(--accent)}
+.kicker{font-size:8px;letter-spacing:.18em;color:var(--muted);margin-bottom:2px}
+.scorePill{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:9px 11px;font-size:11px;white-space:nowrap}
+.card{background:linear-gradient(180deg,#121318,#0e0f12);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
+.row,.sectionHead,.profileTop,.battleRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sectionHead h2{font-size:15px;margin:0}
+.sectionHead span{font-size:9px;color:var(--muted)}
+.avatar{width:64px;height:64px;border-radius:50%;background:#1c1d22;border:1px solid #34353d;display:grid;place-items:center;font-weight:800;font-size:23px;overflow:hidden;flex:0 0 auto}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profileInfo{flex:1;min-width:0}
+.name{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user{font-size:9px;color:var(--muted);margin-top:2px}
+.rankRow{display:flex;align-items:center;gap:8px;margin-top:9px}
+.rank{font-size:10px;font-weight:800;border:1px solid #544539;color:var(--cream);padding:5px 8px;border-radius:8px}
+.rank.f{border-color:#613442;color:#f0a7bc}
+.rankBtn{background:transparent;cursor:pointer}
+.rankBtn:active{transform:scale(.97)}
+.rankModal{position:fixed;inset:0;background:#06070aeb;z-index:95;display:none;align-items:flex-end;justify-content:center;padding:14px}
+.rankModal.show{display:flex}
+.rankSheet{width:min(520px,100%);max-height:78%;overflow:auto;background:#101116;border:1px solid var(--line);border-radius:22px;padding:16px}
+.rankCurrent{padding:14px;border:1px solid #40313a;background:#161116;border-radius:14px;margin-top:10px}
+.rankCurrent b{font-size:26px}
+.rankCurrent small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
+.ladder{margin-top:12px}
+.ladderRow{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #202126}
+.ladderRow:last-child{border-bottom:0}
+.ladderRow .dot{width:10px;height:10px;border-radius:50%;background:#34363d;margin:auto}
+.ladderRow.current .dot{background:var(--accent);box-shadow:0 0 0 4px #d78da61f}
+.ladderRow.current{color:var(--accent2)}
+.ladderRow b{font-size:11px}
+.ladderRow span{font-size:9px;color:var(--muted)}
+.modalClose{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:10px;padding:9px 12px;font-size:10px}
+.progress{height:5px;border-radius:99px;background:#222329;overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;background:var(--accent);width:0%}
+.miniStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat{background:#0d0e11;border:1px solid #222329;border-radius:12px;padding:11px;text-align:center}
+.stat b{font-size:14px;display:block} .stat small{font-size:7px;color:var(--muted)}
+.primary{width:100%;border:0;border-radius:12px;background:#f3f1f1;color:#0b0b0d;padding:13px;font-weight:800;font-size:11px}
+.primary.pink{background:var(--accent);color:#160f12}
+.secondary{width:100%;border:1px solid var(--line);border-radius:12px;background:#14151a;color:#fff;padding:12px;font-size:10px}
+.primary:disabled,.secondary:disabled{opacity:.45;cursor:default}
+.feedTabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:10px}
+.feedTabs::-webkit-scrollbar{display:none}
+.tab{border:1px solid var(--line);background:#0e0f12;color:var(--muted);border-radius:9px;padding:8px 11px;font-size:9px;white-space:nowrap}
+.tab.active{color:#fff;border-color:#555761}
+.battleCard{padding:12px;border:1px solid #25262c;background:#0e0f12;border-radius:14px;margin-top:9px}
+.battleFaces{display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;margin-top:10px}
+.face{text-align:center;min-width:0;overflow:hidden}
+.facePhoto{height:128px;min-height:128px;max-height:128px;width:100%;aspect-ratio:4/5;border-radius:12px;background:#1a1b20;overflow:hidden;display:grid;place-items:center;font-size:28px;font-weight:900}
+.facePhoto img{display:block;width:100%!important;height:100%!important;max-width:100%;max-height:100%;object-fit:cover!important;object-position:center;position:absolute;inset:0;border-radius:inherit}.facePhoto{position:relative;contain:paint}.facePhoto.cosmeticFrame{overflow:hidden!important}.facePhoto.cosmeticFrame:after{inset:2px!important;border-radius:10px!important}
+.face b{display:block;font-size:11px;margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.face small{font-size:8px;color:var(--muted)}
+.vs{text-align:center;font-weight:900;color:#777}
+.voteBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.vote{border:1px solid var(--line);background:#14151a;color:#fff;border-radius:10px;padding:10px;font-size:10px}
+.vote.selected{border-color:var(--accent);color:var(--accent2)}
+.liveDot{color:#97c8a6}
+.timer{font-size:10px;color:var(--muted)}
+.matchBox{text-align:center;padding:18px 12px}
+.matchIcon{width:86px;height:86px;border-radius:50%;margin:4px auto 12px;border:1px solid #3a3b43;display:grid;place-items:center;font-size:30px;background:#131419}
+.tapZone{text-align:center;padding:18px 0 10px}
+.tapCircle{width:190px;height:190px;border-radius:50%;border:1px solid #393a41;background:radial-gradient(circle at 42% 35%,#272830,#111216 68%);margin:auto;display:grid;place-items:center;transition:.08s}
+.tapCircle:active{transform:scale(.95)}
+.claw{font-size:56px;letter-spacing:-.18em;transform:rotate(-8deg);margin-left:-7px}
+.tapText{font-size:10px;letter-spacing:.14em;margin-top:13px}
+.muted{color:var(--muted);font-size:9px;line-height:1.55}
+.reward{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #202126}
+.reward:last-child{border:0}
+.reward b{font-size:11px} .reward small{display:block;color:var(--muted);font-size:8px;margin-top:3px}
+.rewardValue{color:var(--accent2);font-size:10px;white-space:nowrap}
+.inventory{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.item{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:12px}
+.item .rarity{font-size:7px;text-transform:uppercase;color:var(--muted)} .item b{display:block;font-size:10px;margin-top:4px}
+.item button{margin-top:9px}
+.onboard{position:fixed;inset:0;background:#08090bf5;z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
+.onboard.show{display:flex}
+.sheet{width:min(460px,100%);border:1px solid var(--line);background:#101116;border-radius:20px;padding:18px}
+.genderGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.gender{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:14px;padding:18px 10px;font-weight:800}
+.gender.f{border-color:#5b3441;color:#eca2b7}
+.fileLabel{display:block;border:1px dashed #454650;border-radius:14px;padding:18px;text-align:center;margin-top:12px;font-size:10px;color:var(--muted)}
+.fileLabel input{display:none}
+.preview{width:110px;height:110px;border-radius:50%;overflow:hidden;background:#1b1c21;margin:10px auto;display:none}
+.preview img{width:100%;height:100%;object-fit:cover}
+.toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-20px);opacity:0;background:#f4f2f2;color:#0c0c0e;border-radius:10px;padding:9px 13px;font-size:10px;font-weight:800;z-index:100;transition:.2s}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.view{display:none} .view.active{display:block}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#0b0c0feF;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:8px 7px calc(8px + env(safe-area-inset-bottom));z-index:50}
+.nav button{border:0;background:none;color:#72747c;font-size:16px;padding:4px 0}
+.nav button.active{color:#fff}
+.nav small{display:block;font-size:7px;margin-top:3px}
+.sponsor{border:1px solid #51313c;background:#171115;border-radius:12px;padding:12px;margin-top:10px}
+.refbox{background:#0d0e11;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;font-size:9px;word-break:break-word;color:#c9c9ca}
+.chest{border:1px solid #4b3d44;background:linear-gradient(135deg,#181217,#101115);border-radius:14px;padding:15px;text-align:center}
+.chestIcon{font-size:32px;margin-bottom:6px}
+@media(max-width:360px){.facePhoto{height:112px}.tapCircle{width:165px;height:165px}}
+
+.walletCard{background:linear-gradient(180deg,#121318,#0d0e11);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
+.walletTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.walletMeta{min-width:0}.walletMeta b{font-size:12px}
+.walletAddress{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.walletBalance{font-size:24px;font-weight:900;margin-top:14px}
+.walletBalance small{font-size:10px;color:var(--accent2);margin-left:4px}
+.walletNet{font-size:8px;color:var(--muted);margin-top:3px;letter-spacing:.08em}
+#ton-connect{display:flex;justify-content:flex-end}
+
+
+/* ── COSMETICS V6 ───────────────────────────────────────── */
+.cosmeticFrame{position:relative;isolation:isolate;overflow:visible!important}
+.cosmeticFrame:after{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;border:2px solid transparent;z-index:3}
+.frame-graphite:after{border-color:#656873;box-shadow:0 0 12px #65687355}
+.frame-ice:after{border-color:#bfeaff;box-shadow:0 0 18px #8edfff99,inset 0 0 8px #8edfff44}
+.frame-rose:after{border-color:#f0a3bd;box-shadow:0 0 18px #d78da688}
+.frame-emerald:after{border-color:#70f0bb;box-shadow:0 0 18px #38d89b99}
+.frame-void:after{border-color:#7e63cf;box-shadow:0 0 22px #6d4bd8aa}
+.frame-obsidian:after{border-color:#8b8d96;box-shadow:0 0 0 2px #17181c,0 0 22px #b8bbc533}
+.frame-bloodmoon:after{border-color:#d24855;box-shadow:0 0 24px #c52d3dbb}
+.frame-halo:after{border-color:#f0d38b;box-shadow:0 0 8px #fff,0 0 28px #e6b95dbb}
+.frame-truepeak:after{border-color:#fff;box-shadow:0 0 7px #fff,0 0 22px #d9b4ff,0 0 38px #87dfff}
+.frame-prism:after{border-color:#fff;box-shadow:8px 0 18px #74e8ff,-8px 0 18px #fb7cd7,0 8px 18px #ffe977}
+.frame-celestial:after{border-color:#f6d993;box-shadow:0 0 8px #fff,0 0 28px #d9b8ff,0 0 46px #82cfff}
+.frame-top1:after{border-color:#ffd86b;box-shadow:0 0 10px #fff,0 0 34px #ffcb46}
+.frame-top10:after{border-color:#d9dde8;box-shadow:0 0 24px #d9dde888}
+
+.bg-studio{background:linear-gradient(145deg,#15161a,#08090b)!important}
+.bg-silverfog{background:radial-gradient(circle at 15% 10%,#6d707b55,transparent 40%),linear-gradient(145deg,#23252b,#0d0e11)!important}
+.bg-crimson{background:radial-gradient(circle at 80% 0,#7c1f2d77,transparent 45%),linear-gradient(145deg,#211015,#0b0b0e)!important}
+.bg-noir{background:linear-gradient(135deg,#21232a,#09090b 55%,#1a141d)!important}
+.bg-neoncity{background:radial-gradient(circle at 15% 10%,#1c84a955,transparent 35%),radial-gradient(circle at 90% 20%,#a3227555,transparent 38%),#0b0c11!important}
+.bg-eclipse{background:radial-gradient(circle at 50% -30%,#f1d393 0 4%,#4b315e 15%,transparent 36%),linear-gradient(#121017,#070708)!important}
+.bg-marble{background:linear-gradient(125deg,#080808 0 35%,#303036 36%,#111 39%,#444 41%,#090909 44% 100%)!important}
+.bg-aurora{background:radial-gradient(circle at 20% 0,#49d7b766,transparent 42%),radial-gradient(circle at 80% 0,#9f71ff66,transparent 44%),#0a0c11!important}
+
+.name-glow{text-shadow:0 0 12px #f0b4d0,0 0 24px #d78da6}
+.name-royal{background:linear-gradient(90deg,#fff0a3,#dca851,#fff4c9);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.name-chrome{background:linear-gradient(180deg,#fff,#8e949f 46%,#fff 52%,#686e78);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.score-steel{color:#c8ccd4!important;text-shadow:0 0 8px #b9c0cf55}
+.score-fire{color:#ff9971!important;text-shadow:0 0 12px #ff563c88}
+.score-gold{color:#f1d17d!important;text-shadow:0 0 12px #e6b85188}
+.score-cosmic{background:linear-gradient(90deg,#b7f2ff,#e4b4ff,#ffb7d6);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.cosmeticTitle{display:inline-flex;margin-top:5px;padding:3px 7px;border:1px solid #3a3b43;border-radius:6px;font-size:8px;font-weight:900;letter-spacing:.13em;color:#d9dbe2}
+
+.shopFilters{display:flex;gap:6px;overflow:auto;margin:10px 0 6px;padding-bottom:2px}.shopFilters button{white-space:nowrap;border:1px solid var(--line);background:#101116;color:#8f9098;border-radius:999px;padding:7px 10px;font-size:8px;font-weight:800}.shopFilters button.active{color:#fff;border-color:#6a4050;background:#25171e}
+.item{position:relative;overflow:hidden}.itemPreview{height:78px;border-radius:12px;background:#0c0d10;border:1px solid #24252b;margin-bottom:9px;display:grid;place-items:center;position:relative;overflow:hidden}.previewAvatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#32343b,#17181d);position:relative}.previewBg{position:absolute;inset:0}.previewTitle{font-size:11px;font-weight:900;letter-spacing:.08em}.item .rarity{font-weight:900;letter-spacing:.12em}.rarity.common{color:#9da0a8}.rarity.rare{color:#7fd1ff}.rarity.epic{color:#bc8cff}.rarity.elite{color:#ff9fc9}.rarity.legendary{color:#f1c86f}.rarity.mythic{color:#ffb7e9;text-shadow:0 0 10px #e85aaf}.rarity.ascended,.rarity.limited{color:#fff;text-shadow:0 0 8px #fff,0 0 16px #d5a8ff}.sourceTag{font-size:7px;letter-spacing:.1em;color:#777a84;margin-top:4px}.priceStars{color:#f2d36f;font-weight:900}.ownedTag{color:#8bc7a2;font-size:9px;font-weight:900}.exclusiveTag{color:#d9b8ff;font-size:8px;font-weight:900}.equip.isEquipped{border-color:#6aa77f;color:#b9e6c9;background:#132018}
+
+.dropRates{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}.rateChip{border:1px solid #25262d;background:#0d0e11;border-radius:9px;padding:7px 4px;text-align:center}.rateChip b{display:block;font-size:10px}.rateChip small{font-size:6px;color:#80828b;text-transform:uppercase}.dropMeta{display:flex;justify-content:center;gap:8px;margin:10px 0}.dropMeta span{font-size:8px;border:1px solid #2a2b31;border-radius:999px;padding:5px 8px;color:#a7a8af}
+
+.caseModal{position:fixed;inset:0;z-index:120;background:#050508f2;display:none;align-items:center;justify-content:center;padding:14px}.caseModal.show{display:flex}.caseSheet{width:min(520px,100%);background:linear-gradient(180deg,#151219,#0b0c10);border:1px solid #35313a;border-radius:24px;padding:17px;overflow:hidden;box-shadow:0 24px 80px #000}.caseTitle{text-align:center;font-size:10px;letter-spacing:.2em;color:#9a919d}.caseWindow{height:132px;margin-top:16px;border:1px solid #31323a;border-radius:16px;background:#090a0d;overflow:hidden;position:relative}.caseWindow:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 18px #fff;z-index:4}.caseReel{height:100%;display:flex;align-items:center;gap:8px;padding:0 50%;transform:translateX(0);will-change:transform}.caseItem{flex:0 0 92px;height:104px;border:1px solid #292a31;border-radius:13px;background:#121318;padding:8px;text-align:center;display:flex;flex-direction:column;justify-content:center}.caseItem b{font-size:9px;margin-top:5px}.caseItem small{font-size:7px;color:#8e9098}.caseReveal{text-align:center;padding:18px 8px 4px;opacity:0;transform:translateY(8px);transition:.35s}.caseReveal.show{opacity:1;transform:none}.caseReveal h2{margin:5px 0;font-size:24px}.caseReveal .rarity{font-size:9px;letter-spacing:.16em}.caseClose{display:none;margin-top:12px}.caseClose.show{display:block}
+
+@keyframes legendaryPulse{0%,100%{box-shadow:0 0 0 transparent}50%{box-shadow:0 0 38px #e8bf6188}}
+.caseSheet.legendary,.caseSheet.mythic,.caseSheet.ascended,.caseSheet.limited{animation:legendaryPulse 1s ease-in-out 2}
+.walletHelp{font-size:8px;color:#777a84;margin-top:9px;line-height:1.45}
+
+
+/* V7 progression + culture cosmetics */
+.v7grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.upgradeCard{border:1px solid var(--line);border-radius:12px;padding:12px;background:#0d0e11}.upgradeCard b{font-size:10px}.upgradeCard small{display:block;color:var(--muted);font-size:8px;margin:4px 0 9px}.crewBox{border:1px solid #303139;background:linear-gradient(145deg,#101116,#0b0c0f);border-radius:14px;padding:14px}.crewTag{font-family:monospace;letter-spacing:.15em;color:#d7d7da}.v7input{width:100%;box-sizing:border-box;background:#0b0c0f;border:1px solid #303139;border-radius:9px;padding:10px;color:white;margin:5px 0;font-size:10px}
+.frame-pslscan:after{border-color:#d9f7ff;box-shadow:0 0 0 1px #79dfff88,inset 0 0 18px #7ee5ff33}.frame-facecard:after{border:2px solid #eee;box-shadow:inset 0 0 0 3px #111,0 0 18px #ffffff55}.frame-unfrauded:after{border-color:#ff405d;box-shadow:0 0 18px #ff405d77}.frame-outmog:after{border-color:#ffdf6b;box-shadow:0 0 22px #ffb80088}.frame-appeal:after{border-color:#fff;box-shadow:0 0 10px #fff,0 0 28px #c7a8ff}
+.bg-thirds{background-image:linear-gradient(90deg,transparent 32.8%,#ffffff24 33%,#ffffff24 33.5%,transparent 33.7%,transparent 66%,#ffffff24 66.2%,#ffffff24 66.7%,transparent 67%),linear-gradient(180deg,#17181d,#0b0c0f)!important}.bg-editorial{background:linear-gradient(125deg,#ececec 0 2%,#15161a 2% 48%,#31323a 48% 49%,#0d0e11 49%)!important}.bg-morphlab{background:repeating-linear-gradient(0deg,#0d1114 0 15px,#21343a 16px),linear-gradient(90deg,#0c0d10,#18242a)!important}.bg-pslboard{background:radial-gradient(circle at 50% 40%,#213a42,#0b0c0f 62%)!important}.bg-afterhours{background:linear-gradient(135deg,#090a0d,#28111c 50%,#10131a)!important}
+
+
+/* V7.2 — ENGAGEMENT / FIRST MINUTES */
+.goalCard{position:relative;overflow:hidden;background:linear-gradient(135deg,#171217,#101116 62%,#161117);border-color:#3b2d34}
+.goalCard:before{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-70px;top:-90px;background:#d78da61c;filter:blur(8px);pointer-events:none}
+.goalTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-end}.goalRank{font-size:25px;font-weight:950;letter-spacing:.04em}.goalNeed{font-size:9px;color:var(--accent2);text-align:right}.goalCopy{font-size:9px;color:var(--muted);margin-top:7px}
+.battleNow{position:relative;margin-top:12px;overflow:hidden;box-shadow:0 0 0 0 #d78da633;animation:battlePulse 2.6s ease-in-out infinite}.battleNow:after{content:"";position:absolute;inset:-80% -30%;background:linear-gradient(110deg,transparent 42%,#fff5 50%,transparent 58%);transform:translateX(-55%);animation:shine 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes battlePulse{0%,100%{box-shadow:0 0 0 0 #d78da600}50%{box-shadow:0 0 0 7px #d78da614}}@keyframes shine{0%,65%{transform:translateX(-65%)}90%,100%{transform:translateX(65%)}}
+.firstLoop{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.loopStep{padding:9px 6px;border:1px solid #25262c;border-radius:10px;background:#0d0e11;text-align:center;font-size:8px;color:var(--muted)}.loopStep b{display:block;color:#fff;font-size:10px;margin-bottom:3px}.loopStep.done{border-color:#375044;color:#8bc7a2}.loopStep.done b{color:#8bc7a2}
+.emptyAction{border:1px dashed #35363e;border-radius:12px;padding:16px;text-align:center;margin-top:10px}.emptyAction b{font-size:11px}.emptyAction p{margin:5px 0 10px}.emptyAction button{width:auto;min-width:150px}
+.tapCircle{position:relative;overflow:visible}.tapCircle img{width:82%;height:82%;object-fit:contain;border-radius:50%;pointer-events:none;filter:drop-shadow(0 0 16px #d78da62b)}.tapCircle.tapHit{animation:tapHit .18s ease-out}@keyframes tapHit{50%{transform:scale(.91)}100%{transform:scale(1)}}
+.tapFloat{position:fixed;z-index:120;pointer-events:none;font-size:16px;font-weight:950;color:var(--accent2);text-shadow:0 0 14px #d78da6;animation:tapFloat .72s ease-out forwards}@keyframes tapFloat{to{transform:translateY(-52px) scale(1.15);opacity:0}}
+.nav button{transition:transform .16s,color .16s}.nav button:active{transform:scale(.88)}.nav button.active{transform:translateY(-2px)}
+#profileHero{overflow:hidden;position:relative;min-height:0!important;padding:18px!important}#profileHero #bigAvatar{position:relative!important;inset:auto!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;max-width:112px!important;max-height:112px!important;margin:0 auto!important;overflow:hidden!important;border-radius:50%!important;contain:paint}#profileHero #bigAvatar img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:inherit!important}#profileHero #bigAvatar.cosmeticFrame:after{inset:3px!important;border-radius:50%!important}
+.resultFlash{position:fixed;inset:0;z-index:110;display:grid;place-items:center;background:#09090bf2;opacity:0;pointer-events:none;transition:.2s}.resultFlash.show{opacity:1;pointer-events:auto}.resultInner{text-align:center;padding:28px}.resultKicker{font-size:9px;letter-spacing:.2em;color:var(--muted)}.resultScore{font-size:54px;font-weight:950;margin:8px 0}.resultRank{font-size:18px;color:var(--accent2)}
+@media(prefers-reduced-motion:reduce){.battleNow,.battleNow:after{animation:none}.nav button{transition:none}}
+
+
+/* V7.3 — RETENTION / GAME FEEL */
+.view.active{animation:viewIn .22s ease-out}
+@keyframes viewIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dailyRun{background:linear-gradient(145deg,#111216,#0d0e11);border-color:#302a30}
+.runTop{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.runScore{font-size:22px;font-weight:950;letter-spacing:.03em}
+.runLabel{font-size:8px;color:var(--muted);letter-spacing:.12em}
+.missionList{display:grid;gap:7px;margin-top:11px}
+.missionRow{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:10px;border:1px solid #25262c;border-radius:11px;background:#0c0d10}
+.missionRow.done{border-color:#355040;background:#0d1410}
+.missionIcon{width:26px;height:26px;border-radius:8px;background:#17181d;display:grid;place-items:center;font-size:12px}
+.missionRow.done .missionIcon{background:#183022}
+.missionText b{display:block;font-size:9px}.missionText small{display:block;font-size:7px;color:var(--muted);margin-top:2px}
+.missionProgress{font-size:8px;font-weight:900;color:var(--accent2);white-space:nowrap}
+.missionRow.done .missionProgress{color:#8bc7a2}
+.missionFoot{display:flex;justify-content:space-between;gap:10px;margin-top:9px;font-size:8px;color:var(--muted)}
+.streak{color:#f0bd79;font-weight:900}
+.statusPunch{display:flex;align-items:center;gap:8px;margin-top:9px;padding:9px 10px;border-radius:10px;background:#0d0e11;border:1px solid #24252b}
+.statusPunch b{font-size:9px}.statusPunch span{margin-left:auto;font-size:8px;color:var(--accent2)}
+.profileActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.shareBtn{border-color:#543745!important;background:#171116!important}
+.introOverlay{position:fixed;inset:0;z-index:130;background:#07080af4;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.18s}
+.introOverlay.show{opacity:1;pointer-events:auto}
+.introCore{text-align:center;width:min(360px,88vw);position:relative;overflow:hidden;padding:34px 22px;border:1px solid #363039;border-radius:22px;background:linear-gradient(180deg,#141116,#0b0c0f)}
+.introCore:before{content:"";position:absolute;left:0;right:0;height:1px;background:#f3d7e3;box-shadow:0 0 16px #d78da6;animation:scanLine 1.05s ease-in-out infinite}
+@keyframes scanLine{0%{top:18%;opacity:0}20%{opacity:1}80%{opacity:1}100%{top:82%;opacity:0}}
+.introKicker{font-size:8px;letter-spacing:.22em;color:var(--muted)}
+.introTitle{font-size:28px;font-weight:950;margin-top:8px}
+.introSub{font-size:9px;color:var(--accent2);margin-top:6px}
+.introDots{display:flex;justify-content:center;gap:5px;margin-top:16px}.introDots i{width:5px;height:5px;border-radius:50%;background:#4b4148;animation:dotPulse 1s infinite}.introDots i:nth-child(2){animation-delay:.14s}.introDots i:nth-child(3){animation-delay:.28s}
+@keyframes dotPulse{50%{background:#f0d7df;transform:scale(1.35)}}
+.resultInner{width:min(390px,92vw);border:1px solid #343038;background:linear-gradient(180deg,#141116,#0b0c0f);border-radius:24px;padding:28px 20px;box-shadow:0 28px 80px #000}
+.resultHeadline{font-size:11px;font-weight:950;letter-spacing:.16em;margin-top:8px}
+.resultActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.rankUpBurst{animation:rankBurst .7s ease-out}
+@keyframes rankBurst{0%{transform:scale(.78);filter:blur(4px)}65%{transform:scale(1.08);filter:none}100%{transform:scale(1)}}
+.tapCircle:after{content:"";position:absolute;inset:-10px;border-radius:50%;border:1px solid #d78da61f;pointer-events:none}
+.tapCircle.tapHit:after{animation:tapRing .42s ease-out}
+@keyframes tapRing{to{inset:-30px;opacity:0}}
+.energyPulse i{transition:width .35s cubic-bezier(.2,.8,.2,1)}
+@media(prefers-reduced-motion:reduce){.view.active,.introCore:before,.introDots i,.rankUpBurst,.tapCircle.tapHit:after{animation:none}}
+
+
+.npcBadge{display:inline-flex;align-items:center;margin-left:5px;padding:2px 5px;border:1px solid rgba(255,255,255,.20);border-radius:999px;font-size:7px;line-height:1;letter-spacing:.08em;color:#bbb;background:rgba(255,255,255,.05);vertical-align:2px}.npcBadge:before{content:"◆";font-size:5px;margin-right:3px}.npcNote{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:.08em;margin-top:3px}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div id="onboard" class="onboard">
+  <div class="sheet">
+    <div class="kicker">WELCOME TO MOGG BATTLE</div>
+    <h2 style="margin:5px 0 0;font-size:20px">Создай профиль</h2>
+    <p class="muted">Сначала выбери пол и загрузи фото для баттлов. Рейтинг начинается с 0.</p>
+
+    <div id="genderStep">
+      <div class="genderGrid">
+        <button class="gender" data-g="male">MALE<br><small class="muted">MTN · CHAD · GIGACHAD</small></button>
+        <button class="gender f" data-g="female">FEMALE<br><small class="muted">MTB · STACY · TRUE STACY</small></button>
+      </div>
+    </div>
+
+    <div id="photoStep" style="display:none">
+      <div id="preview" class="preview"><img id="previewImg" alt=""></div>
+      <label class="fileLabel">
+        <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp">
+        Нажми, чтобы выбрать фото<br><span style="font-size:8px">JPEG / PNG / WEBP · до 5 MB</span>
+      </label>
+      <button id="uploadBtn" class="primary pink" style="margin-top:10px" disabled>СОХРАНИТЬ ФОТО</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="rankModal" class="rankModal">
+  <div class="rankSheet">
+    <div class="sectionHead">
+      <div><div class="kicker">MOGG RANK LADDER</div><h2 style="margin-top:4px">Твой путь</h2></div>
+      <button id="closeRankModal" class="modalClose" type="button">ЗАКРЫТЬ</button>
+    </div>
+    <div class="rankCurrent">
+      <small>CURRENT</small>
+      <b id="modalRank">SUB3</b>
+      <small><span id="modalScore">0</span> MOGG · до следующего ранга <span id="modalNeed">700</span></small>
+      <div class="progress"><i id="modalRankProgress"></i></div>
+    </div>
+    <div id="rankLadder" class="ladder"></div>
+  </div>
+</div>
+
+<main class="app">
+  <header class="top">
+    <div><div class="kicker">LOOKSMAXING COMPETITION</div><div class="logo">MOGG <span>BATTLE</span></div></div>
+    <div class="scorePill"><b id="score">0</b> MOGG</div>
+  </header>
+
+  <section id="homeView" class="view active">
+    <div class="card goalCard">
+      <div class="kicker">YOUR NEXT RANK</div>
+      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 SCORE TO GO</div></div>
+      <div class="progress"><i id="nextRankProgress"></i></div>
+      <div class="goalCopy" id="goalCopy">Win Ranked battles to raise your MOGG Score.</div>
+      <button id="battleNowBtn" class="primary pink battleNow">⚔ BATTLE NOW</button>
+      <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
+    </div>
+
+    <div class="card dailyRun">
+      <div class="runTop">
+        <div><div class="kicker">DAILY RUN</div><div class="runScore" id="dailyDone">0 / 4</div></div>
+        <div style="text-align:right"><div class="runLabel">STREAK</div><div class="streak" id="dailyStreak">🔥 1 DAY</div></div>
+      </div>
+      <div id="dailyMissions" class="missionList"></div>
+      <div class="missionFoot"><span>Progress saves on this device today.</span><span id="dailyReset">RESET · —</span></div>
+    </div>
+
+    <div class="card" id="homeProfileCard">
+      <div class="profileTop">
+        <div class="avatar" id="avatar">?</div>
+        <div class="profileInfo">
+          <div class="name" id="name">Loading...</div>
+          <div class="user" id="username">@telegram</div><div id="homeTitle"></div>
+          <div class="rankRow"><button id="rank" class="rank rankBtn" type="button">SUB3</button><span class="timer"><b id="homeScore">0</b> MOGG</span></div>
+          <div class="progress"><i id="rankProgress"></i></div>
+        </div>
+      </div>
+      <div class="miniStats">
+        <div class="stat"><b id="seasonPeak">0</b><small>SEASON PEAK</small></div>
+        <div class="stat"><b id="allPeak">0</b><small>ALL-TIME</small></div>
+        <div class="stat"><b id="battleCount">0</b><small>BATTLES</small></div>
+        <div class="stat"><b id="pointsBalance">0</b><small>POINTS</small></div>
+      </div>
+      <div class="statusPunch"><b id="statusPunchText">BUILD YOUR STATUS</b><span id="statusPunchNext">RANK UP →</span></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Live battles</h2><span><span class="liveDot">●</span> LIVE</span></div>
+      <div class="feedTabs">
+        <button class="tab active" data-feed="all">LIVE</button>
+        <button class="tab" data-feed="promotion">PROMOTION</button>
+        <button class="tab" data-feed="high">HIGH ELO</button>
+      </div>
+      <div id="homeFeed"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Daily in app</h2><span>SPONSOR</span></div>
+      <div class="sponsor">
+        <b style="font-size:11px">@mbgbchannel</b>
+        <p class="muted">Подпишись на официальный канал и забери усиленный дневной бонус.</p>
+        <div class="row">
+          <button class="secondary" id="openChannel" style="width:auto">ОТКРЫТЬ КАНАЛ</button>
+          <span class="rewardValue">+150 POINTS</span>
+        </div>
+      </div>
+      <button id="appDailyBtn" class="primary pink">ПРОВЕРИТЬ И ЗАБРАТЬ</button>
+    </div>
+  </section>
+
+  <section id="battleView" class="view">
+    <div class="card matchBox">
+      <div class="matchIcon">⚔</div>
+      <h2 style="font-size:18px;margin:0 0 6px">CHOOSE BATTLE MODE</h2>
+      <p class="muted">Выбери рейтинговый бой или играй без ограничений.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
+        <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">MOGG SCORE · NO COOLDOWN</span></button>
+        <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">NO SCORE · UNLIMITED</span></button>
+      </div>
+      <div id="matchStatus" class="muted" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Active</h2><span id="feedCount">0 BATTLES</span></div>
+      <div id="battleFeed"></div>
+    </div>
+  </section>
+
+  <section id="tapView" class="view">
+    <div class="card">
+      <div class="row"><span class="kicker">ENERGY</span><span class="timer"><b id="energy">100</b>/<span id="maxEnergy">100</span></span></div>
+      <div class="tapZone">
+        <button id="tapBtn" class="tapCircle"><img src="mogg-token.png" alt="MOGG"></button>
+        <div class="tapText">TAP TO ASCEND</div>
+        <div class="muted">1 tap = +1 POINT · энергия восстанавливается</div>
+      </div>
+      <div class="progress energyPulse"><i id="energyProgress"></i></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>MOGG Points</h2><span><b id="tapPoints">0</b> PTS</span></div>
+      <p class="muted">Тапай → копи Points → покупай оформление, эффекты и коллекционные предметы. MOGG Score растёт в Ranked и немного за оценки чужих баттлов.</p>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><div><div class="kicker">ACCOUNT PROGRESSION</div><h2 style="margin-top:4px">MOGG LAB</h2></div><span class="timer">UPGRADES</span></div>
+      <div class="v7grid" id="upgradeGrid">
+        <div class="upgradeCard"><b>TAP POWER</b><small>Больше Points за tap.</small><button class="secondary upg" data-kind="tap">UPGRADE</button></div>
+        <div class="upgradeCard"><b>ENERGY</b><small>+10 max Energy.</small><button class="secondary upg" data-kind="energy">UPGRADE</button></div>
+        <div class="upgradeCard"><b>RECOVERY</b><small>Ускоряет восстановление Energy.</small><button class="secondary upg" data-kind="recovery">UPGRADE</button></div>
+        <div class="upgradeCard"><b>IDLE</b><small>Приносит Points офлайн · до 12 часов.</small><button class="secondary upg" data-kind="idle">UPGRADE</button></div>
+      </div>
+      <button id="prestigeBtn" class="primary" style="margin-top:10px">CLAIM DAILY PRESTIGE</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
+      <p class="muted">Альтернативный медленный путь. Чем выше Score, тем слабее Prestige; после 2900 он не даёт Score.</p>
+    </div>
+    <div class="card crewBox">
+      <div class="kicker">SOCIAL</div><h2 style="margin:4px 0 8px">CREW</h2><div id="crewContent"></div>
+    </div>
+  </section>
+
+  <section id="rewardsView" class="view">
+    <div class="card">
+      <div class="sectionHead"><h2>Ascension Drop</h2><span>RANK REWARD</span></div>
+      <div class="chest">
+        <div class="chestIcon">◇</div>
+        <b id="dropTitle">Первый drop после SUB5</b>
+        <p class="muted" id="dropText">6 milestone Drops: SUB5, LTN/LTB, MTN/MTB, HTN/HTB, CHAD/STACY и GIGACHAD/TRUE STACY.</p>
+        <div class="dropMeta"><span id="dropAvailable">0 AVAILABLE</span><span id="dropTier">RANK LOCKED</span></div>
+        <div id="dropRates" class="dropRates"></div>
+        <button id="dropBtn" class="secondary" style="margin-top:10px">OPEN ASCENSION DROP</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Cosmetics Shop</h2><span><b id="shopPoints">0</b> PTS</span></div>
+      <p class="muted">Points — за игру. ⭐ Stars — премиальная фиксированная косметика. TOP/Season предметы нельзя купить.</p>
+      <div id="shopFilters" class="shopFilters"></div>
+      <div id="shop" class="inventory"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Inventory</h2><span id="inventoryCount">0 ITEMS</span></div>
+      <div id="inventory" class="inventory"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Referrals</h2><span>INVITE</span></div>
+      <p class="muted">Приглашай друзей. Награда начисляется после того, как приглашённый выберет пол и загрузит фото.</p>
+      <div class="refbox">Открой бота и используй команду <b>/ref</b> — он выдаст персональную ссылку.</div>
+    </div>
+  </section>
+
+  <section id="profileView" class="view">
+    <div class="card" id="profileHero" style="text-align:center">
+      <div class="avatar" id="bigAvatar" style="width:92px;height:92px;margin:auto;font-size:32px">?</div>
+      <h2 id="bigName" style="font-size:19px;margin:10px 0 2px">Player</h2>
+      <div class="user" id="bigUsername">@telegram</div><div id="profileTitle"></div>
+      <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> MOGG</span></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionHead"><h2>Profile</h2><span>SYNCED</span></div>
+      <div class="reward"><div><b>Photo</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
+      <div class="reward"><div><b>Gender</b><small>Влияет только на названия рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
+      <div class="reward"><div><b>Referrals</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
+      <div class="profileActions">
+        <button id="changePhotoBtn" class="secondary">СМЕНИТЬ ФОТО</button>
+        <button id="shareProfileBtn" class="secondary shareBtn">↗ SHARE STATUS</button>
+      </div>
+    </div>
+
+    <div class="walletCard">
+      <div class="walletTop">
+        <div class="walletMeta">
+          <b>TON WALLET</b>
+          <div id="walletAddress" class="walletAddress">Не подключён</div>
+        </div>
+        <div id="ton-connect"></div>
+      </div>
+      <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
+      <div class="walletNet">TON TESTNET · ON-CHAIN BALANCE</div><div class="walletHelp">Если кошелёк пишет, что регион не поддерживается, это ограничение выбранного wallet/provider или VPN, а не MOGG BATTLE. Попробуй отключить VPN или выбрать другой TON Connect wallet.</div>
+    </div>
+  </section>
+</main>
+
+
+<div id="caseModal" class="caseModal">
+  <div id="caseSheet" class="caseSheet">
+    <div class="caseTitle">ASCENSION DROP · VERIFIED RANK REWARD</div>
+    <div class="caseWindow"><div id="caseReel" class="caseReel"></div></div>
+    <div id="caseReveal" class="caseReveal"><div id="caseRarity" class="rarity"></div><h2 id="caseName">UNLOCKED</h2><div id="caseKind" class="muted"></div></div>
+    <button id="caseClose" class="primary pink caseClose">ADD TO COLLECTION</button>
+  </div>
+</div>
+
+<div id="introOverlay" class="introOverlay"><div class="introCore"><div class="introKicker">MOGG ANALYSIS</div><div id="introTitle" class="introTitle">SCANNING</div><div id="introSub" class="introSub">MATCH FOUND · CALIBRATING FACES</div><div class="introDots"><i></i><i></i><i></i></div></div></div>
+
+<div id="resultFlash" class="resultFlash"><div class="resultInner"><div class="resultKicker">MOGG BATTLE</div><div id="resultHeadline" class="resultHeadline">SCORE UPDATED</div><div id="resultScore" class="resultScore">+0</div><div id="resultRank" class="resultRank">SCORE UPDATED</div><div class="resultActions"><button id="resultClose" class="secondary">CONTINUE</button><button id="resultShare" class="secondary shareBtn">↗ SHARE</button></div></div></div>
+
+<nav class="nav">
+  <button class="active" data-view="home">⌂<small>HOME</small></button>
+  <button data-view="battle">⚔<small>BATTLES</small></button>
+  <button data-view="tap">///<small>TAP</small></button>
+  <button data-view="rewards">◇<small>REWARDS</small></button>
+  <button data-view="profile">○<small>PROFILE</small></button>
+</nav>
+
+<script>
+const API="https://zjznmcydpngceiblqtwj.supabase.co/functions/v1/player-api";
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+
+const TONCONNECT_MANIFEST="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/tonconnect-manifest.json";
+const MOGG_JETTON_MASTER="kQAvdrlh1cc-Kt-9jfHQwgg2yexvrgKJ8MYFHf4Kr73fLJ7r";
+const TONCENTER_TESTNET="https://testnet.toncenter.com/api/v3";
+let tonConnectUi=null;
+
+function shortAddress(a){
+  if(!a)return "Не подключён";
+  return a.length>16 ? a.slice(0,8)+"…"+a.slice(-6) : a;
+}
+
+async function loadChainMogg(owner){
+  const out=$("chainMogg");
+  if(!owner){out.textContent="—";return}
+  out.textContent="...";
+  try{
+    const url=TONCENTER_TESTNET+"/jetton/wallets?owner_address="+encodeURIComponent(owner)
+      +"&jetton_address="+encodeURIComponent(MOGG_JETTON_MASTER)+"&limit=1";
+    const r=await fetch(url);
+    if(!r.ok)throw new Error("balance_fetch_failed");
+    const d=await r.json();
+    const w=d.jetton_wallets?.[0];
+    const nano=w?.balance ? BigInt(w.balance) : 0n;
+    const whole=nano/1000000000n;
+    const frac=(nano%1000000000n).toString().padStart(9,"0").replace(/0+$/,"");
+    out.textContent=frac ? whole.toString()+"."+frac.slice(0,4) : whole.toString();
+  }catch(e){
+    console.error(e);
+    out.textContent="—";
+  }
+}
+
+function initTonConnect(){
+  try{
+    if(!window.TON_CONNECT_UI?.TonConnectUI)return;
+    tonConnectUi=new TON_CONNECT_UI.TonConnectUI({
+      manifestUrl:TONCONNECT_MANIFEST,
+      buttonRootId:"ton-connect",
+      restoreConnection:true,
+      uiPreferences:{theme:"DARK"}
+    });
+    tonConnectUi.onStatusChange(wallet=>{
+      const address=wallet?.account?.address||"";
+      $("walletAddress").textContent=shortAddress(address);
+      $("walletAddress").title=address;
+      loadChainMogg(address);
+    });
+    const current=tonConnectUi.account?.address||"";
+    if(current){
+      $("walletAddress").textContent=shortAddress(current);
+      $("walletAddress").title=current;
+      loadChainMogg(current);
+    }
+  }catch(e){console.error("TON Connect:",e)}
+}
+
+
+let state={player:null,feed:[],inventory:[],shop:[],sponsors:[],drops:null,crew:null,gender:null,photoFile:null,shopFilter:"all"};
+const $=id=>document.getElementById(id);
+const toast=m=>{const e=$("toast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1500)};
+const DAY_KEY=()=>new Date().toISOString().slice(0,10);
+function loadDaily(){
+  const key="mogg_daily_"+DAY_KEY();
+  try{
+    const raw=JSON.parse(localStorage.getItem(key)||"{}");
+    return {taps:Number(raw.taps||0),votes:Number(raw.votes||0),quick:Number(raw.quick||0),scoreGain:Number(raw.scoreGain||0)};
+  }catch{return {taps:0,votes:0,quick:0,scoreGain:0}}
+}
+function saveDaily(d){try{localStorage.setItem("mogg_daily_"+DAY_KEY(),JSON.stringify(d))}catch{}}
+let daily=loadDaily();
+function bumpDaily(kind,amount=1){daily[kind]=Math.max(0,Number(daily[kind]||0)+Number(amount||0));saveDaily(daily);renderDaily()}
+function nextMidnightLabel(){
+  const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);
+  const mins=Math.max(0,Math.ceil((m-n)/60000)),h=Math.floor(mins/60),mm=mins%60;
+  return `${h}H ${String(mm).padStart(2,"0")}M`;
+}
+function renderDaily(){
+  const missions=[
+    {icon:"⚡",name:"TAP SESSION",sub:"Build Points and momentum",key:"taps",goal:50},
+    {icon:"◉",name:"RATE THE FEED",sub:"Vote on other players",key:"votes",goal:3},
+    {icon:"⚔",name:"QUICK WARM-UP",sub:"Start Quick battles",key:"quick",goal:2},
+    {icon:"▲",name:"GAIN SCORE",sub:"Move your Ranked Score today",key:"scoreGain",goal:20},
+  ];
+  const done=missions.filter(m=>Number(daily[m.key]||0)>=m.goal).length;
+  $("dailyDone").textContent=done+" / "+missions.length;
+  $("dailyMissions").innerHTML=missions.map(m=>{
+    const v=Math.min(m.goal,Number(daily[m.key]||0)),ok=v>=m.goal;
+    return `<div class="missionRow ${ok?"done":""}"><div class="missionIcon">${ok?"✓":m.icon}</div><div class="missionText"><b>${m.name}</b><small>${m.sub}</small></div><div class="missionProgress">${v} / ${m.goal}</div></div>`;
+  }).join("");
+  $("dailyReset").textContent="RESET · "+nextMidnightLabel();
+  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+  const ykey="mogg_daily_"+yesterday.toISOString().slice(0,10);
+  let streak=1;try{const y=JSON.parse(localStorage.getItem(ykey)||"{}");if(Object.values(y).some(v=>Number(v)>0))streak=2}catch{}
+  $("dailyStreak").textContent="🔥 "+streak+" DAY"+(streak===1?"":"S");
+}
+
+
+const maleRanks=["SUB3","SUB5","LLTN","LTN","HLTN","LMTN","MTN","HMTN","LHTN","HTN","HHTN","CHAD","GIGACHAD"];
+const femaleRanks=["SUB3","SUB5","LLTB","LTB","HLTB","LMTB","MTB","HMTB","LHTB","HTB","HHTB","STACY","TRUE STACY"];
+const cuts=[0,700,900,1100,1300,1500,1700,1900,2100,2350,2600,2900,3300];
+
+function rankIndex(score){let i=0;cuts.forEach((x,n)=>{if(score>=x)i=n});return i}
+function ranksFor(g){return g==="female"?["SUB3","SUB5","LLTB","LTB","HLTB","LMTB","MTB","HMTB","LHTB","HTB","HHTB","STACY","TRUE STACY"]:["SUB3","SUB5","LLTN","LTN","HLTN","LMTN","MTN","HMTN","LHTN","HTN","HHTN","CHAD","GIGACHAD"]}
+function rankFor(score,g){return (g==="female"?femaleRanks:maleRanks)[rankIndex(score)]}
+function nextCut(score){const i=rankIndex(score);return cuts[Math.min(i+1,cuts.length-1)]||3300}
+function initials(name){return (name||"?").trim().charAt(0).toUpperCase()||"?"}
+
+async function call(action,extra={}){
+  if(!tg?.initData)throw new Error("open_in_telegram");
+  const r=await fetch(API,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({initData:tg.initData,action,...extra})
+  });
+  const d=await r.json();
+  if(!r.ok||d.error){const e=new Error(d.error||"request_failed");e.data=d;throw e}
+  return d;
+}
+
+function avatarInto(el,p){
+  if(p?.profile_photo_url)el.innerHTML=`<img src="${p.profile_photo_url}" alt="">`;
+  else el.textContent=initials(p?.first_name||p?.username);
+}
+
+
+function visualKey(c){return String(c?.visual_key||c?.code||"").replace(/^(frame_|bg_|title_|intro_|victory_|score_|name_|react_)/,"").replace(/_/g,"")}
+function frameClass(c){return c?`cosmeticFrame frame-${visualKey(c)}`:""}
+function bgClass(c){return c?`bg-${visualKey(c)}`:""}
+function nameClass(c){return c?`name-${visualKey(c)}`:""}
+function scoreClass(c){return c?`score-${visualKey(c)}`:""}
+function clearCosmeticClasses(el,prefix){[...el.classList].filter(x=>x.startsWith(prefix)).forEach(x=>el.classList.remove(x))}
+function previewHtml(c){
+  const k=visualKey(c),kind=c.kind||"";
+  if(kind==="frame")return `<div class="previewAvatar cosmeticFrame frame-${k}"></div>`;
+  if(kind==="profile_bg")return `<div class="previewBg bg-${k}"></div><div class="previewAvatar"></div>`;
+  if(kind==="title")return `<div class="previewTitle">${c.name}</div>`;
+  if(kind==="score_style")return `<div class="previewTitle score-${k}">3,300 MOGG</div>`;
+  if(kind==="name_style")return `<div class="previewTitle name-${k}">GIGACHAD</div>`;
+  if(kind==="battle_intro")return `<div class="previewTitle">⚔ ${c.name}</div>`;
+  if(kind==="victory_card")return `<div class="previewTitle">WIN · ${c.name}</div>`;
+  if(kind==="reaction")return `<div style="font-size:28px">${k.includes("skull")?"☠":k.includes("crown")?"♛":k.includes("jaw")?"◆":"✦"}</div>`;
+  return `<div class="previewTitle">${c.name}</div>`;
+}
+function equippedIdForKind(kind){
+  const p=state.player||{};return ({frame:p.equipped_frame,profile_bg:p.equipped_background,title:p.equipped_title,battle_intro:p.equipped_battle_intro,victory_card:p.equipped_victory_card,score_style:p.equipped_score_style,name_style:p.equipped_name_style,reaction:p.equipped_reaction})[kind]||null;
+}
+function kindLabel(k){return ({frame:"FRAME",profile_bg:"BACKGROUND",title:"TITLE",battle_intro:"BATTLE INTRO",victory_card:"VICTORY",score_style:"SCORE STYLE",name_style:"NAME STYLE",reaction:"REACTION"})[k]||k}
+
+function renderPlayer(){
+  const p=state.player;if(!p)return;
+  const score=Number(p.mogg_score||0), name=p.first_name||p.username||"Player", rank=rankFor(score,p.gender), st=p.style||{};
+  $("score").textContent=score.toLocaleString();$("homeScore").textContent=score.toLocaleString();$("bigScore").textContent=score.toLocaleString();
+  $("name").textContent=name;$("bigName").textContent=name;
+  $("name").className="name"+(st.name_style?" "+nameClass(st.name_style):"");$("bigName").className=st.name_style?nameClass(st.name_style):"";
+  $("homeScore").className=st.score_style?scoreClass(st.score_style):"";$("bigScore").className=st.score_style?scoreClass(st.score_style):"";
+  $("username").textContent=p.username?"@"+p.username:"";$("bigUsername").textContent=p.username?"@"+p.username:"";
+  $("rank").textContent=rank;$("bigRank").textContent=rank;
+  $("rank").classList.toggle("f",p.gender==="female");$("bigRank").classList.toggle("f",p.gender==="female");
+  avatarInto($("avatar"),p);avatarInto($("bigAvatar"),p);
+  [$("avatar"),$("bigAvatar")].forEach(el=>{clearCosmeticClasses(el,"frame-");el.classList.add("avatar");el.classList.toggle("cosmeticFrame",!!st.frame);if(st.frame)el.classList.add("frame-"+visualKey(st.frame));});
+  [$("homeProfileCard"),$("profileHero")].forEach(el=>{clearCosmeticClasses(el,"bg-");if(st.profile_bg)el.classList.add("bg-"+visualKey(st.profile_bg));});
+  const titleHtml=st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:"";$("homeTitle").innerHTML=titleHtml;$("profileTitle").innerHTML=titleHtml;
+  $("seasonPeak").textContent=Number(p.season_peak||0).toLocaleString();$("allPeak").textContent=Number(p.all_time_peak||0).toLocaleString();$("battleCount").textContent=p.battles_played||0;
+  const pts=Number(p.mogg_points||0);$("pointsBalance").textContent=pts.toLocaleString();$("tapPoints").textContent=pts.toLocaleString();$("shopPoints").textContent=pts.toLocaleString();
+  $("energy").textContent=p.energy??100;$("maxEnergy").textContent=p.max_energy??100;$("energyProgress").style.width=Math.max(0,Math.min(100,(Number(p.energy||0)/Number(p.max_energy||100))*100))+"%";
+  const n=nextCut(score), base=cuts[rankIndex(score)]||0;const pct=n===base?100:Math.max(0,Math.min(100,(score-base)/(n-base)*100));$("rankProgress").style.width=pct+"%";
+  $("genderState").textContent=p.gender==="female"?"FEMALE":"MALE";$("photoState").textContent=p.profile_photo_url?"✓":"MISSING";$("refCount").textContent=p.referral_count||0;
+  const idx=rankIndex(score), nextIdx=Math.min(idx+1,cuts.length-1), atMax=idx>=cuts.length-1;
+  $("nextRankName").textContent=atMax?rank:ranksFor(p.gender)[nextIdx];
+  $("nextRankNeed").textContent=atMax?"MAX RANK":Math.max(0,cuts[nextIdx]-score).toLocaleString()+" SCORE TO GO";
+  $("nextRankProgress").style.width=pct+"%";
+  $("loopPhoto").classList.toggle("done",!!p.profile_photo_url);$("loopBattle").classList.toggle("done",Number(p.battles_played||0)>0);$("loopRank").classList.toggle("done",score>=700);
+  const statusNext=atMax?"ELITE STATUS":ranksFor(p.gender)[nextIdx];
+  $("statusPunchText").textContent=rank+" · "+score.toLocaleString()+" MOGG";
+  $("statusPunchNext").textContent=atMax?"MAX RANK":statusNext+" →";
+  renderDaily();
+}
+
+function nameOf(p){return p?.first_name||p?.username||"Player"}
+function battleHtml(b){
+  const a=b.a||{}, bb=b.b||{}, sa=a.style||{}, sb=bb.style||{};
+  const total=Number(b.votes_a||0)+Number(b.votes_b||0),pa=total?Math.round(Number(b.votes_a||0)/total*100):50,pb=100-pa;
+  const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
+  const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${p.is_npc?`<span class="npcBadge">NPC · SPARRING</span>`:""}${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small>${p.is_npc?`<div class="npcNote">official fictional sparring profile</div>`:""}</div>`;
+  return `<div class="battleCard" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div><div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">VOTE A</button><button class="vote" data-side="b" data-id="${b.id}">VOTE B</button></div></div>`;
+}
+
+function renderFeed(){
+  const valid=state.feed.filter(b=>new Date(b.ends_at).getTime()>Date.now());
+  $("feedCount").textContent=valid.length+" BATTLES";
+  $("homeFeed").innerHTML=valid.length?valid.slice(0,3).map(battleHtml).join(""):`<div class="emptyAction"><b>NO LIVE BATTLES</b><p class="muted">Запусти баттл и стань первым в ленте.</p><button class="secondary emptyBattleBtn">FIND OPPONENT</button></div>`;
+  $("battleFeed").innerHTML=valid.length?valid.map(battleHtml).join(""):`<div class="emptyAction"><b>READY TO MOG?</b><p class="muted">Ranked меняет Score. Quick — без риска.</p><button class="secondary emptyBattleBtn">START BATTLE</button></div>`;
+  document.querySelectorAll(".vote").forEach(btn=>btn.addEventListener("click",()=>vote(btn.dataset.id,btn.dataset.side,btn)));document.querySelectorAll(".emptyBattleBtn").forEach(btn=>btn.onclick=()=>openView("battle"));
+}
+
+function renderDropInfo(){
+  const d=state.drops||{}, rates=d.rates||{};const av=d.available_tiers||[];
+  const labels={1:"SUB5",3:(state.player?.gender==="female"?"LTB":"LTN"),6:(state.player?.gender==="female"?"MTB":"MTN"),9:(state.player?.gender==="female"?"HTB":"HTN"),11:(state.player?.gender==="female"?"STACY":"CHAD"),12:(state.player?.gender==="female"?"TRUE STACY":"GIGACHAD")};
+  const dropScore={1:700,3:1100,6:1700,9:2350,11:2900,12:3300}; const milestones=d.milestones||[1,3,6,9,11,12]; const future=milestones.find(t=>t>Number(d.current_tier||0)); const score=Number(state.player?.mogg_score||0);
+  $("dropAvailable").textContent=av.length+" AVAILABLE";$("dropTier").textContent=d.next_tier?(labels[d.next_tier]||"DROP"):(future?"NEXT · "+labels[future]:"ALL CLAIMED");
+  $("dropBtn").disabled=!d.next_tier;$("dropBtn").textContent=d.next_tier?`OPEN ${labels[d.next_tier]||"ASCENSION"} DROP`:(future?`NEXT DROP · ${labels[future]}`:"ALL ASCENSION DROPS CLAIMED");
+  $("dropTitle").textContent=d.next_tier?`Ascension Drop · ${labels[d.next_tier]}`:(future?`Следующий Ascension Drop · ${labels[future]} · ${Math.max(0,(dropScore[future]||0)-score).toLocaleString()} SCORE TO GO`:"Все 6 Ascension Drops получены");
+  $("dropRates").innerHTML=Object.entries(rates).filter(([k,v])=>Number(v)>0).map(([k,v])=>`<div class="rateChip"><b>${v}%</b><small>${k}</small></div>`).join("");
+}
+function renderShopFilters(){
+  const fs=[["all","ALL"],["frame","FRAMES"],["profile_bg","BACKGROUNDS"],["title","TITLES"],["effects","EFFECTS"],["exclusive","EXCLUSIVE"]];
+  $("shopFilters").innerHTML=fs.map(([k,n])=>`<button class="${state.shopFilter===k?"active":""}" data-filter="${k}">${n}</button>`).join("");
+  $("shopFilters").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.shopFilter=b.dataset.filter;renderShop()});
+}
+function renderV7(){
+  const ph=$("prestigeHint"),pb=$("prestigeBtn");if(ph&&pb&&state.player){const sc=Number(state.player.mogg_score||0);if(sc>=2900){ph.textContent="PvE Score cap reached · CHAD/STACY and above require competitive progression";pb.disabled=true}else{ph.textContent="Small daily Score boost · automatically weakens at higher ranks";pb.disabled=false}}
+  const p=state.player||{};document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`LV ${lvl} · ${cost.toLocaleString()} P`;});
+  const c=state.crew,box=$("crewContent");if(!box)return;
+  if(c)box.innerHTML=`<b class="crewTag">[${c.tag}] ${c.name}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
+  else box.innerHTML=`<p class="muted">Создай своё объединение за 5,000 Points. Crew battles/leaderboard — следующий слой.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
+  $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await load();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
+  $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await load();toast("+500 CREW")}catch(e){toast(String(e.message))}});
+}
+function renderShop(){
+  renderShopFilters();
+  const owned=new Set(state.inventory.map(x=>x.cosmetics?.id).filter(Boolean));
+  let items=state.shop||[];
+  if(state.shopFilter==="effects")items=items.filter(c=>["battle_intro","victory_card","score_style","name_style","reaction"].includes(c.kind));
+  else if(state.shopFilter==="exclusive")items=items.filter(c=>c.price_stars>0||["top1","top10"].includes(c.collection)||c.limited_total);
+  else if(state.shopFilter!=="all")items=items.filter(c=>c.kind===state.shopFilter);
+  $("shop").innerHTML=items.length?items.map(c=>{
+    const isOwned=owned.has(c.id),stars=Number(c.price_stars||0),points=Number(c.price_points||0),exclusive=["top1","top10"].includes(c.collection);
+    let action="";
+    if(isOwned)action=`<div class="ownedTag">OWNED ✓</div>`;
+    else if(stars>0)action=`<button class="secondary starBuy" data-id="${c.id}"><span class="priceStars">⭐ ${stars}</span></button>`;
+    else if(points>0&&c.is_purchasable)action=`<button class="secondary buy" data-id="${c.id}">BUY · ${points.toLocaleString()} PTS</button>`;
+    else if(exclusive)action=`<div class="exclusiveTag">${c.collection==="top1"?"TOP 1 ONLY":"TOP 10 ONLY"}</div>`;
+    else action=`<div class="exclusiveTag">RANK / EVENT DROP</div>`;
+    return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div>${action}</div>`;
+  }).join(""):`<p class="muted">В этой категории пока нет предметов.</p>`;
+  document.querySelectorAll(".buy").forEach(b=>b.onclick=()=>buyCosmetic(b.dataset.id));document.querySelectorAll(".starBuy").forEach(b=>b.onclick=()=>buyWithStars(b.dataset.id));
+}
+function renderInventory(){
+  $("inventoryCount").textContent=state.inventory.length+" ITEMS";
+  $("inventory").innerHTML=state.inventory.length?state.inventory.map(x=>{const c=x.cosmetics||{};const eq=equippedIdForKind(c.kind)===c.id;return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity||"item").toUpperCase()}</div><b>${c.name||"Cosmetic"}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">SOURCE · ${String(x.source||"drop").toUpperCase()}</div><button class="secondary equip ${eq?"isEquipped":""}" data-id="${c.id}">${eq?"UNEQUIP":"EQUIP"}</button></div>`}).join(""):`<p class="muted">Пока пусто. Первый Ascension Drop откроется после SUB5.</p>`;
+  document.querySelectorAll(".equip").forEach(b=>b.onclick=()=>equip(b.dataset.id));
+}
+
+function openRankModal(){
+  const p=state.player;if(!p)return;
+  const score=Number(p.mogg_score||0);
+  const idx=rankIndex(score);
+  const ranks=p.gender==="female"?femaleRanks:maleRanks;
+  const current=ranks[idx];
+  const next=idx<cuts.length-1?cuts[idx+1]:null;
+  const base=cuts[idx]||0;
+  const pct=next===null?100:Math.max(0,Math.min(100,(score-base)/(next-base)*100));
+
+  $("modalRank").textContent=current;
+  $("modalScore").textContent=score.toLocaleString();
+  $("modalNeed").textContent=next===null?"MAX":Math.max(0,next-score).toLocaleString();
+  $("modalRankProgress").style.width=pct+"%";
+
+  $("rankLadder").innerHTML=ranks.map((r,i)=>{
+    const low=cuts[i];
+    const high=i<cuts.length-1?cuts[i+1]-1:"∞";
+    return `<div class="ladderRow ${i===idx?"current":""}">
+      <div class="dot"></div>
+      <div><b>${r}</b><br><span>${low.toLocaleString()}${high==="∞"?"+":" – "+Number(high).toLocaleString()} MOGG</span></div>
+      <span>${i===idx?"YOU":i<idx?"✓":""}</span>
+    </div>`;
+  }).join("");
+
+  $("rankModal").classList.add("show");
+}
+
+async function init(){
+  try{
+    const d=await call("me");
+    state.player=d.player;state.feed=d.feed||[];state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];state.drops=d.drops||null;state.crew=d.crew||null;
+    renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
+
+    const start=tg?.initDataUnsafe?.start_param||"";
+    if(start.startsWith("ref_")){
+      const id=Number(start.slice(4));if(id)call("apply_ref",{ref_telegram_id:id}).catch(()=>{});
+    }
+
+    if(!state.player.gender || !state.player.profile_photo_url){
+      $("onboard").classList.add("show");
+      if(state.player.gender){state.gender=state.player.gender;$("genderStep").style.display="none";$("photoStep").style.display="block"}
+    }
+  }catch(e){console.error(e);toast("Ошибка подключения")}
+}
+
+document.querySelectorAll(".gender").forEach(b=>b.addEventListener("click",async()=>{
+  try{
+    state.gender=b.dataset.g;
+    const d=await call("set_gender",{gender:state.gender});
+    state.player=d.player;renderPlayer();
+    $("genderStep").style.display="none";$("photoStep").style.display="block";
+  }catch(e){toast("Не удалось сохранить")}
+}));
+
+$("photoInput").addEventListener("change",()=>{
+  const f=$("photoInput").files?.[0];state.photoFile=f||null;
+  $("uploadBtn").disabled=!f;
+  if(f){$("preview").style.display="block";$("previewImg").src=URL.createObjectURL(f)}
+});
+
+async function uploadPhoto(){
+  const f=state.photoFile;if(!f)return;
+  if(f.size>5*1024*1024)return toast("Фото больше 5 MB");
+  $("uploadBtn").disabled=true;$("uploadBtn").textContent="UPLOADING...";
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    try{
+      const base64=String(reader.result).split(",")[1];
+      const d=await call("upload_photo",{mime:f.type,base64});
+      state.player=d.player;renderPlayer();
+      $("onboard").classList.remove("show");
+      $("uploadBtn").textContent="СОХРАНИТЬ ФОТО";
+      toast("Профиль готов ✓");
+    }catch(e){toast("Ошибка загрузки");$("uploadBtn").disabled=false;$("uploadBtn").textContent="СОХРАНИТЬ ФОТО"}
+  };
+  reader.readAsDataURL(f);
+}
+$("uploadBtn").addEventListener("click",uploadPhoto);
+$("changePhotoBtn").addEventListener("click",()=>{state.photoFile=null;$("photoStep").style.display="block";$("genderStep").style.display="none";$("onboard").classList.add("show")});
+
+$("tapBtn").addEventListener("click",async(e)=>{
+  const btn=$("tapBtn");btn.classList.remove("tapHit");void btn.offsetWidth;btn.classList.add("tapHit");
+  try{const before=Number(state.player?.mogg_points||0);const d=await call("tap");state.player=d.player;bumpDaily("taps",1);renderPlayer();const gain=Math.max(1,Number(d.player?.mogg_points||0)-before);const r=btn.getBoundingClientRect(),f=document.createElement("div");f.className="tapFloat";f.textContent="+"+gain+" P";f.style.left=(r.left+r.width/2-18)+"px";f.style.top=(r.top+r.height/2-8)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),750);tg?.HapticFeedback?.impactOccurred("light")}
+  catch(e){toast(String(e.message).includes("no_energy")?"Нет энергии":"Ошибка")}
+});
+
+$("openChannel").addEventListener("click",()=>{tg?.openTelegramLink?.("https://t.me/mbgbchannel")||window.open("https://t.me/mbgbchannel","_blank")});
+
+$("appDailyBtn").addEventListener("click",async()=>{
+  try{
+    const d=await call("app_daily");state.player=d.player;renderPlayer();$("appDailyBtn").disabled=true;$("appDailyBtn").textContent="CLAIMED";toast("+"+d.reward+" POINTS");
+  }catch(e){
+    if(e.message==="subscription_required")toast("Сначала подпишись на @"+(e.data?.channel||"mbgbchannel"));
+    else if(String(e.message).includes("already"))toast("Уже получено сегодня");
+    else toast("Не удалось проверить подписку");
+  }
+});
+
+
+function showBattleIntro(mode){
+  const style=state.player?.style?.battle_intro;
+  $("introTitle").textContent=style?.name|| (mode==="ranked"?"RANKED LOCK":"QUICK SCAN");
+  $("introSub").textContent=mode==="ranked"?"MATCH FOUND · SCORE ON THE LINE":"MATCH FOUND · ZERO SCORE RISK";
+  $("introOverlay").classList.add("show");
+  tg?.HapticFeedback?.impactOccurred("medium");
+  return new Promise(resolve=>setTimeout(()=>{$("introOverlay").classList.remove("show");resolve()},1150));
+}
+
+async function startMatchmaking(mode){
+  const ranked=$("rankedBtn"),quick=$("quickBtn");
+  ranked.disabled=true;quick.disabled=true;
+  $("matchStatus").textContent=mode==="ranked"?"Ищем рейтингового соперника...":"Ищем быстрый баттл...";
+  try{
+    const d=await call("open_matchmaking",{mode});
+    if(mode==="quick")bumpDaily("quick",1);
+    if(d.matched){
+      $("matchStatus").textContent=mode==="ranked"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
+      toast(mode==="ranked"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
+      await showBattleIntro(mode);
+      openView("battle");
+      await refresh();
+    }else{
+      $("matchStatus").textContent=mode==="ranked"?"Ты в Ranked очереди. Ждём соперника.":"Ты в Quick очереди. Ждём соперника.";
+      toast("Поиск запущен");
+    }
+  }catch(e){
+    $("matchStatus").textContent="";
+    if(e.message==="photo_required"||e.message==="onboarding_required")toast("Сначала загрузи фото и заверши профиль");
+    else { console.error("matchmaking",e); toast("Ошибка поиска: "+String(e.message||"unknown")); }
+  }finally{ranked.disabled=false;quick.disabled=false}
+}
+$("rankedBtn").addEventListener("click",()=>startMatchmaking("ranked"));
+document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{try{await call('buy_upgrade',{kind:b.dataset.kind});await load();toast('UPGRADED')}catch(e){toast(String(e.message))}}));
+$("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("PRESTIGE CLAIMED")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше Score нужно подтверждать в competitive progression");else toast(String(e.message))}});
+$("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
+
+async function vote(id,side,btn){
+  try{
+    const d=await call("vote",{battle_id:id,side});
+    document.querySelectorAll(`[data-id="${id}"]`).forEach(x=>x.disabled=true);
+    btn.classList.add("selected");bumpDaily("votes",1);toast("Голос принят ✓");await refresh();
+  }catch(e){
+    if(e.message==="already_voted")toast("Ты уже голосовал");
+    else if(e.message==="fighters_cannot_vote")toast("Участники не голосуют за себя");
+    else toast("Баттл закрыт");
+  }
+}
+
+async function buyCosmetic(id){
+  try{
+    const d=await call("buy_cosmetic",{cosmetic_id:id});
+    state.player=d.player;renderPlayer();toast("Предмет куплен ✓");await refresh();
+  }catch(e){
+    if(String(e.message).includes("not_enough_points"))toast("Недостаточно Points");
+    else if(String(e.message).includes("already_owned"))toast("Уже в коллекции");
+    else toast("Не удалось купить");
+  }
+}
+
+async function equip(id){
+  try{const d=await call("equip",{cosmetic_id:id});toast(d.equipped?"Оформление применено ✓":"Оформление снято");await refresh()}
+  catch(e){console.error(e);toast("Не удалось применить: "+String(e.message||"error"))}
+}
+async function buyWithStars(id){
+  try{
+    if(!tg?.openInvoice)return toast("Покупка за Stars доступна внутри Telegram");
+    const d=await call("create_star_invoice",{cosmetic_id:id});
+    tg.openInvoice(d.invoice_url,async status=>{if(status==="paid"){toast("Оплата прошла ⭐");setTimeout(refresh,1000)}else if(status==="failed")toast("Платёж не прошёл")});
+  }catch(e){if(e.message==="already_owned")toast("Уже в коллекции");else if(e.message==="sold_out")toast("Предмет распродан");else toast("Не удалось открыть Stars оплату")}
+}
+
+function animateDrop(result){
+  const pool=(state.shop||[]).filter(c=>c.drop_enabled&&!['stars','top1','top10'].includes(c.collection));const reel=[];
+  for(let i=0;i<34;i++)reel.push(pool[Math.floor(Math.random()*pool.length)]||result);reel[29]=result;
+  $("caseReel").innerHTML=reel.map(c=>`<div class="caseItem"><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><small>${kindLabel(c.kind)}</small></div>`).join("");
+  $("caseReveal").classList.remove("show");$("caseClose").classList.remove("show");$("caseSheet").className="caseSheet";$("caseModal").classList.add("show");
+  const itemW=100,target=29*itemW;$("caseReel").style.transition="none";$("caseReel").style.transform="translateX(0px)";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{$("caseReel").style.transition="transform 4.6s cubic-bezier(.08,.68,.09,1)";$("caseReel").style.transform=`translateX(-${target}px)`;}));
+  setTimeout(()=>{tg?.HapticFeedback?.notificationOccurred("success");$("caseRarity").className="rarity "+result.rarity;$("caseRarity").textContent=String(result.rarity).toUpperCase();$("caseName").textContent=result.name;$("caseKind").textContent=kindLabel(result.kind)+" · permanently added to Inventory";$("caseReveal").classList.add("show");$("caseClose").classList.add("show");$("caseSheet").classList.add(result.rarity);},4750);
+}
+$("caseClose").onclick=()=>{$("caseModal").classList.remove("show");refresh()};
+$("dropBtn").addEventListener("click",async()=>{
+  $("dropBtn").disabled=true;
+  try{const d=await call("open_drop");const c=d.drop?.cosmetics;if(!c)throw new Error("drop_missing");animateDrop(c)}
+  catch(e){if(e.message==="no_drop_available")toast("Первый drop после SUB5");else if(e.message==="all_rank_drops_claimed")toast("Все доступные drops уже получены");else toast("Drop error: "+String(e.message||"unknown"));$("dropBtn").disabled=false}
+});
+
+
+let lastKnownScore=null;
+let lastResultShare="";
+function maybeShowScoreResult(newScore,gender){
+  if(lastKnownScore===null){lastKnownScore=newScore;return}
+  const oldScore=lastKnownScore,diff=newScore-oldScore;
+  if(diff!==0){
+    const oldRank=rankFor(oldScore,gender),newRank=rankFor(newScore,gender),rankUp=oldRank!==newRank&&diff>0;
+    if(diff>0)bumpDaily("scoreGain",diff);
+    $("resultHeadline").textContent=rankUp?"RANK UP":"SCORE UPDATED";
+    $("resultScore").textContent=(diff>0?"+":"")+diff;
+    $("resultScore").style.color=diff>0?"var(--good)":"var(--bad)";
+    $("resultRank").textContent=rankUp?oldRank+" → "+newRank:newRank+" · "+newScore.toLocaleString()+" MOGG";
+    $("resultScore").classList.toggle("rankUpBurst",rankUp);
+    lastResultShare=`${rankUp?"RANK UP · "+newRank:"MOGG BATTLE · "+(diff>0?"+":"")+diff+" SCORE"}\n${newScore.toLocaleString()} MOGG`;
+    $("resultFlash").classList.add("show");
+    tg?.HapticFeedback?.notificationOccurred(diff>0?"success":"warning");
+  }
+  lastKnownScore=newScore;
+}
+$("resultClose").onclick=()=>$("resultFlash").classList.remove("show");
+
+async function refresh(){
+  try{
+    const d=await call("me");state.player=d.player;maybeShowScoreResult(Number(d.player?.mogg_score||0),d.player?.gender);state.feed=d.feed||[];state.inventory=d.inventory||[];state.shop=d.shop||[];state.drops=d.drops||null;state.crew=d.crew||null;renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
+  }catch(e){}
+}
+
+
+function shareTelegram(text){
+  const url="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/";
+  const share="https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(text);
+  if(tg?.openTelegramLink)tg.openTelegramLink(share);else window.open(share,"_blank");
+}
+function profileShareText(){
+  const p=state.player||{},score=Number(p.mogg_score||0),rank=rankFor(score,p.gender);
+  return `${p.first_name||p.username||"Player"} · ${rank}\n${score.toLocaleString()} MOGG\nThink you can outmog me?`;
+}
+
+function openView(view){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
+document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>openView(btn.dataset.view)));
+$("battleNowBtn").onclick=()=>{tg?.HapticFeedback?.impactOccurred("medium");openView("battle")};
+$("shareProfileBtn").onclick=()=>shareTelegram(profileShareText());
+$("resultShare").onclick=()=>shareTelegram(lastResultShare||profileShareText());
+
+
+$("rank").addEventListener("click",openRankModal);
+$("bigRank").addEventListener("click",openRankModal);
+$("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove("show"));
+$("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
+
+setInterval(refresh,15000);
+initTonConnect();
+init();
+</script>
+</body>
+</html>
