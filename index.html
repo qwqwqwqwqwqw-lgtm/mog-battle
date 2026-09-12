@@ -519,7 +519,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
         <div id="ton-connect"></div>
       </div>
       <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
-      <div class="walletNet">TON TESTNET · ON-CHAIN BALANCE</div><div class="walletHelp">Если кошелёк пишет, что регион не поддерживается, это ограничение выбранного wallet/provider или VPN, а не MOGG BATTLE. Попробуй отключить VPN или выбрать другой TON Connect wallet.</div>
+      <div class="walletNet">TON MAINNET · ON-CHAIN BALANCE</div><div id="walletHelp" class="walletHelp">Здесь отображается настоящий MOGG на подключённом кошельке в сети TON.</div>
     </div>
   </section>
 </main>
@@ -567,34 +567,55 @@ const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
 
 const TONCONNECT_MANIFEST="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/tonconnect-manifest.json";
-const MOGG_JETTON_MASTER="kQAvdrlh1cc-Kt-9jfHQwgg2yexvrgKJ8MYFHf4Kr73fLJ7r";
-const TONCENTER_TESTNET="https://testnet.toncenter.com/api/v3";
+const MOGG_JETTON_MASTER="EQD4-rV0gBrtGdPA6rr1Zuq54RjwvUFEoUXCGbGz2a-mCiJE";
+const TONCENTER_MAINNET="https://toncenter.com/api/v3";
+const MOGG_CHAIN="-239";
+const MOGG_WALLET_HELP="Здесь отображается настоящий MOGG на подключённом кошельке в сети TON.";
 let tonConnectUi=null;
+let chainBalanceRequest=0;
 
 function shortAddress(a){
   if(!a)return "Не подключён";
   return a.length>16 ? a.slice(0,8)+"…"+a.slice(-6) : a;
 }
 
-async function loadChainMogg(owner){
-  const out=$("chainMogg");
-  if(!owner){out.textContent="—";return}
+async function loadChainMogg(owner,chain){
+  const requestId=++chainBalanceRequest;
+  const out=$("chainMogg"),help=$("walletHelp");
+  out.textContent="—";
+  help.textContent=MOGG_WALLET_HELP;
+  if(!owner)return;
+  if(String(chain)!==MOGG_CHAIN){
+    help.textContent="Подключён тестовый кошелёк или сеть не определена. Переключи кошелёк на TON Mainnet и подключи его заново.";
+    return;
+  }
   out.textContent="...";
   try{
-    const url=TONCENTER_TESTNET+"/jetton/wallets?owner_address="+encodeURIComponent(owner)
+    const url=TONCENTER_MAINNET+"/jetton/wallets?owner_address="+encodeURIComponent(owner)
       +"&jetton_address="+encodeURIComponent(MOGG_JETTON_MASTER)+"&limit=1";
     const r=await fetch(url);
     if(!r.ok)throw new Error("balance_fetch_failed");
     const d=await r.json();
-    const w=d.jetton_wallets?.[0];
-    const nano=w?.balance ? BigInt(w.balance) : 0n;
+    if(!Array.isArray(d.jetton_wallets))throw new Error("invalid_balance_response");
+    const w=d.jetton_wallets[0];
+    const nano=w ? BigInt(w.balance) : 0n;
     const whole=nano/1000000000n;
-    const frac=(nano%1000000000n).toString().padStart(9,"0").replace(/0+$/,"");
-    out.textContent=frac ? whole.toString()+"."+frac.slice(0,4) : whole.toString();
+    const frac=(nano%1000000000n).toString().padStart(9,"0").slice(0,4).replace(/0+$/,"");
+    if(requestId!==chainBalanceRequest)return;
+    out.textContent=frac ? whole.toString()+"."+frac : whole.toString();
   }catch(e){
+    if(requestId!==chainBalanceRequest)return;
     console.error(e);
     out.textContent="—";
+    help.textContent="Не удалось загрузить баланс MOGG. Попробуй переподключить кошелёк чуть позже.";
   }
+}
+
+function updateMoggWallet(account){
+  const address=account?.address||"";
+  $("walletAddress").textContent=shortAddress(address);
+  $("walletAddress").title=address;
+  return loadChainMogg(address,account?.chain);
 }
 
 function initTonConnect(){
@@ -606,18 +627,8 @@ function initTonConnect(){
       restoreConnection:true,
       uiPreferences:{theme:"DARK"}
     });
-    tonConnectUi.onStatusChange(wallet=>{
-      const address=wallet?.account?.address||"";
-      $("walletAddress").textContent=shortAddress(address);
-      $("walletAddress").title=address;
-      loadChainMogg(address);
-    });
-    const current=tonConnectUi.account?.address||"";
-    if(current){
-      $("walletAddress").textContent=shortAddress(current);
-      $("walletAddress").title=current;
-      loadChainMogg(current);
-    }
+    tonConnectUi.onStatusChange(wallet=>updateMoggWallet(wallet?.account));
+    updateMoggWallet(tonConnectUi.account);
   }catch(e){console.error("TON Connect:",e)}
 }
 
