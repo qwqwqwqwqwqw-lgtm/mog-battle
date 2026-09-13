@@ -6,29 +6,6 @@
 <meta name="theme-color" content="#09090b">
 <title>MOGG BATTLE · V7.3</title>
 <script src="https://telegram.org/js/telegram-web-app.js">
-// === V8 UI ===
-function v8MarkOwnBattle(){
-  const me=String(state?.player?.telegram_id||state?.player?.id||"");
-  if(!me)return;
-  document.querySelectorAll(".battle-card,.battleCard").forEach(el=>el.classList.remove("v8-own-battle"));
-  (state?.feed||[]).forEach((b,i)=>{
-    const a=String(b.player1_id||b.player_a_id||b.left_player_id||b.fighter1_id||"");
-    const c=String(b.player2_id||b.player_b_id||b.right_player_id||b.fighter2_id||"");
-    if((a===me||c===me)&&String(b.status||"active").toLowerCase()!=="finished"){
-      const cards=document.querySelectorAll(".battle-card,.battleCard");
-      if(cards[i])cards[i].classList.add("v8-own-battle");
-    }
-  });
-}
-const v8Observer=new MutationObserver(()=>v8MarkOwnBattle());
-document.addEventListener("DOMContentLoaded",()=>{
-  const feed=document.querySelector("#battleFeed,#feed,.battleFeed");
-  if(feed)v8Observer.observe(feed,{childList:true,subtree:true});
-  document.getElementById("guideBtn")?.addEventListener("click",()=>document.getElementById("guideModal")?.classList.add("show"));
-  document.getElementById("guideClose")?.addEventListener("click",()=>document.getElementById("guideModal")?.classList.remove("show"));
-  document.getElementById("guideModal")?.addEventListener("click",e=>{if(e.target.id==="guideModal")e.currentTarget.classList.remove("show")});
-});
-
 </script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
 <style>
@@ -755,16 +732,20 @@ function renderPlayer(){
 }
 
 function nameOf(p){return p?.first_name||p?.username||"Player"}
+function isOwnLiveBattle(b){
+  const me=state.player?.id;
+  return !!me && (b.player_a===me || b.player_b===me) && b.status==="active" && new Date(b.ends_at).getTime()>Date.now();
+}
 function battleHtml(b){
   const a=b.a||{}, bb=b.b||{}, sa=a.style||{}, sb=bb.style||{};
   const total=Number(b.votes_a||0)+Number(b.votes_b||0),pa=total?Math.round(Number(b.votes_a||0)/total*100):50,pb=100-pa;
   const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
   const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div><div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">VOTE A</button><button class="vote" data-side="b" data-id="${b.id}">VOTE B</button></div></div>`;
+  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div><div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">VOTE A</button><button class="vote" data-side="b" data-id="${b.id}">VOTE B</button></div></div>`;
 }
 
 function renderFeed(){
-  const valid=state.feed.filter(b=>new Date(b.ends_at).getTime()>Date.now());
+  const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now()).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)));
   $("feedCount").textContent=valid.length+" BATTLES";
   $("homeFeed").innerHTML=valid.length?valid.slice(0,3).map(battleHtml).join(""):`<div class="emptyAction"><b>NO LIVE BATTLES</b><p class="muted">Запусти баттл и стань первым в ленте.</p><button class="secondary emptyBattleBtn">FIND OPPONENT</button></div>`;
   $("battleFeed").innerHTML=valid.length?valid.map(battleHtml).join(""):`<div class="emptyAction"><b>READY TO MOG?</b><p class="muted">Ranked меняет Score. Quick — без риска.</p><button class="secondary emptyBattleBtn">START BATTLE</button></div>`;
@@ -791,8 +772,8 @@ function renderV7(){
   const c=state.crew,box=$("crewContent");if(!box)return;
   if(c)box.innerHTML=`<b class="crewTag">[${c.tag}] ${c.name}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
   else box.innerHTML=`<p class="muted">Создай своё объединение за 5,000 Points. Crew battles/leaderboard — следующий слой.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
-  $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await load();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
-  $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await load();toast("+500 CREW")}catch(e){toast(String(e.message))}});
+  $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await refresh();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
+  $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await refresh();toast("+500 CREW")}catch(e){toast(String(e.message))}});
 }
 function renderShop(){
   renderShopFilters();
@@ -952,7 +933,7 @@ async function startMatchmaking(mode){
   }finally{ranked.disabled=false;quick.disabled=false}
 }
 $("rankedBtn").addEventListener("click",()=>startMatchmaking("ranked"));
-document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{try{await call('buy_upgrade',{kind:b.dataset.kind});await load();toast('UPGRADED')}catch(e){toast(String(e.message))}}));
+document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{try{await call('buy_upgrade',{kind:b.dataset.kind});await refresh();toast('UPGRADED')}catch(e){toast(String(e.message))}}));
 $("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("PRESTIGE CLAIMED")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше Score нужно подтверждать в competitive progression");else toast(String(e.message))}});
 $("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
 
@@ -1058,9 +1039,14 @@ $("bigRank").addEventListener("click",openRankModal);
 $("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove("show"));
 $("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
 
+$("guideBtn").addEventListener("click",()=>$("guideModal").classList.add("show"));
+$("guideClose").addEventListener("click",()=>$("guideModal").classList.remove("show"));
+$("guideModal").addEventListener("click",e=>{if(e.target===$("guideModal"))e.currentTarget.classList.remove("show")});
+
 setInterval(refresh,15000);
 initTonConnect();
 init();
 </script>
 </body>
 </html>
+
