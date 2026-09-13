@@ -282,6 +282,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 .bg-marble{background:repeating-linear-gradient(130deg,#090b10 0 23px,#20232d 25px,#b5bdcb 26px,#17191f 28px,#090b10 44px)!important}
 .bg-aurora{background:radial-gradient(ellipse at 15% 20%,#45e4bd99,transparent 55%),radial-gradient(ellipse at 85% 70%,#bc7cffaa,transparent 55%),#111525!important}
 .showroom{margin:12px 0;padding:16px;border-radius:15px;background:linear-gradient(120deg,#272b37,#19131e);border:1px solid #45414c}.showroom b{font-size:18px}.showroom p{line-height:1.6;font-size:10px;color:#b7b8c3}.tryOn{margin-top:8px!important;border-color:#66546c}.tryCard{padding:28px 16px;border-radius:16px;text-align:center;margin:15px 0;background-color:#12141b}.tryCard .previewAvatar{width:100px;height:100px;margin:12px auto}.tryCard .previewTitle{margin-top:16px}.shopDescription{font-size:9px;line-height:1.5;color:#b0b0bb;min-height:40px;margin-top:7px}.shopSheet{max-height:85vh;overflow:auto}
+.guideSheet{padding:22px;max-height:86vh;overflow:auto}.guideProgress{display:flex;gap:6px;margin:22px 0}.guideProgress i{height:4px;flex:1;border-radius:8px;background:#30313a}.guideProgress i.active{background:var(--accent)}.guideStep{font-size:10px;color:var(--accent);letter-spacing:.12em}.guideSheet h2{font-size:26px;line-height:1.15;margin:12px 0}.guideLead{font-size:13px;line-height:1.65;color:#c7c8cf}.guideDetail{padding:14px;margin-top:12px;border:1px solid #34343d;border-radius:12px;font-size:12px;line-height:1.65;color:#d2d3da}.guideDetail b{color:#fff}.guideControls{margin-top:22px}.guideControls button{flex:1}.guideControls button:disabled{opacity:.3}
 </style>
 </head>
 <body>
@@ -528,18 +529,13 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 <div id="resultFlash" class="resultFlash"><div class="resultInner"><div class="resultKicker">MOGG BATTLE</div><div id="resultHeadline" class="resultHeadline">SCORE UPDATED</div><div id="resultScore" class="resultScore">+0</div><div id="resultRank" class="resultRank">SCORE UPDATED</div><div class="resultActions"><button id="resultClose" class="secondary">CONTINUE</button><button id="resultShare" class="secondary shareBtn">↗ SHARE</button></div></div></div>
 
 
-<div id="guideModal" class="rankModal">
-  <div class="rankSheet" style="max-height:82vh;overflow:auto">
-    <div class="kicker">MOGG BATTLE</div><h2>КАК ИГРАТЬ</h2>
-    <div class="card"><b>⚔ RANKED</b><p class="muted">Побеждай в боях и поднимай MOGG Score. Поражение может отнять Score.</p></div>
-    <div class="card"><b>⚡ QUICK</b><p class="muted">Бои без риска для Score. Играй сколько хочешь.</p></div>
-    <div class="card"><b>👁 VOTING</b><p class="muted">Голосуй за других игроков. Один пользователь — один голос.</p></div>
-    <div class="card"><b>/// TAP + MOGG FARM</b><p class="muted">Тапай ради Points → улучшай Tap Power, Energy, Recovery и Idle → используй Prestige. Ranked остаётся главным путём к топ-рангам.</p></div>
-    <div class="card"><b>◇ ASCENSION DROPS</b><p class="muted">Достигай ключевых рангов и открывай косметические награды.</p></div>
-    <div class="card"><b>CREW</b><p class="muted">Создавай Crew, объединяйся с игроками и развивай команду.</p></div>
-    <div class="card"><b>MOGG TOKEN</b><p class="muted">Отдельный on-chain токен экосистемы. MOGG Score купить нельзя.</p></div>
-    <button id="guideClose" class="primary pink">ПОНЯТНО</button>
-  </div>
+<div id="guideModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+ <div class="rankSheet guideSheet"><div class="row"><span class="kicker">MOGG BATTLE · БЫСТРЫЙ СТАРТ</span><button id="guideClose" class="modalClose" aria-label="Закрыть обучение">Закрыть</button></div>
+ <div id="guideProgress" class="guideProgress" aria-label="Прогресс обучения"></div>
+ <div id="guideBody" aria-live="polite"></div>
+ <div class="row guideControls"><button id="guideBack" class="secondary">Назад</button><button id="guideNext" class="primary pink">Далее</button></div>
+ <button id="guideFarm" class="secondary" style="margin-top:9px;display:none">Сначала изучить ферму</button>
+ </div>
 </div>
 
 <nav class="nav">
@@ -1093,9 +1089,39 @@ $("bigRank").addEventListener("click",openRankModal);
 $("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove("show"));
 $("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
 
-$("guideBtn").addEventListener("click",()=>$("guideModal").classList.add("show"));
-$("guideClose").addEventListener("click",()=>$("guideModal").classList.remove("show"));
-$("guideModal").addEventListener("click",e=>{if(e.target===$("guideModal"))e.currentTarget.classList.remove("show")});
+const guideSteps=[
+ {tag:'01 · ТВОЯ ЦЕЛЬ',title:'Создай образ. Выходи на баттл.',lead:'MOGG BATTLE — игра с фото-баттлами, голосованием и развитием профиля.',detail:'<b>Начни с фото</b><br>Заверши профиль и загрузи своё фото. Затем попробуй Quick, чтобы познакомиться с боем без изменения рейтинга.'},
+ {tag:'02 · ПЕРВЫЙ БОЙ',title:'Quick для старта. Ranked для рейтинга.',lead:'В баттле сравниваются два профиля. Голоса определяют результат.',detail:'<b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свой активный бой ищи первым в ленте. В игре также есть NPC-соперники.'},
+ {tag:'03 · ПРОГРЕСС',title:'Развивай свою ферму.',lead:'Тапы, задания и голосование дают игровые Points. Вкладывай их в улучшения MOGG FARM.',detail:'<b>Автоферма</b> производит Points каждые 10 минут и учитывает до 12 часов офлайн.<br>Улучшай добычу, запас энергии и восстановление. Цена и эффект следующего уровня видны до покупки.'},
+ {tag:'04 · ВАЛЮТЫ И СТИЛЬ',title:'Три разных показателя.',lead:'Рейтинг, игровые ресурсы и токен выполняют разные задачи.',detail:'<b>Score</b> — рейтинг и ранги.<br><b>Points</b> — улучшения и игровые покупки.<br><b>MOGG в кошельке</b> — отдельный токен в TON; автоматического обмена Points в MOGG сейчас нет.<br><br>Косметику можно примерить бесплатно. Предметы за Stars оформляются через платёжное окно Telegram.'},
+ {tag:'05 · ГОТОВО К СТАРТУ',title:'Твой первый шаг — Quick.',lead:'Профиль → фото → Quick → результат. После первого боя попробуй Ranked или развивай ферму.',detail:'<b>Дальше</b><br>Голосуй в чужих боях, собирай Points и подбирай оформление профиля. Обучение можно снова открыть кнопкой «Как играть».'}
+];
+let guideIndex=0,guideReturnFocus=null;
+function renderGuide(){
+ const s=guideSteps[guideIndex];
+ $('guideProgress').innerHTML=guideSteps.map((_,i)=>`<i class="${i<=guideIndex?'active':''}"></i>`).join('');
+ $('guideProgress').setAttribute('aria-label',`Шаг ${guideIndex+1} из ${guideSteps.length}`);
+ $('guideBody').innerHTML=`<div class="guideStep">${s.tag}</div><h2 id="guideTitle">${s.title}</h2><p class="guideLead">${s.lead}</p><div class="guideDetail">${s.detail}</div>`;
+ $('guideBack').disabled=guideIndex===0;
+ $('guideNext').textContent=guideIndex===guideSteps.length-1?'Перейти к боям':'Далее';
+ $('guideFarm').style.display=guideIndex===guideSteps.length-1?'block':'none';
+}
+function closeGuide(){ $('guideModal').classList.remove('show');guideReturnFocus?.focus(); }
+$('guideBtn').onclick=()=>{guideReturnFocus=document.activeElement;guideIndex=0;renderGuide();$('guideModal').classList.add('show');$('guideClose').focus()};
+$('guideClose').onclick=closeGuide;
+$('guideBack').onclick=()=>{if(guideIndex>0){guideIndex--;renderGuide()}};
+$('guideNext').onclick=()=>{if(guideIndex<guideSteps.length-1){guideIndex++;renderGuide()}else{closeGuide();openView('battle')}};
+$('guideFarm').onclick=()=>{closeGuide();openView('tap')};
+$('guideModal').onclick=e=>{if(e.target===$('guideModal'))closeGuide()};
+$('guideModal').addEventListener('keydown',e=>{
+ if(e.key==='Escape'){e.preventDefault();closeGuide()}
+ if(e.key==='Tab'){
+  const buttons=[$('guideClose'),$('guideBack'),$('guideNext'),$('guideFarm')].filter(b=>!b.disabled&&b.style.display!=='none');
+  const first=buttons[0],last=buttons[buttons.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+ }
+});
 
 setInterval(refresh,15000);
 initTonConnect();
