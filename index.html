@@ -271,6 +271,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 .progress i{transition:width .65s cubic-bezier(.2,.8,.2,1)}
 @media(max-width:600px){.v8-own-battle{transform:none}.v8-own-battle img{transform:scale(1.07)}}
 
+.farmHero{margin:14px 0;padding:16px;border:1px solid #454035;border-radius:16px;background:radial-gradient(ellipse at top,#34302355,#101116 70%)}.farmStage{display:flex;gap:8px;align-items:end;justify-content:center;min-height:84px;margin:12px 0}.farmRig{width:46px;height:64px;border:1px solid #64624d;border-radius:8px;background:linear-gradient(135deg,#30332b,#151916);display:grid;place-items:center;font-size:22px;color:#cbe2ae;box-shadow:0 0 18px #b3ce6c12}.farmRig.off{opacity:.3;filter:grayscale(1)}.farmStats{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:8px}.farmStats b{display:block;font-size:23px}.farmStats small{font-size:8px;color:var(--muted)}.upg:disabled{opacity:.45;cursor:default}
 </style>
 </head>
 <body>
@@ -420,12 +421,13 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
     </div>
 
     <div class="card">
-      <div class="sectionHead"><div><div class="kicker">ACCOUNT PROGRESSION</div><h2 style="margin-top:4px">MOGG LAB</h2></div><span class="timer">UPGRADES</span></div>
+      <div class="sectionHead"><div><div class="kicker">BUILD YOUR EMPIRE</div><h2 style="margin-top:4px">MOGG FARM</h2></div><span class="timer">UPGRADES</span></div>
+      <div class="farmHero"><div class="kicker">ТВОЯ ФЕРМА</div><div id="farmStage" class="farmStage"></div><div class="farmStats"><div><b id="farmRate">0</b><small>POINTS / ЧАС</small></div><div><b id="farmBalance">0</b><small>ТВОИ POINTS</small></div></div><p id="farmHint" class="muted"></p><div class="progress"><i id="farmProgress"></i></div><p id="farmNext" class="muted"></p></div>
       <div class="v7grid" id="upgradeGrid">
-        <div class="upgradeCard"><b>TAP POWER</b><small>Больше Points за tap.</small><button class="secondary upg" data-kind="tap">UPGRADE</button></div>
-        <div class="upgradeCard"><b>ENERGY</b><small>+10 max Energy.</small><button class="secondary upg" data-kind="energy">UPGRADE</button></div>
-        <div class="upgradeCard"><b>RECOVERY</b><small>Ускоряет восстановление Energy.</small><button class="secondary upg" data-kind="recovery">UPGRADE</button></div>
-        <div class="upgradeCard"><b>IDLE</b><small>Приносит Points офлайн · до 12 часов.</small><button class="secondary upg" data-kind="idle">UPGRADE</button></div>
+        <div class="upgradeCard"><b>⚡ РУЧНОЙ ДОБЫТЧИК</b><small id="effect-tap"></small><button class="secondary upg" data-kind="tap">UPGRADE</button></div>
+        <div class="upgradeCard"><b>▣ АККУМУЛЯТОР</b><small id="effect-energy"></small><button class="secondary upg" data-kind="energy">UPGRADE</button></div>
+        <div class="upgradeCard"><b>↻ ГЕНЕРАТОР</b><small id="effect-recovery"></small><button class="secondary upg" data-kind="recovery">UPGRADE</button></div>
+        <div class="upgradeCard"><b>◈ АВТОФЕРМА</b><small id="effect-idle"></small><button class="secondary upg" data-kind="idle">UPGRADE</button></div>
       </div>
       <button id="prestigeBtn" class="primary" style="margin-top:10px">CLAIM DAILY PRESTIGE</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
       <p class="muted">Альтернативный медленный путь. Чем выше Score, тем слабее Prestige; после 2900 он не даёт Score.</p>
@@ -522,7 +524,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
     <div class="card"><b>⚔ RANKED</b><p class="muted">Побеждай в боях и поднимай MOGG Score. Поражение может отнять Score.</p></div>
     <div class="card"><b>⚡ QUICK</b><p class="muted">Бои без риска для Score. Играй сколько хочешь.</p></div>
     <div class="card"><b>👁 VOTING</b><p class="muted">Голосуй за других игроков. Один пользователь — один голос.</p></div>
-    <div class="card"><b>/// TAP + MOGG LAB</b><p class="muted">Тапай ради Points → улучшай Tap Power, Energy, Recovery и Idle → используй Prestige. Ranked остаётся главным путём к топ-рангам.</p></div>
+    <div class="card"><b>/// TAP + MOGG FARM</b><p class="muted">Тапай ради Points → улучшай Tap Power, Energy, Recovery и Idle → используй Prestige. Ranked остаётся главным путём к топ-рангам.</p></div>
     <div class="card"><b>◇ ASCENSION DROPS</b><p class="muted">Достигай ключевых рангов и открывай косметические награды.</p></div>
     <div class="card"><b>CREW</b><p class="muted">Создавай Crew, объединяйся с игроками и развивай команду.</p></div>
     <div class="card"><b>MOGG TOKEN</b><p class="muted">Отдельный on-chain токен экосистемы. MOGG Score купить нельзя.</p></div>
@@ -766,9 +768,29 @@ function renderShopFilters(){
   $("shopFilters").innerHTML=fs.map(([k,n])=>`<button class="${state.shopFilter===k?"active":""}" data-filter="${k}">${n}</button>`).join("");
   $("shopFilters").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.shopFilter=b.dataset.filter;renderShop()});
 }
+let upgradeBusy=false;
+function farmStats(p){
+  const level=Math.max(0,Number(p.idle_level||0));
+  return {level,rate:level*6,cap:level*72,cost:Math.floor(250*Math.pow(1.72,level))};
+}
+function renderFarm(p){
+  const f=farmStats(p),points=Number(p.mogg_points||0);
+  $("farmRate").textContent=f.rate.toLocaleString();
+  $("farmBalance").textContent=points.toLocaleString();
+  $("farmStage").innerHTML=Array.from({length:4},(_,i)=>`<div class="farmRig ${f.level>i?'':'off'}">◈</div>`).join("");
+  $("farmHint").textContent=f.level?`Автоферма LV ${f.level} · +${f.level} Points каждые 10 минут. Офлайн: до ${f.cap} Points за 12 часов. Доход зачисляется автоматически при обновлении.`:'Запусти автоферму за 250 Points. Заработай их тапами и заданиями — затем улучшай производство.';
+  $("farmProgress").style.width=Math.min(100,points/f.cost*100)+'%';
+  $("farmNext").textContent=points>=f.cost?'Хватает на следующий уровень автофермы →':`До следующего уровня автофермы: ${Math.max(0,f.cost-points).toLocaleString()} Points`;
+  $("effect-tap").textContent=`${Number(p.tap_power||1)} → ${Number(p.tap_power||1)+1} Points за tap`;
+  $("effect-energy").textContent=`Запас энергии: ${Number(p.max_energy||100)} → ${Number(p.max_energy||100)+10}`;
+  const rec=Number(p.recovery_level||0),secs=l=>Math.max(60,Math.round(180/(1+l*.1)));
+  $("effect-recovery").textContent=`1 энергия за ${secs(rec)} → ${secs(rec+1)} сек.`;
+  $("effect-idle").textContent=`${f.rate} → ${f.rate+6} Points / час · офлайн до 12 ч`;
+}
 function renderV7(){
   const ph=$("prestigeHint"),pb=$("prestigeBtn");if(ph&&pb&&state.player){const sc=Number(state.player.mogg_score||0);if(sc>=2900){ph.textContent="PvE Score cap reached · CHAD/STACY and above require competitive progression";pb.disabled=true}else{ph.textContent="Small daily Score boost · automatically weakens at higher ranks";pb.disabled=false}}
-  const p=state.player||{};document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`LV ${lvl} · ${cost.toLocaleString()} P`;});
+  const p=state.player||{};renderFarm(p);
+  document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`LV ${lvl} → ${lvl+1} · ${cost.toLocaleString()} P`;b.disabled=upgradeBusy||Number(p.mogg_points||0)<cost;});
   const c=state.crew,box=$("crewContent");if(!box)return;
   if(c)box.innerHTML=`<b class="crewTag">[${c.tag}] ${c.name}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
   else box.innerHTML=`<p class="muted">Создай своё объединение за 5,000 Points. Crew battles/leaderboard — следующий слой.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
@@ -933,7 +955,12 @@ async function startMatchmaking(mode){
   }finally{ranked.disabled=false;quick.disabled=false}
 }
 $("rankedBtn").addEventListener("click",()=>startMatchmaking("ranked"));
-document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{try{await call('buy_upgrade',{kind:b.dataset.kind});await refresh();toast('UPGRADED')}catch(e){toast(String(e.message))}}));
+document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{
+  if(upgradeBusy)return;upgradeBusy=true;renderV7();
+  try{const d=await call('buy_upgrade',{kind:b.dataset.kind});state.player=d.player;renderPlayer();renderV7();toast('Улучшение построено');}
+  catch(e){toast(e.message==='not_enough_points'?'Не хватает Points': 'Не удалось улучшить: '+String(e.message));}
+  finally{upgradeBusy=false;renderV7();}
+}));
 $("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("PRESTIGE CLAIMED")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше Score нужно подтверждать в competitive progression");else toast(String(e.message))}});
 $("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
 
