@@ -272,6 +272,16 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 @media(max-width:600px){.v8-own-battle{transform:none}.v8-own-battle img{transform:scale(1.07)}}
 
 .farmHero{margin:14px 0;padding:16px;border:1px solid #454035;border-radius:16px;background:radial-gradient(ellipse at top,#34302355,#101116 70%)}.farmStage{display:flex;gap:8px;align-items:end;justify-content:center;min-height:84px;margin:12px 0}.farmRig{width:46px;height:64px;border:1px solid #64624d;border-radius:8px;background:linear-gradient(135deg,#30332b,#151916);display:grid;place-items:center;font-size:22px;color:#cbe2ae;box-shadow:0 0 18px #b3ce6c12}.farmRig.off{opacity:.3;filter:grayscale(1)}.farmStats{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:8px}.farmStats b{display:block;font-size:23px}.farmStats small{font-size:8px;color:var(--muted)}.upg:disabled{opacity:.45;cursor:default}
+
+/* Cosmetics showroom */
+.itemPreview{height:116px}.previewAvatar{background:radial-gradient(circle at 50% 30%,#aaa 0 20%,transparent 21%),radial-gradient(ellipse at 50% 110%,#676b77 0 52%,transparent 53%),#20222a;width:60px;height:60px;background-size:cover;background-position:center}
+.frame-chromeface:after{border:3px solid #e8eef7;box-shadow:0 0 0 2px #454953,0 0 18px #d3e8ff66,inset 0 0 8px #fff8}
+.frame-prism:after{border:3px solid transparent;background:linear-gradient(130deg,#7cecff,#ed94ff,#fff3a6,#7cecff) border-box;mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);mask-composite:exclude;box-shadow:0 0 24px #da85f877}
+.frame-celestial:after{border:3px double #ffe6a1;box-shadow:0 0 0 3px #a17b3f44,0 0 23px #ffda7c99}
+.bg-contactsheet{background:repeating-linear-gradient(90deg,transparent 0 31%,#eee8 32% 33%),repeating-linear-gradient(0deg,#13151b 0 38px,#b5bccb 39px 41px)!important}
+.bg-marble{background:repeating-linear-gradient(130deg,#090b10 0 23px,#20232d 25px,#b5bdcb 26px,#17191f 28px,#090b10 44px)!important}
+.bg-aurora{background:radial-gradient(ellipse at 15% 20%,#45e4bd99,transparent 55%),radial-gradient(ellipse at 85% 70%,#bc7cffaa,transparent 55%),#111525!important}
+.showroom{margin:12px 0;padding:16px;border-radius:15px;background:linear-gradient(120deg,#272b37,#19131e);border:1px solid #45414c}.showroom b{font-size:18px}.showroom p{line-height:1.6;font-size:10px;color:#b7b8c3}.tryOn{margin-top:8px!important;border-color:#66546c}.tryCard{padding:28px 16px;border-radius:16px;text-align:center;margin:15px 0;background-color:#12141b}.tryCard .previewAvatar{width:100px;height:100px;margin:12px auto}.tryCard .previewTitle{margin-top:16px}.shopDescription{font-size:9px;line-height:1.5;color:#b0b0bb;min-height:40px;margin-top:7px}.shopSheet{max-height:85vh;overflow:auto}
 </style>
 </head>
 <body>
@@ -453,7 +463,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
     <div class="card">
       <div class="sectionHead"><h2>Cosmetics Shop</h2><span><b id="shopPoints">0</b> PTS</span></div>
       <p class="muted">Points — за игру. ⭐ Stars — премиальная фиксированная косметика. TOP/Season предметы нельзя купить.</p>
-      <div id="shopFilters" class="shopFilters"></div>
+      <div class="showroom"><div class="kicker">THE MOGG EDIT</div><b>Твоё фото. Твой стиль.</b><p>Хром, свет и журнальные текстуры. Примерь на себе — выбери образ для следующего баттла.</p></div><div id="shopFilters" class="shopFilters"></div>
       <div id="shop" class="inventory"></div>
     </div>
 
@@ -540,6 +550,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
   <button data-view="profile">○<small>PROFILE</small></button>
 </nav>
 
+<div id="tryModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="tryTitle"><div class="rankSheet shopSheet"><div class="row"><h2 id="tryTitle">Примерка</h2><button id="tryClose" class="modalClose">Закрыть</button></div><div id="tryPreview"></div><p id="tryDescription" class="muted"></p><p class="muted">Примерка бесплатна. Покупка — отдельной кнопкой в магазине.</p></div></div>
 <script>
 const API="https://zjznmcydpngceiblqtwj.supabase.co/functions/v1/player-api";
 const tg=window.Telegram?.WebApp;
@@ -686,13 +697,27 @@ function bgClass(c){return c?`bg-${visualKey(c)}`:""}
 function nameClass(c){return c?`name-${visualKey(c)}`:""}
 function scoreClass(c){return c?`score-${visualKey(c)}`:""}
 function clearCosmeticClasses(el,prefix){[...el.classList].filter(x=>x.startsWith(prefix)).forEach(x=>el.classList.remove(x))}
+function htmlText(value){return String(value??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));}
+function cosmeticDescription(c){
+  return ({frame:'Обрамляет твоё фото в профиле и на карточке баттла.',profile_bg:'Меняет фон профиля и оформление твоей стороны в баттле.',name_style:'Выделяет имя в профиле и баттлах.',title:'Подпись под твоим именем — часть твоего образа.',score_style:'Меняет оформление Score. Сам рейтинг остаётся прежним.',battle_intro:'Оформление вступления в бой.',victory_card:'Оформление карточки победы.',reaction:'Визуальная реакция.'})[c.kind]||'Косметический предмет.';
+}
+function showTryOn(id){
+  const c=state.shop.find(x=>x.id===id);if(!c)return;
+  $('tryTitle').textContent=c.name;
+  $('tryDescription').textContent=cosmeticDescription(c);
+  $('tryPreview').innerHTML=`<div class="tryCard">${previewHtml(c)}</div>`;
+  $('tryModal').classList.add('show');
+}
+$('tryClose').onclick=()=>$('tryModal').classList.remove('show');
+$('tryModal').onclick=e=>{if(e.target===$('tryModal'))$('tryModal').classList.remove('show')};
 function previewHtml(c){
   const k=visualKey(c),kind=c.kind||"";
-  if(kind==="frame")return `<div class="previewAvatar cosmeticFrame frame-${k}"></div>`;
-  if(kind==="profile_bg")return `<div class="previewBg bg-${k}"></div><div class="previewAvatar"></div>`;
+  const avatar=`<div class="previewAvatar">${state.player?.profile_photo_url?`<img src="${htmlText(state.player.profile_photo_url)}" alt="Твоё фото" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`:''}</div>`;
+  if(kind==="frame")return `<div class="cosmeticFrame frame-${k}" style="border-radius:50%;display:inline-block">${avatar}</div>`;
+  if(kind==="profile_bg")return `<div class="bg-${k}" style="padding:16px;width:100%;display:grid;place-items:center;border-radius:10px">${avatar}</div>`;
   if(kind==="title")return `<div class="previewTitle">${c.name}</div>`;
   if(kind==="score_style")return `<div class="previewTitle score-${k}">3,300 MOGG</div>`;
-  if(kind==="name_style")return `<div class="previewTitle name-${k}">GIGACHAD</div>`;
+  if(kind==="name_style")return `<div class="previewTitle name-${k}">${htmlText(state.player?.first_name||"YOUR NAME")}</div>`;
   if(kind==="battle_intro")return `<div class="previewTitle">⚔ ${c.name}</div>`;
   if(kind==="victory_card")return `<div class="previewTitle">WIN · ${c.name}</div>`;
   if(kind==="reaction")return `<div style="font-size:28px">${k.includes("skull")?"☠":k.includes("crown")?"♛":k.includes("jaw")?"◆":"✦"}</div>`;
@@ -804,6 +829,7 @@ function renderShop(){
   if(state.shopFilter==="effects")items=items.filter(c=>["battle_intro","victory_card","score_style","name_style","reaction"].includes(c.kind));
   else if(state.shopFilter==="exclusive")items=items.filter(c=>c.price_stars>0||["top1","top10"].includes(c.collection)||c.limited_total);
   else if(state.shopFilter!=="all")items=items.filter(c=>c.kind===state.shopFilter);
+  items=[...items].sort((a,b)=>Number(b.price_stars>0)-Number(a.price_stars>0)||Number(a.price_stars||0)-Number(b.price_stars||0));
   $("shop").innerHTML=items.length?items.map(c=>{
     const isOwned=owned.has(c.id),stars=Number(c.price_stars||0),points=Number(c.price_points||0),exclusive=["top1","top10"].includes(c.collection);
     let action="";
@@ -812,8 +838,9 @@ function renderShop(){
     else if(points>0&&c.is_purchasable)action=`<button class="secondary buy" data-id="${c.id}">BUY · ${points.toLocaleString()} PTS</button>`;
     else if(exclusive)action=`<div class="exclusiveTag">${c.collection==="top1"?"TOP 1 ONLY":"TOP 10 ONLY"}</div>`;
     else action=`<div class="exclusiveTag">RANK / EVENT DROP</div>`;
-    return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div>${action}</div>`;
+    return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div><div class="shopDescription">${cosmeticDescription(c)}</div><button class="secondary tryOn" data-id="${c.id}">ПРИМЕРИТЬ</button>${action}</div>`;
   }).join(""):`<p class="muted">В этой категории пока нет предметов.</p>`;
+  document.querySelectorAll(".tryOn").forEach(b=>b.onclick=()=>showTryOn(b.dataset.id));
   document.querySelectorAll(".buy").forEach(b=>b.onclick=()=>buyCosmetic(b.dataset.id));document.querySelectorAll(".starBuy").forEach(b=>b.onclick=()=>buyWithStars(b.dataset.id));
 }
 function renderInventory(){
