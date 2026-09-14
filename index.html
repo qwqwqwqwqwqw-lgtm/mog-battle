@@ -956,15 +956,25 @@ function showBattleIntro(mode){
 
 async function startMatchmaking(mode){
   const ranked=$("rankedBtn"),quick=$("quickBtn");
+  if(ranked.disabled||quick.disabled)return;
   ranked.disabled=true;quick.disabled=true;
   $("matchStatus").textContent=mode==="ranked"?"Ищем рейтингового соперника...":"Ищем быстрый баттл...";
   try{
     const d=await call("open_matchmaking",{mode});
-    if(mode==="quick")bumpDaily("quick",1);
+    const actualMode=d.battle?.mode||d.mode||mode;
+    if(d.existing){
+      const label=actualMode==='quick'?'QUICK':actualMode==='group'?'GROUP':'RANKED';
+      $("matchStatus").textContent=`У тебя уже идёт ${label}. Дождись завершения, чтобы начать новый бой.`;
+      toast(`Уже идёт ${label} — открываю текущий бой`);
+      if(d.battle){state.feed=[d.battle,...state.feed.filter(b=>b.id!==d.battle.id)];renderFeed();}
+      openView("battle");
+      return;
+    }
     if(d.matched){
-      $("matchStatus").textContent=mode==="ranked"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
-      toast(mode==="ranked"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
-      await showBattleIntro(mode);
+      if(actualMode==='quick')bumpDaily('quick',1);
+      $("matchStatus").textContent=actualMode!=="quick"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
+      toast(actualMode!=="quick"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
+      await showBattleIntro(actualMode);
       openView("battle");
       await refresh();
     }else{
