@@ -294,6 +294,8 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
 
 /* Portrait-first profile */
 #profileHero{display:grid;grid-template-columns:minmax(0,1fr);text-align:left!important;padding:0!important;border-radius:18px;overflow:hidden;background:#15191f}#profileHero #bigAvatar{width:100%!important;height:320px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;border:0;border-radius:0!important;margin:0!important;background:#232830}#profileHero #bigAvatar img{object-position:center 35%!important;transform:none!important;border-radius:0!important}#profileHero #bigAvatar.cosmeticFrame:after{border-radius:0!important}#profileHero h2,#profileHero .user,#profileHero #profileTitle,#profileHero .rankRow{margin-left:18px!important;margin-right:18px!important}#profileHero h2{font-size:26px!important;letter-spacing:-.03em}#profileHero .rankRow{justify-content:flex-start!important;margin-bottom:18px}.photoReviewCard{border:1px solid #475364;background:linear-gradient(150deg,#202934,#12171e)}.photoReviewCard h2{font-size:21px;margin:6px 0}.reviewConsent{display:flex;align-items:flex-start;gap:10px;font-size:11px;line-height:1.6;margin:16px 0;color:#c8cfd9}.reviewConsent input{width:18px;height:18px;flex-shrink:0;margin-top:2px}.reviewMetric{border-top:1px solid #394351;padding:12px 0}.reviewMetric b{font-size:13px}.reviewMetric p{font-size:11px;line-height:1.6;color:#bbc4d0;margin:5px 0}.reviewTips{padding-left:20px;font-size:12px;line-height:1.7}.reviewTips li{margin-bottom:8px}.facePhoto img,.avatar img{transform:none!important}.battleCard .voteBar button:disabled{opacity:.45}.goalCard{background:#151b23!important}.goalRank{font-size:28px}.matchIcon{display:none}.matchBox{text-align:left}.matchBox h2{font-size:24px!important}#guideBtn{margin-top:10px} 
+
+.ownBattleHint{padding:13px 0 2px;font-size:11px;line-height:1.5;color:#b9c4d2;border-top:1px solid #303a47;margin-top:12px}.battleTimer{font-variant-numeric:tabular-nums;font-weight:700;color:#e0e5ed}.vote{white-space:normal;overflow-wrap:anywhere}.face b{overflow-wrap:anywhere}#homeProfileCard .profileTop{align-items:center}#homeProfileCard .avatar{width:76px;height:88px;border-radius:12px}.firstLoop{display:none}.statusPunch{display:none}.battleFaces .vs{font-size:18px;font-style:italic}.battleCard .row.timer{margin-top:12px;border-top:3px solid #414e5e;padding-top:8px}.shopFilters{padding-bottom:8px}.item .sourceTag{font-size:8px}.profileActions .secondary{min-height:46px}
 </style>
 </head>
 <body>
@@ -778,7 +780,7 @@ function battleHtml(b){
   const total=Number(b.votes_a||0)+Number(b.votes_b||0),pa=total?Math.round(Number(b.votes_a||0)/total*100):50,pb=100-pa;
   const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
   const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div><div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">VOTE A</button><button class="vote" data-side="b" data-id="${b.id}">VOTE B</button></div></div>`;
+  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div>${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
 }
 
 function renderFeed(){
@@ -1185,6 +1187,9 @@ $('reviewRun').onclick=async()=>{
  finally{reviewBusy=false;$('reviewConsent').checked=false;updateReviewButton();}
 };
 
+setInterval(()=>{
+ document.querySelectorAll('.battleTimer').forEach(el=>{const left=Math.max(0,Math.ceil((new Date(el.dataset.ends).getTime()-Date.now())/1000));el.textContent=left?`${left}s`:'Подводим итог…';});
+},1000);
 setInterval(refresh,15000);
 initTonConnect();
 init();
