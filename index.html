@@ -291,6 +291,9 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 .studioLabel{font-size:18px;font-weight:800;margin-top:10px}.farmStage{display:block;position:relative;height:208px;overflow:hidden;border-radius:12px;background:#232c34;border:1px solid #414e58}.studioRoom{position:absolute;inset:0;background:linear-gradient(160deg,#34424b,#20272d 65%)}.studioFloor{position:absolute;bottom:0;height:48px;width:100%;background:repeating-linear-gradient(90deg,#635e50 0 35px,#514e44 36px 37px);border-top:2px solid #777568}.studioBackdrop{position:absolute;left:33%;top:22px;width:33%;height:140px;background:linear-gradient(#c9c6b7,#969d94);border:5px solid #151c22;border-bottom:0;border-radius:4px 4px 22px 22px}.studioLight{position:absolute;left:12%;top:35px;width:38px;height:51px;background:#e5e2c7;transform:rotate(-12deg);border:5px solid #151c22;box-shadow:0 0 30px #ffefba44}.studioLight:after{content:'';position:absolute;top:45px;left:16px;width:3px;height:95px;background:#11181e}.studioCamera{position:absolute;left:45%;bottom:38px;width:44px;height:28px;border-radius:5px;background:#141a20;border:2px solid #6f7b86}.studioCamera:before{content:'';position:absolute;left:12px;top:4px;width:17px;height:17px;border-radius:50%;background:#416273;border:3px solid #8f9da4}.studioCamera:after{content:'';position:absolute;top:26px;left:19px;width:4px;height:34px;background:#11181e}.studioDesk{position:absolute;right:5%;bottom:36px;width:67px;height:7px;background:#a49b80;border-bottom:27px solid #4e514b}.studioMonitor{position:absolute;right:8%;bottom:72px;width:47px;height:33px;border:4px solid #11181e;border-radius:3px;background:linear-gradient(145deg,#91b8a7,#40586e)}.studioBattery{position:absolute;left:5%;bottom:25px;width:22px;height:28px;border:3px solid #11181e;background:repeating-linear-gradient(0deg,#aeca7c 0 5px,#52633d 6px 8px)}.studioCharging{position:absolute;left:15%;bottom:20px;font-size:20px;color:#d4e7a1}.studioRoom .locked{opacity:.2;filter:grayscale(1)}.studioTag{position:absolute;top:8px;right:9px;font-size:8px;color:#dbe4e8;letter-spacing:.1em}.studioRoom.stage-2{background:linear-gradient(155deg,#4b5b62,#242a32)}.studioRoom.stage-3{background:linear-gradient(155deg,#5b655a,#252c2e)}.studioRoom.stage-3 .studioBackdrop{background:linear-gradient(#d6c7a1,#879b8d)}
+
+/* Portrait-first profile */
+#profileHero{display:grid;grid-template-columns:minmax(0,1fr);text-align:left!important;padding:0!important;border-radius:18px;overflow:hidden;background:#15191f}#profileHero #bigAvatar{width:100%!important;height:320px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;border:0;border-radius:0!important;margin:0!important;background:#232830}#profileHero #bigAvatar img{object-position:center 35%!important;transform:none!important;border-radius:0!important}#profileHero #bigAvatar.cosmeticFrame:after{border-radius:0!important}#profileHero h2,#profileHero .user,#profileHero #profileTitle,#profileHero .rankRow{margin-left:18px!important;margin-right:18px!important}#profileHero h2{font-size:26px!important;letter-spacing:-.03em}#profileHero .rankRow{justify-content:flex-start!important;margin-bottom:18px}.photoReviewCard{border:1px solid #475364;background:linear-gradient(150deg,#202934,#12171e)}.photoReviewCard h2{font-size:21px;margin:6px 0}.reviewConsent{display:flex;align-items:flex-start;gap:10px;font-size:11px;line-height:1.6;margin:16px 0;color:#c8cfd9}.reviewConsent input{width:18px;height:18px;flex-shrink:0;margin-top:2px}.reviewMetric{border-top:1px solid #394351;padding:12px 0}.reviewMetric b{font-size:13px}.reviewMetric p{font-size:11px;line-height:1.6;color:#bbc4d0;margin:5px 0}.reviewTips{padding-left:20px;font-size:12px;line-height:1.7}.reviewTips li{margin-bottom:8px}.facePhoto img,.avatar img{transform:none!important}.battleCard .voteBar button:disabled{opacity:.45}.goalCard{background:#151b23!important}.goalRank{font-size:28px}.matchIcon{display:none}.matchBox{text-align:left}.matchBox h2{font-size:24px!important}#guideBtn{margin-top:10px} 
 </style>
 </head>
 <body>
@@ -497,6 +500,8 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
       <div class="user" id="bigUsername">@telegram</div><div id="profileTitle"></div>
       <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> MOGG</span></div>
     </div>
+
+    <div class="card photoReviewCard"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Покажи себя лучше</h2><p class="muted">Разбор света, ракурса и кадрирования. Три совета для следующего снимка. Оценивается подача фото, а не твоя привлекательность.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
 
     <div class="card">
       <div class="sectionHead"><h2>Profile</h2><span>SYNCED</span></div>
@@ -1158,6 +1163,27 @@ $('guideModal').addEventListener('keydown',e=>{
   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
  }
 });
+
+let reviewAvailable=false,reviewBusy=false;
+function updateReviewButton(){ $('reviewRun').disabled=!reviewAvailable||reviewBusy||!$('reviewConsent').checked; }
+$('reviewConsent').onchange=updateReviewButton;
+$('reviewOpen').onclick=async()=>{
+ $('reviewPanel').hidden=false;$('reviewStatus').textContent='Проверяем доступность…';
+ try{const d=await call('photo_review_status');reviewAvailable=!!d.available;$('reviewStatus').textContent=reviewAvailable?'Готово. Для анализа используется текущее фото профиля.':'ИИ-разбор ещё не подключён. Скоро здесь появится анализ твоего снимка.';}
+ catch{reviewAvailable=false;$('reviewStatus').textContent='Не удалось проверить сервис. Попробуй позже.';}
+ updateReviewButton();
+};
+function renderPhotoReview(r){
+ $('reviewResult').innerHTML=`<p class="guideLead">${htmlText(r.summary)}</p>`+(r.usable?(r.criteria.map(c=>`<div class="reviewMetric"><b>${htmlText(c.label)} · ${Number(c.score)}/5</b><p>${htmlText(c.note)}</p></div>`).join('')+`<h3>Попробуй в следующем фото</h3><ol class="reviewTips">${r.tips.map(t=>`<li>${htmlText(t)}</li>`).join('')}</ol>`):'');
+}
+$('reviewRun').onclick=async()=>{
+ if(reviewBusy||!reviewAvailable||!$('reviewConsent').checked)return;
+ reviewBusy=true;updateReviewButton();$('reviewResult').textContent='';$('reviewStatus').textContent='Анализируем снимок…';
+ const originalPhoto=state.player?.profile_photo_url;
+ try{const d=await call('photo_review',{consent:true});if(originalPhoto!==state.player?.profile_photo_url){$('reviewStatus').textContent='Фото изменилось. Запусти разбор нового снимка.';return;}renderPhotoReview(d.review);$('reviewStatus').textContent='Разбор готов. Это рекомендации по фото, не оценка красоты.';}
+ catch(e){const messages={review_daily_limit:'Лимит анализов на сегодня исчерпан. Попробуй завтра.',review_unavailable:'ИИ-разбор пока недоступен.',photo_required:'Сначала добавь фото профиля.',review_photo_unsupported:'Загрузи фото заново через профиль.',review_service_error:'Сервис не завершил анализ. Попробуй позже.'};$('reviewStatus').textContent=messages[e.message]||'Не удалось получить разбор. Попробуй позже.';}
+ finally{reviewBusy=false;$('reviewConsent').checked=false;updateReviewButton();}
+};
 
 setInterval(refresh,15000);
 initTonConnect();
