@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#09090b">
-<title>MOGG BATTLE · V7.3</title>
+<title>MOGG BATTLE</title>
 <script src="https://telegram.org/js/telegram-web-app.js">
 </script>
 <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
@@ -283,6 +283,12 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 .bg-aurora{background:radial-gradient(ellipse at 15% 20%,#45e4bd99,transparent 55%),radial-gradient(ellipse at 85% 70%,#bc7cffaa,transparent 55%),#111525!important}
 .showroom{margin:12px 0;padding:16px;border-radius:15px;background:linear-gradient(120deg,#272b37,#19131e);border:1px solid #45414c}.showroom b{font-size:18px}.showroom p{line-height:1.6;font-size:10px;color:#b7b8c3}.tryOn{margin-top:8px!important;border-color:#66546c}.tryCard{padding:28px 16px;border-radius:16px;text-align:center;margin:15px 0;background-color:#12141b}.tryCard .previewAvatar{width:100px;height:100px;margin:12px auto}.tryCard .previewTitle{margin-top:16px}.shopDescription{font-size:9px;line-height:1.5;color:#b0b0bb;min-height:40px;margin-top:7px}.shopSheet{max-height:85vh;overflow:auto}
 .guideSheet{padding:22px;max-height:86vh;overflow:auto}.guideProgress{display:flex;gap:6px;margin:22px 0}.guideProgress i{height:4px;flex:1;border-radius:8px;background:#30313a}.guideProgress i.active{background:var(--accent)}.guideStep{font-size:10px;color:var(--accent);letter-spacing:.12em}.guideSheet h2{font-size:26px;line-height:1.15;margin:12px 0}.guideLead{font-size:13px;line-height:1.65;color:#c7c8cf}.guideDetail{padding:14px;margin-top:12px;border:1px solid #34343d;border-radius:12px;font-size:12px;line-height:1.65;color:#d2d3da}.guideDetail b{color:#fff}.guideControls{margin-top:22px}.guideControls button{flex:1}.guideControls button:disabled{opacity:.3}
+
+/* MOGG / graphite + chrome */
+:root{--bg:#0b0d10;--card:#13161c;--card2:#191d24;--line:#2b3039;--text:#f1f3f7;--muted:#a0a8b5;--accent:#c9f66f;--accent2:#e0ffad;--cream:#dce1e9;--good:#c9f66f;--bad:#ff9caa}
+body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0d10}.app{max-width:580px;padding:22px 18px calc(98px + env(safe-area-inset-bottom))}.logo{letter-spacing:-.05em;font-size:25px}.kicker{font-size:9px;letter-spacing:.16em}.muted{font-size:11px;line-height:1.65}.timer{font-size:11px}.card,.walletCard{background:linear-gradient(145deg,#171b22,#101319);border-color:var(--line);border-radius:20px;padding:18px;margin-top:14px}.sectionHead h2{font-size:17px;letter-spacing:-.025em}.primary,.secondary{min-height:44px;font-size:12px;border-radius:12px}.primary.pink{background:#c9f66f;color:#11170a}.secondary{background:#1c2028;border-color:#343b48}.primary:focus-visible,.secondary:focus-visible,.nav button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.goalCard{background:radial-gradient(ellipse at top right,#c9f66f18,transparent 60%),linear-gradient(135deg,#202630,#101318)!important}.goalRank{font-size:34px;letter-spacing:-.05em}.goalCopy{font-size:12px;line-height:1.6}.goalNeed{font-size:10px}.goalCard .battleNow{margin-top:18px}.firstLoop{gap:7px}.loopStep{font-size:9px;padding:10px 7px}.loopStep b{font-size:9px}.loopStep.done{border-color:#c9f66f55;color:var(--accent2)}.dailyRun .missionFoot{font-size:9px}.miniStats{grid-template-columns:repeat(4,minmax(0,1fr))}.stat{padding:11px 3px}.stat b{font-size:16px}.stat small{font-size:8px}.avatar{border-radius:18px}.rank{font-size:11px;color:#e1e7ee;border-color:#4b5665}.battleCard{padding:15px;border-radius:17px;background:#10141b;margin-top:13px}.battleFaces{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:8px}.facePhoto{height:180px;min-height:180px;max-height:180px;border-radius:12px}.face b{font-size:13px;margin-top:10px}.face small{font-size:9px}.vote{min-height:43px;font-size:11px;background:#1d232d}.vote.selected{background:#c9f66f18}.v8-own-battle{border-color:#c9f66f88!important;box-shadow:0 0 0 1px #c9f66f18,0 12px 32px #0004;transform:none}.v8-own-battle:before{content:'ТВОЙ БОЙ · LIVE';color:#c9f66f}.v8-own-battle img{transform:none!important}.matchIcon{border-radius:23px;background:linear-gradient(135deg,#39414c,#171b22);color:#dce4ee}.nav{width:min(580px,100%);background:#0d1016f5;padding-top:12px;border-color:#333a46}.nav small{font-size:9px;margin-top:6px}.nav button.active{color:#c9f66f}.nav button{min-height:43px}.item{border-radius:16px;background:#151a22;padding:13px}.item b{font-size:12px}.itemPreview{height:130px;background:#0d1117}.shopDescription{font-size:10px;min-height:48px}.showroom{background:radial-gradient(ellipse at right,#b1bece24,transparent 65%),#171c24;border-color:#414b5b;padding:20px}.showroom b{font-size:24px;letter-spacing:-.04em}.showroom p{font-size:12px}.farmHero{background:radial-gradient(ellipse at top,#c9f66f18,#10151b 70%);border-color:#424d39}.farmRig{border-color:#77865c;color:#d3f6a0}.upgradeCard{padding:14px;background:#141a21;border-radius:15px}.upgradeCard b{font-size:11px}.upgradeCard small{font-size:10px;line-height:1.5;min-height:32px}.farmStats b{font-size:29px}.farmStats small{font-size:9px}.guideSheet,.rankSheet{background:#141921;border-color:#36404e}.guideDetail{background:#0e131b;border-color:#303a47}.walletBalance{font-size:30px}.walletHelp{font-size:10px}.statusPunch{border-color:#c9f66f33}.feedTabs{display:none}.shopFilters button{font-size:10px;padding:9px 12px}.shopFilters button.active{background:#c9f66f17;border-color:#819b51;color:#d9f6ac}
+@media(max-width:370px){.app{padding-left:12px;padding-right:12px}.card{padding:13px}.facePhoto{height:150px;min-height:150px;max-height:150px}.farmStats b{font-size:24px}.upgradeCard{padding:10px}.miniStats .stat small{font-size:7px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -336,24 +342,6 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
   </header>
 
   <section id="homeView" class="view active">
-    <div class="card goalCard">
-      <div class="kicker">YOUR NEXT RANK</div>
-      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 SCORE TO GO</div></div>
-      <div class="progress"><i id="nextRankProgress"></i></div>
-      <div class="goalCopy" id="goalCopy">Win Ranked battles to raise your MOGG Score.</div>
-      <button id="battleNowBtn" class="primary pink battleNow">⚔ BATTLE NOW</button>
-      <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
-    </div>
-
-    <div class="card dailyRun">
-      <div class="runTop">
-        <div><div class="kicker">DAILY RUN</div><div class="runScore" id="dailyDone">0 / 4</div></div>
-        <div style="text-align:right"><div class="runLabel">STREAK</div><div class="streak" id="dailyStreak">🔥 1 DAY</div></div>
-      </div>
-      <div id="dailyMissions" class="missionList"></div>
-      <div class="missionFoot"><span>Progress saves on this device today.</span><span id="dailyReset">RESET · —</span></div>
-    </div>
-
     <div class="card" id="homeProfileCard">
       <div class="profileTop">
         <div class="avatar" id="avatar">?</div>
@@ -367,14 +355,24 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
       <div class="miniStats">
         <div class="stat"><b id="seasonPeak">0</b><small>SEASON PEAK</small></div>
         <div class="stat"><b id="allPeak">0</b><small>ALL-TIME</small></div>
-        <div class="stat"><b id="battleCount">0</b><small>BATTLES</small></div>
+        <div class="stat"><b id="battleCount">0</b><small>Бои</small></div>
         <div class="stat"><b id="pointsBalance">0</b><small>POINTS</small></div>
       </div>
       <div class="statusPunch"><b id="statusPunchText">BUILD YOUR STATUS</b><span id="statusPunchNext">RANK UP →</span></div>
     </div>
 
+
+    <div class="card goalCard">
+      <div class="kicker">СЛЕДУЮЩИЙ РАНГ</div>
+      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 SCORE TO GO</div></div>
+      <div class="progress"><i id="nextRankProgress"></i></div>
+      <div class="goalCopy" id="goalCopy">Win Ranked battles to raise your MOGG Score.</div>
+      <button id="battleNowBtn" class="primary pink battleNow">ПЕРЕЙТИ К БОЯМ</button>
+      <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
+    </div>
+
     <div class="card">
-      <div class="sectionHead"><h2>Live battles</h2><span><span class="liveDot">●</span> LIVE</span></div>
+      <div class="sectionHead"><h2>Бои сейчас</h2><span><span class="liveDot">●</span> LIVE</span></div>
       <div class="feedTabs">
         <button class="tab active" data-feed="all">LIVE</button>
         <button class="tab" data-feed="promotion">PROMOTION</button>
@@ -384,7 +382,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Daily in app</h2><span>SPONSOR</span></div>
+      <div class="sectionHead"><h2>Ежедневный бонус</h2><span>SPONSOR</span></div>
       <div class="sponsor">
         <b style="font-size:11px">@mbgbchannel</b>
         <p class="muted">Подпишись на официальный канал и забери усиленный дневной бонус.</p>
@@ -395,12 +393,21 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
       </div>
       <button id="appDailyBtn" class="primary pink">ПРОВЕРИТЬ И ЗАБРАТЬ</button>
     </div>
+    <div class="card dailyRun">
+      <div class="runTop">
+        <div><div class="kicker">ЗАДАНИЯ НА СЕГОДНЯ</div><div class="runScore" id="dailyDone">0 / 4</div></div>
+        <div style="text-align:right"><div class="runLabel">STREAK</div><div class="streak" id="dailyStreak">🔥 1 DAY</div></div>
+      </div>
+      <div id="dailyMissions" class="missionList"></div>
+      <div class="missionFoot"><span>Прогресс за день сохраняется на этом устройстве.</span><span id="dailyReset">RESET · —</span></div>
+    </div>
+
   </section>
 
   <section id="battleView" class="view">
     <div class="card matchBox">
       <div class="matchIcon">⚔</div>
-      <h2 style="font-size:18px;margin:0 0 6px">CHOOSE BATTLE MODE</h2>
+      <h2 style="font-size:18px;margin:0 0 6px">Выбери свой бой</h2>
       <p class="muted">Выбери режим. Одновременно можно участвовать в одном бою.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
         <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">ВЛИЯЕТ НА SCORE</span></button>
@@ -410,7 +417,7 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Active</h2><span id="feedCount">0 BATTLES</span></div>
+      <div class="sectionHead"><h2>Текущие бои</h2><span id="feedCount">0 BATTLES</span></div>
       <div id="battleFeed"></div>
     </div>
   </section>
@@ -539,11 +546,11 @@ linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto
 </div>
 
 <nav class="nav">
-  <button class="active" data-view="home">⌂<small>HOME</small></button>
-  <button data-view="battle">⚔<small>BATTLES</small></button>
-  <button data-view="tap">///<small>TAP</small></button>
-  <button data-view="rewards">◇<small>REWARDS</small></button>
-  <button data-view="profile">○<small>PROFILE</small></button>
+  <button class="active" data-view="home">⌂<small>Главная</small></button>
+  <button data-view="battle">⚔<small>Бои</small></button>
+  <button data-view="tap">///<small>Ферма</small></button>
+  <button data-view="rewards">◇<small>Магазин</small></button>
+  <button data-view="profile">○<small>Профиль</small></button>
 </nav>
 
 <div id="tryModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="tryTitle"><div class="rankSheet shopSheet"><div class="row"><h2 id="tryTitle">Примерка</h2><button id="tryClose" class="modalClose">Закрыть</button></div><div id="tryPreview"></div><p id="tryDescription" class="muted"></p><p class="muted">Примерка бесплатна. Покупка — отдельной кнопкой в магазине.</p></div></div>
@@ -768,6 +775,8 @@ function battleHtml(b){
 }
 
 function renderFeed(){
+  const own=state.feed.find(isOwnLiveBattle);
+  $('battleNowBtn').textContent=own?'ОТКРЫТЬ ТЕКУЩИЙ БОЙ':'ПЕРЕЙТИ К БОЯМ';
   const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now()).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)));
   $("feedCount").textContent=valid.length+" BATTLES";
   $("homeFeed").innerHTML=valid.length?valid.slice(0,3).map(battleHtml).join(""):`<div class="emptyAction"><b>NO LIVE BATTLES</b><p class="muted">Запусти баттл и стань первым в ленте.</p><button class="secondary emptyBattleBtn">FIND OPPONENT</button></div>`;
