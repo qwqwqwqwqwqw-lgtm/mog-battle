@@ -318,6 +318,56 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
 .title-founder{background-image:linear-gradient(110deg,#b28a43,#fff0c3,#c59a4a,#fff3c8)}
 .intro-portal{background:radial-gradient(ellipse at center,#7055a466,transparent 65%),#10121b!important;box-shadow:inset 0 0 36px #a4adf544;animation:premiumHalo 4s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.frame-chromeface:after,.frame-prism:after,.frame-celestial:after,.bg-marble,.bg-aurora,.bg-contactsheet,.name-chrome,.title-founder,.title-ogmogger,.intro-portal{animation:none!important}}
+
+/* September 16: photo-led graphite interface. Cosmetic-specific styles retain priority. */
+:root{--bg:#101113;--card:#191b1f;--card2:#202328;--line:#34373e;--text:#f0f1ed;--muted:#a3a6ac;--accent:#d3eda0;--accent2:#e6f4cd}
+body{background:#101113}body:before{display:none}
+.app{max-width:580px;padding:22px 16px calc(108px + env(safe-area-inset-bottom))}
+.top{padding:3px 2px 15px;margin:0;border-bottom:1px solid #303237}
+.top>.kicker,.top>div>.kicker{display:none}
+.logo{font-size:27px;letter-spacing:-1.1px;line-height:1;font-weight:900}.logo span{color:#c4c9cf}
+.scorePill{background:none;border:0;border-left:1px solid #40434a;border-radius:0;padding:4px 0 4px 14px;font-size:12px;color:#bfc4ca}
+.card,.walletCard{border:1px solid #2e3137;background:#191c20;border-radius:16px;padding:19px;margin-top:16px;box-shadow:none}
+.sectionHead{gap:12px;margin-bottom:4px}.sectionHead h2{font-size:19px;font-weight:700;letter-spacing:-.5px}.sectionHead>span{font-size:10px;letter-spacing:.04em}
+.muted{font-size:12px;line-height:1.55}.kicker{font-size:10px;letter-spacing:.12em}.timer{font-variant-numeric:tabular-nums;color:#b3b8c0}
+#homeProfileCard{background:linear-gradient(120deg,#23272d,#181b20);border:0;padding:20px}
+#homeProfileCard .profileTop{gap:17px;align-items:center}
+#homeProfileCard .avatar{width:92px;height:112px;border-radius:12px;font-size:32px;border:0}
+#homeProfileCard .name{font-size:23px;letter-spacing:-.7px}
+.user{font-size:11px}.rankRow{gap:8px;flex-wrap:wrap}.rank{border-radius:6px;padding:6px 9px;font-size:11px}
+.miniStats{gap:0;margin-top:20px;border-top:1px solid #373c44;padding-top:15px}
+.stat{background:none;border:0;border-right:1px solid #373c44;border-radius:0;padding:2px 5px}.stat:last-child{border-right:0}.stat b{font-size:18px;font-variant-numeric:tabular-nums;font-weight:650}.stat small{font-size:8px;letter-spacing:.025em;color:#a5adb7}
+.goalCard{position:relative;background:linear-gradient(120deg,#232a23,#181d1b)!important;border:1px solid #414b3b}
+.goalRank{font-size:38px;letter-spacing:-1.5px}.goalNeed{font-size:11px;color:#bdc7b5}
+.goalCopy{font-size:12px;color:#aab4a3}.progress{height:4px;background:#30362e}.progress i{background:#d3eda0}
+.primary,.primary.pink{background:#d3eda0;color:#182015;border-radius:10px;min-height:48px;font-size:13px;font-weight:750;letter-spacing:.02em;box-shadow:none}
+.secondary{background:#252930;border-color:#3a404a;border-radius:10px;min-height:44px;font-size:12px}
+.battleNow{animation:none}.battleNow:after{display:none}
+.battleCard{background:#121519;border:1px solid #32373e;border-radius:13px;padding:13px;margin-top:16px}
+.battleFaces{grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);gap:5px;align-items:start;margin-top:14px}
+.facePhoto{height:clamp(172px,49vw,248px);min-height:0;max-height:none;border-radius:9px}
+.face b{font-size:14px;margin-top:11px}.face small{display:block;font-size:10px;line-height:1.5;margin-top:3px}.vs{align-self:center;color:#adb5c0;font-size:11px;letter-spacing:-.3px}
+.voteBar{gap:10px;margin-top:14px}.vote{min-height:45px;background:#252b32;border-color:#424b56;border-radius:9px;font-size:12px}.vote.selected{color:#e2f6be;background:#303e24;border-color:#a8cb77}
+.v8-own-battle{border-color:#9bad7c!important;box-shadow:none;transform:none}.v8-own-battle:before{font-size:10px;letter-spacing:.1em;color:#d3eda0}
+.matchBox{background:linear-gradient(140deg,#293126,#171c1a);border-color:#424e39;padding:22px}
+#rankedBtn,#quickBtn{min-height:102px!important;font-size:16px;letter-spacing:.04em;text-align:left;padding:18px}
+#quickBtn{background:#2d343c;color:#f0f2ef;border:1px solid #56606c}
+#rankedBtn span,#quickBtn span{display:inline-block;margin-top:9px;font-size:11px!important;letter-spacing:0}
+.nav{width:min(580px,100%);background:#171a1ff5;border-top:1px solid #444b54;gap:3px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));backdrop-filter:blur(18px)}
+.nav button{border-radius:10px;min-height:49px;color:#a5abb4;font-size:18px;transform:none!important}
+.nav button.active{background:#2c3526;color:#e2f3c9;box-shadow:inset 0 1px #526144}.nav small{font-size:10px;margin-top:5px}
+.inventory{gap:12px}.item{background:#1d2228;border:1px solid #383f48;border-radius:13px;padding:12px;min-width:0}.item b{font-size:13px;line-height:1.3;display:block;margin:7px 0;overflow-wrap:anywhere}
+.itemPreview{height:158px;border-radius:9px;background:radial-gradient(ellipse at 50% 0,#323a46,#10151b 80%);overflow:hidden}
+.item .rarity{margin-top:12px;font-size:9px;letter-spacing:.1em}.shopDescription{font-size:11px;line-height:1.45;min-height:36px}
+.item .secondary{font-size:11px;min-height:42px}.sourceTag{font-size:8px;color:#a5adb7;line-height:1.5}
+.shopFilters{gap:7px;padding:9px 0}.shopFilters button{border-radius:20px;font-size:11px;padding:10px 14px}.shopFilters button.active{background:#d3eda0;color:#182015;border-color:#d3eda0}
+.starsSection{border-top:1px solid #9d8453;padding-top:23px}.starsSection>h3{font-size:20px;letter-spacing:-.3px;color:#edd8ad}.premiumItem{border-color:#806b49!important}
+.upgradeCard{background:#1e252b;border:1px solid #3c4650;border-radius:12px}.upgradeCard b{font-size:12px}.upgradeCard small{color:#b1bbc5;font-size:11px}
+#profileHero{background:#1a1f25;border:1px solid #3c444e}#profileHero #bigAvatar{height:360px!important}#profileHero h2{font-size:29px!important}
+.walletCard{background:#19212a}.walletNet{font-size:10px;color:#b7c6d7}
+button:focus-visible{outline:2px solid #e3f4c4;outline-offset:3px}
+@media(max-width:370px){.app{padding-left:10px;padding-right:10px}.card{padding:14px}.inventory{gap:8px}.item{padding:9px}.itemPreview{height:130px}#homeProfileCard .avatar{width:74px;height:92px}#homeProfileCard .name{font-size:20px}.nav small{font-size:9px}#rankedBtn,#quickBtn{padding:13px}}
+@media(prefers-reduced-motion:reduce){.card,.primary,.secondary,.nav button{transition:none}}
 </style>
 </head>
 <body>
