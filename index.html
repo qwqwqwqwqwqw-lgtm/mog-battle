@@ -389,10 +389,10 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Ежедневный бонус</h2><span>SPONSOR</span></div>
+      <div class="sectionHead"><h2>Ежедневный бонус</h2></div>
       <div class="sponsor">
         <b style="font-size:11px">@mbgbchannel</b>
-        <p class="muted">Подпишись на официальный канал и забери усиленный дневной бонус.</p>
+        <p class="muted">Бонус за подписку на канал.</p>
         <div class="row">
           <button class="secondary" id="openChannel" style="width:auto">ОТКРЫТЬ КАНАЛ</button>
           <span class="rewardValue">+150 POINTS</span>
@@ -414,11 +414,11 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
   <section id="battleView" class="view">
     <div class="card matchBox">
       <div class="matchIcon">⚔</div>
-      <h2 style="font-size:18px;margin:0 0 6px">Выбери свой бой</h2>
-      <p class="muted">Выбери режим. Одновременно можно участвовать в одном бою.</p>
+      <h2 style="font-size:18px;margin:0 0 6px">Начать бой</h2>
+      <p class="muted">Один активный бой за раз.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
-        <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">ВЛИЯЕТ НА SCORE</span></button>
-        <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">БЕЗ ИЗМЕНЕНИЯ SCORE</span></button>
+        <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">С рейтингом</span></button>
+        <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">Без рейтинга</span></button>
       </div>
       <div id="matchStatus" class="muted" style="margin-top:10px"></div>
     </div>
@@ -434,19 +434,19 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
       <div class="row"><span class="kicker">ENERGY</span><span class="timer"><b id="energy">100</b>/<span id="maxEnergy">100</span></span></div>
       <div class="tapZone">
         <button id="tapBtn" class="tapCircle"><img src="mogg-token.png" alt="MOGG"></button>
-        <div class="tapText">TAP TO ASCEND</div>
-        <div class="muted">1 tap = +1 POINT · энергия восстанавливается</div>
+        <div class="tapText">ТАПАЙ</div>
+        <div class="muted">1 тап = 1 Point</div>
       </div>
       <div class="progress energyPulse"><i id="energyProgress"></i></div>
     </div>
 
     <div class="card">
       <div class="sectionHead"><h2>MOGG Points</h2><span><b id="tapPoints">0</b> PTS</span></div>
-      <p class="muted">Тапай → копи Points → покупай оформление, эффекты и коллекционные предметы. MOGG Score растёт в Ranked и немного за оценки чужих баттлов.</p>
+      <p class="muted">Points можно тратить на улучшения и косметику.</p>
     </div>
 
     <div class="card">
-      <div class="sectionHead"><div><div class="kicker">BUILD YOUR EMPIRE</div><h2 style="margin-top:4px">MOGG STUDIO</h2></div><span class="timer">UPGRADES</span></div>
+      <div class="sectionHead"><div><h2 style="margin-top:4px">MOGG STUDIO</h2></div></div>
       <div class="farmHero"><div class="kicker">ТВОЯ СТУДИЯ</div><div id="studioLabel" class="studioLabel"></div><div id="farmStage" class="farmStage"></div><p id="studioGoal" class="muted"></p><div class="farmStats"><div><b id="farmRate">0</b><small>POINTS / ЧАС</small></div><div><b id="farmBalance">0</b><small>ТВОИ POINTS</small></div></div><p id="farmHint" class="muted"></p><div class="progress"><i id="farmProgress"></i></div><p id="farmNext" class="muted"></p></div>
       <div class="v7grid" id="upgradeGrid">
         <div class="upgradeCard"><b>КАМЕРА</b><small id="effect-tap"></small><button class="secondary upg" data-kind="tap">UPGRADE</button></div>
@@ -454,8 +454,8 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
         <div class="upgradeCard"><b>ЗАРЯДНАЯ СТАНЦИЯ</b><small id="effect-recovery"></small><button class="secondary upg" data-kind="recovery">UPGRADE</button></div>
         <div class="upgradeCard"><b>МОНТАЖНАЯ СТАНЦИЯ</b><small id="effect-idle"></small><button class="secondary upg" data-kind="idle">UPGRADE</button></div>
       </div>
-      <button id="prestigeBtn" class="primary" style="margin-top:10px">CLAIM DAILY PRESTIGE</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
-      <p class="muted">Альтернативный медленный путь. Чем выше Score, тем слабее Prestige; после 2900 он не даёт Score.</p>
+      <button id="prestigeBtn" class="primary" style="margin-top:10px">ЗАБРАТЬ БОНУС</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
+      
     </div>
     <div class="card crewBox">
       <div class="kicker">SOCIAL</div><h2 style="margin:4px 0 8px">CREW</h2><div id="crewContent"></div>
@@ -476,19 +476,19 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Cosmetics Shop</h2><span><b id="shopPoints">0</b> PTS</span></div>
-      <p class="muted">Points — за игру. ⭐ Stars — премиальная фиксированная косметика. TOP/Season предметы нельзя купить.</p>
-      <div class="showroom"><div class="kicker">THE MOGG EDIT</div><b>Твоё фото. Твой стиль.</b><p>Хром, свет и журнальные текстуры. Примерь на себе — выбери образ для следующего баттла.</p></div><div id="shopFilters" class="shopFilters"></div>
+      <div class="sectionHead"><h2>Магазин</h2><span><b id="shopPoints">0</b> PTS</span></div>
+      <p class="muted">Покупки за Points или ⭐ Stars.</p>
+      <div id="shopFilters" class="shopFilters"></div>
       <div id="shop" class="inventory"></div>
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Inventory</h2><span id="inventoryCount">0 ITEMS</span></div>
+      <div class="sectionHead"><h2>Мои предметы</h2><span id="inventoryCount">0 ITEMS</span></div>
       <div id="inventory" class="inventory"></div>
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Referrals</h2><span>INVITE</span></div>
+      <div class="sectionHead"><h2>Пригласить друзей</h2><span>INVITE</span></div>
       <p class="muted">Приглашай друзей. Награда начисляется после того, как приглашённый выберет пол и загрузит фото.</p>
       <div class="refbox">Открой бота и используй команду <b>/ref</b> — он выдаст персональную ссылку.</div>
     </div>
@@ -503,16 +503,16 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
       <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> MOGG</span></div>
     </div>
 
-    <div class="card photoReviewCard"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Покажи себя лучше</h2><p class="muted">Разбор света, ракурса и кадрирования. Три совета для следующего снимка. Оценивается подача фото, а не твоя привлекательность.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
+    <div class="card photoReviewCard"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Разбор фото</h2><p class="muted">Свет, ракурс и кадрирование — советы по фото.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Profile</h2><span>SYNCED</span></div>
+      <div class="sectionHead"><h2>Profile</h2></div>
       <div class="reward"><div><b>Photo</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
       <div class="reward"><div><b>Gender</b><small>Влияет только на названия рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
       <div class="reward"><div><b>Referrals</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
       <div class="profileActions">
         <button id="changePhotoBtn" class="secondary">СМЕНИТЬ ФОТО</button>
-        <button id="shareProfileBtn" class="secondary shareBtn">↗ SHARE STATUS</button>
+        <button id="shareProfileBtn" class="secondary shareBtn">ПОДЕЛИТЬСЯ</button>
       </div>
     </div>
 
@@ -525,7 +525,7 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
         <div id="ton-connect"></div>
       </div>
       <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
-      <div class="walletNet">TON MAINNET · ON-CHAIN BALANCE</div><div id="walletHelp" class="walletHelp">Здесь отображается настоящий MOGG на подключённом кошельке в сети TON.</div>
+      <div class="walletNet">TON MAINNET · ON-CHAIN BALANCE</div><div id="walletHelp" class="walletHelp">Баланс MOGG в кошельке.</div>
     </div>
   </section>
 </main>
@@ -572,7 +572,7 @@ const TONCONNECT_MANIFEST="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/toncon
 const MOGG_JETTON_MASTER="EQD4-rV0gBrtGdPA6rr1Zuq54RjwvUFEoUXCGbGz2a-mCiJE";
 const TONCENTER_MAINNET="https://toncenter.com/api/v3";
 const MOGG_CHAIN="-239";
-const MOGG_WALLET_HELP="Здесь отображается настоящий MOGG на подключённом кошельке в сети TON.";
+const MOGG_WALLET_HELP="Баланс MOGG в кошельке.";
 let tonConnectUi=null;
 let chainBalanceRequest=0;
 
@@ -711,7 +711,7 @@ function scoreClass(c){return c?`score-${visualKey(c)}`:""}
 function clearCosmeticClasses(el,prefix){[...el.classList].filter(x=>x.startsWith(prefix)).forEach(x=>el.classList.remove(x))}
 function htmlText(value){return String(value??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));}
 function cosmeticDescription(c){
-  return ({frame:'Обрамляет твоё фото в профиле и на карточке баттла.',profile_bg:'Меняет фон профиля и оформление твоей стороны в баттле.',name_style:'Выделяет имя в профиле и баттлах.',title:'Подпись под твоим именем — часть твоего образа.',score_style:'Меняет оформление Score. Сам рейтинг остаётся прежним.',battle_intro:'Оформление вступления в бой.',victory_card:'Оформление карточки победы.',reaction:'Визуальная реакция.'})[c.kind]||'Косметический предмет.';
+  return ({frame:'Рамка для фото.',profile_bg:'Фон профиля и карточки боя.',name_style:'Оформление имени.',title:'Подпись под именем.',score_style:'Стиль рейтинга.',battle_intro:'Вступление в бой.',victory_card:'Карточка победы.',reaction:'Визуальная реакция.'})[c.kind]||'Косметический предмет.';
 }
 function showTryOn(id){
   const c=state.shop.find(x=>x.id===id);if(!c)return;
@@ -820,11 +820,11 @@ function renderFarm(p){
   const stage=total>=12?3:total>=6?2:total>=2?1:0;
   const names=['Домашняя студия','Первый сетап','Рабочая студия','Авторская студия'];
   $('studioLabel').textContent=names[stage];
-  $('studioGoal').textContent=stage===3?'Все облики открыты. Улучшай оборудование дальше.':`До нового облика: ${[2,6,12][stage]-total} улучшений. Любая покупка оборудования учитывается.`;
+  $('studioGoal').textContent=stage===3?'Все облики открыты.':`До нового облика: ${[2,6,12][stage]-total} улучшений.`;
   $('farmStage').setAttribute('role','img');
   $('farmStage').setAttribute('aria-label',`${names[stage]}. Камера, фон, свет и рабочее место. Уровень монтажной станции ${f.level}.`);
   $("farmStage").innerHTML=`<div class="studioRoom stage-${stage}"><span class="studioTag">${String(stage+1).padStart(2,'0')} / 04</span><div class="studioFloor"></div><div class="studioBackdrop"></div><div class="studioLight ${total<2?'locked':''}"></div><div class="studioCamera"></div><div class="studioDesk"></div><div class="studioMonitor ${f.level===0?'locked':''}"></div><div class="studioBattery ${Number(p.energy_level||0)===0?'locked':''}"></div><div class="studioCharging ${Number(p.recovery_level||0)===0?'locked':''}">↯</div></div>`;
-  $("farmHint").textContent=f.level?`Монтажная станция LV ${f.level} · +${f.level} Points каждые 10 минут. Офлайн: до ${f.cap} Points за 12 часов. Доход зачисляется автоматически при обновлении.`:'Открой монтажную станцию за 250 Points. Заработай их тапами и заданиями — затем развивай студию.';
+  $("farmHint").textContent=f.level?`Монтажная станция LV ${f.level} · +${f.level} Points каждые 10 минут. Офлайн: до ${f.cap} Points за 12 часов.`:'Монтажная станция — 250 Points.';
   $("farmProgress").style.width=Math.min(100,points/f.cost*100)+'%';
   $("farmNext").textContent=points>=f.cost?'Хватает на следующий уровень монтажной станции →':`До следующего уровня монтажной станции: ${Math.max(0,f.cost-points).toLocaleString()} Points`;
   $("effect-tap").textContent=`${Number(p.tap_power||1)} → ${Number(p.tap_power||1)+1} Points за tap`;
@@ -834,12 +834,12 @@ function renderFarm(p){
   $("effect-idle").textContent=`${f.rate} → ${f.rate+6} Points / час · офлайн до 12 ч`;
 }
 function renderV7(){
-  const ph=$("prestigeHint"),pb=$("prestigeBtn");if(ph&&pb&&state.player){const sc=Number(state.player.mogg_score||0);if(sc>=2900){ph.textContent="PvE Score cap reached · CHAD/STACY and above require competitive progression";pb.disabled=true}else{ph.textContent="Small daily Score boost · automatically weakens at higher ranks";pb.disabled=false}}
+  const ph=$("prestigeHint"),pb=$("prestigeBtn");if(ph&&pb&&state.player){const sc=Number(state.player.mogg_score||0);if(sc>=2900){ph.textContent="Бонус доступен до 2900 Score.";pb.disabled=true}else{ph.textContent="Ежедневный бонус к Score. Уменьшается с ростом ранга.";pb.disabled=false}}
   const p=state.player||{};renderFarm(p);
   document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`LV ${lvl} → ${lvl+1} · ${cost.toLocaleString()} P`;b.disabled=upgradeBusy||Number(p.mogg_points||0)<cost;});
   const c=state.crew,box=$("crewContent");if(!box)return;
   if(c)box.innerHTML=`<b class="crewTag">[${c.tag}] ${c.name}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
-  else box.innerHTML=`<p class="muted">Создай своё объединение за 5,000 Points. Crew battles/leaderboard — следующий слой.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
+  else box.innerHTML=`<p class="muted">Создать команду — 5 000 Points.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
   $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await refresh();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
   $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await refresh();toast("+500 CREW")}catch(e){toast(String(e.message))}});
 }
@@ -1027,7 +1027,7 @@ document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=
   catch(e){toast(e.message==='not_enough_points'?'Не хватает Points': 'Не удалось улучшить: '+String(e.message));}
   finally{upgradeBusy=false;renderV7();}
 }));
-$("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("PRESTIGE CLAIMED")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше Score нужно подтверждать в competitive progression");else toast(String(e.message))}});
+$("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("PRESTIGE CLAIMED")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше рейтинг растёт в боях.");else toast(String(e.message))}});
 $("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
 
 async function vote(id,side,btn){
@@ -1196,4 +1196,5 @@ init();
 </script>
 </body>
 </html>
+
 
