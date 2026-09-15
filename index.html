@@ -305,6 +305,19 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
 .frame-pslscan:after{border:2px solid #c6d4da;box-shadow:0 0 0 4px #12171c,inset 0 0 0 1px #e0edf4; border-radius:inherit}
 .bg-pslboard{background:radial-gradient(ellipse at 50% 0,#737d8877,transparent 65%),#0d1015!important}
 @media(prefers-reduced-motion:reduce){.cosmeticFrame:after{animation:none!important}}
+
+.shopSection{margin:22px 0 0}.shopSection h3{font-size:15px;margin:0 0 12px}.starsSection{margin-top:30px;padding-top:22px;border-top:1px solid #746344}.starsSection h3{color:#ead3a2}.premiumItem{border-color:#756449!important;background:linear-gradient(145deg,#29251e,#15171c)!important}
+@keyframes premiumMetal{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes premiumHalo{0%,100%{box-shadow:0 0 9px #f4dca766,inset 0 0 5px #fff4}50%{box-shadow:0 0 24px #f4dca7aa,inset 0 0 9px #fff6}}
+@keyframes premiumChrome{0%,100%{border-color:#7c8998;box-shadow:3px -2px 12px #dfeeff66}50%{border-color:#f5faff;box-shadow:-3px 2px 18px #dfeeff99}}
+.frame-chromeface:after{animation:premiumChrome 5s ease-in-out infinite}
+.frame-prism:after{animation:premiumChrome 6s ease-in-out infinite;border-color:#d4b7f4}
+.frame-celestial:after{animation:premiumHalo 5s ease-in-out infinite}
+.bg-marble,.bg-aurora,.bg-contactsheet{background-size:180% 180%!important;animation:premiumMetal 14s ease-in-out infinite}
+.name-chrome,.title-founder,.title-ogmogger{background:linear-gradient(110deg,#8e98a8,#fff 35%,#aab9cd 50%,#fff 65%,#8e98a8);background-size:240% 100%;background-clip:text;-webkit-background-clip:text;color:transparent!important;animation:premiumMetal 7s ease-in-out infinite}
+.title-founder{background-image:linear-gradient(110deg,#b28a43,#fff0c3,#c59a4a,#fff3c8)}
+.intro-portal{background:radial-gradient(ellipse at center,#7055a466,transparent 65%),#10121b!important;box-shadow:inset 0 0 36px #a4adf544;animation:premiumHalo 4s ease-in-out infinite}
+@media(prefers-reduced-motion:reduce){.frame-chromeface:after,.frame-prism:after,.frame-celestial:after,.bg-marble,.bg-aurora,.bg-contactsheet,.name-chrome,.title-founder,.title-ogmogger,.intro-portal{animation:none!important}}
 </style>
 </head>
 <body>
@@ -488,7 +501,7 @@ body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0
       <div class="sectionHead"><h2>Магазин</h2><span><b id="shopPoints">0</b> PTS</span></div>
       <p class="muted">Покупки за Points или ⭐ Stars.</p>
       <div id="shopFilters" class="shopFilters"></div>
-      <div id="shop" class="inventory"></div>
+      <div id="shop"></div>
     </div>
 
     <div class="card">
@@ -720,6 +733,8 @@ function scoreClass(c){return c?`score-${visualKey(c)}`:""}
 function clearCosmeticClasses(el,prefix){[...el.classList].filter(x=>x.startsWith(prefix)).forEach(x=>el.classList.remove(x))}
 function htmlText(value){return String(value??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));}
 function cosmeticDescription(c){
+  const premium={prism:'Переливающийся контур.',chromeface:'Хромовая рамка с движущимся бликом.',celestial:'Мягкое свечение золотого контура.',marble:'Мрамор с медленно движущимся светом.',aurora:'Плавное движение цветного света.',contactsheet:'Контактный лист с проходящим бликом.',chrome:'Металлический перелив имени.',founder:'Титул с золотым переливом.',ogmogger:'Титул с хромовым переливом.',portal:'Световое вступление в бой.'};
+  if(Number(c.price_stars)>0&&premium[visualKey(c)])return premium[visualKey(c)];
   return ({frame:'Рамка для фото.',profile_bg:'Фон профиля и карточки боя.',name_style:'Оформление имени.',title:'Подпись под именем.',score_style:'Стиль рейтинга.',battle_intro:'Надпись перед началом боя.',victory_card:'Карточка победы.',reaction:'Визуальная реакция.'})[c.kind]||'Косметический предмет.';
 }
 function showTryOn(id){
@@ -736,10 +751,10 @@ function previewHtml(c){
   const avatar=`<div class="previewAvatar">${state.player?.profile_photo_url?`<img src="${htmlText(state.player.profile_photo_url)}" alt="Твоё фото" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`:''}</div>`;
   if(kind==="frame")return `<div class="cosmeticFrame frame-${k}" style="border-radius:50%;display:inline-block">${avatar}</div>`;
   if(kind==="profile_bg")return `<div class="bg-${k}" style="padding:16px;width:100%;display:grid;place-items:center;border-radius:10px">${avatar}</div>`;
-  if(kind==="title")return `<div class="previewTitle">${c.name}</div>`;
+  if(kind==="title")return `<div class="previewTitle cosmeticTitle title-${k}">${htmlText(c.name)}</div>`;
   if(kind==="score_style")return `<div class="previewTitle score-${k}">3,300 MOGG</div>`;
   if(kind==="name_style")return `<div class="previewTitle name-${k}">${htmlText(state.player?.first_name||"YOUR NAME")}</div>`;
-  if(kind==="battle_intro")return `<div class="previewTitle">⚔ ${c.name}</div>`;
+  if(kind==="battle_intro")return `<div class="previewTitle intro-${k}">⚔ ${htmlText(c.name)}</div>`;
   if(kind==="victory_card")return `<div class="previewTitle">WIN · ${c.name}</div>`;
   if(kind==="reaction")return `<div class="previewTitle">${htmlText(c.name)}</div>`;
   return `<div class="previewTitle">${c.name}</div>`;
@@ -762,7 +777,7 @@ function renderPlayer(){
   avatarInto($("avatar"),p);avatarInto($("bigAvatar"),p);
   [$("avatar"),$("bigAvatar")].forEach(el=>{clearCosmeticClasses(el,"frame-");el.classList.add("avatar");el.classList.toggle("cosmeticFrame",!!st.frame);if(st.frame)el.classList.add("frame-"+visualKey(st.frame));});
   [$("homeProfileCard"),$("profileHero")].forEach(el=>{clearCosmeticClasses(el,"bg-");if(st.profile_bg)el.classList.add("bg-"+visualKey(st.profile_bg));});
-  const titleHtml=st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:"";$("homeTitle").innerHTML=titleHtml;$("profileTitle").innerHTML=titleHtml;
+  const titleHtml=st.title?`<span class="cosmeticTitle title-${visualKey(st.title)}">${st.title.name}</span>`:"";$("homeTitle").innerHTML=titleHtml;$("profileTitle").innerHTML=titleHtml;
   $("seasonPeak").textContent=Number(p.season_peak||0).toLocaleString();$("allPeak").textContent=Number(p.all_time_peak||0).toLocaleString();$("battleCount").textContent=p.battles_played||0;
   const pts=Number(p.mogg_points||0);$("pointsBalance").textContent=pts.toLocaleString();$("tapPoints").textContent=pts.toLocaleString();$("shopPoints").textContent=pts.toLocaleString();
   $("energy").textContent=p.energy??100;$("maxEnergy").textContent=p.max_energy??100;$("energyProgress").style.width=Math.max(0,Math.min(100,(Number(p.energy||0)/Number(p.max_energy||100))*100))+"%";
@@ -859,8 +874,8 @@ function renderShop(){
   if(state.shopFilter==="effects")items=items.filter(c=>["battle_intro","victory_card","score_style","name_style","reaction"].includes(c.kind));
   else if(state.shopFilter==="exclusive")items=items.filter(c=>c.price_stars>0||["top1","top10"].includes(c.collection)||c.limited_total);
   else if(state.shopFilter!=="all")items=items.filter(c=>c.kind===state.shopFilter);
-  items=[...items].sort((a,b)=>Number(b.price_stars>0)-Number(a.price_stars>0)||Number(a.price_stars||0)-Number(b.price_stars||0));
-  $("shop").innerHTML=items.length?items.map(c=>{
+  items=[...items].sort((a,b)=>Number(a.price_stars||a.price_points||0)-Number(b.price_stars||b.price_points||0));
+  const renderItem=c=>{
     const isOwned=owned.has(c.id),stars=Number(c.price_stars||0),points=Number(c.price_points||0),exclusive=["top1","top10"].includes(c.collection);
     let action="";
     if(isOwned)action=`<div class="ownedTag">OWNED ✓</div>`;
@@ -868,8 +883,13 @@ function renderShop(){
     else if(points>0&&c.is_purchasable)action=`<button class="secondary buy" data-id="${c.id}">BUY · ${points.toLocaleString()} PTS</button>`;
     else if(exclusive)action=`<div class="exclusiveTag">${c.collection==="top1"?"TOP 1 ONLY":"TOP 10 ONLY"}</div>`;
     else action=`<div class="exclusiveTag">RANK / EVENT DROP</div>`;
-    return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div><div class="shopDescription">${cosmeticDescription(c)}</div><button class="secondary tryOn" data-id="${c.id}">ПРИМЕРИТЬ</button>${action}</div>`;
-  }).join(""):`<p class="muted">В этой категории пока нет предметов.</p>`;
+    return `<div class="item ${stars>0?"premiumItem":""}"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div><div class="shopDescription">${cosmeticDescription(c)}</div><button class="secondary tryOn" data-id="${c.id}">ПРИМЕРИТЬ</button>${action}</div>`;
+  };
+  const pointsItems=items.filter(c=>!Number(c.price_stars)&&c.is_purchasable&&Number(c.price_points)>0);
+  const rewardItems=items.filter(c=>!Number(c.price_stars)&&!(c.is_purchasable&&Number(c.price_points)>0));
+  const starItems=items.filter(c=>Number(c.price_stars)>0);
+  const section=(title,list,cls='')=>list.length?`<section class="shopSection ${cls}"><h3>${title}</h3><div class="inventory">${list.map(renderItem).join('')}</div></section>`:'';
+  $("shop").innerHTML=section('За Points',pointsItems)+section('Награды',rewardItems)+section('За Stars',starItems,'starsSection')||'<p class="muted">В этой категории пока нет предметов.</p>';
   document.querySelectorAll(".tryOn").forEach(b=>b.onclick=()=>showTryOn(b.dataset.id));
   document.querySelectorAll(".buy").forEach(b=>b.onclick=()=>buyCosmetic(b.dataset.id));document.querySelectorAll(".starBuy").forEach(b=>b.onclick=()=>buyWithStars(b.dataset.id));
 }
@@ -983,7 +1003,7 @@ function showBattleIntro(mode){
   const style=state.player?.style?.battle_intro;
   $("introTitle").textContent=style?.name|| (mode==="ranked"?"RANKED LOCK":"QUICK SCAN");
   $("introSub").textContent=mode==="ranked"?"MATCH FOUND · SCORE ON THE LINE":"MATCH FOUND · ZERO SCORE RISK";
-  $("introOverlay").classList.add("show");
+  $("introOverlay").className="introOverlay show"+(style?" intro-"+visualKey(style):"");
   tg?.HapticFeedback?.impactOccurred("medium");
   return new Promise(resolve=>setTimeout(()=>{$("introOverlay").classList.remove("show");resolve()},1150));
 }
