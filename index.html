@@ -445,6 +445,65 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-ser
 #spinResult{min-height:48px;text-align:center;font-size:15px;line-height:1.5;padding:10px 0}
 .spinOdds{margin-top:16px;color:#b6c5db;font-size:11px;line-height:1.6}.spinOdds summary{cursor:pointer;font-size:12px}
 @media(max-height:650px){#homeFeed .facePhoto{height:140px}.app{padding-top:10px}.spinStage{transform:scale(.85);margin:0 auto}}
+
+/* Studio edition: shared geometry, type scale and intentional visual hierarchy. */
+:root{--bg:#090c12;--card:#141a24;--line:#2b3649;--text:#f2f4f8;--muted:#a0adc0;--accent:#8caaff;--accent2:#d5e2ff}
+body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090c12}
+.app{padding:17px 15px calc(94px + env(safe-area-inset-bottom));max-width:540px}
+.top{border:0;padding:4px 1px 15px;align-items:center}.logo{font-size:23px;font-weight:850;letter-spacing:-1.2px}.logo span{font-size:11px;font-weight:500;letter-spacing:2px;display:block;margin-top:3px;color:#8798b3}.scorePill{font-size:11px;border:1px solid #303e55;border-radius:30px;background:#172133;padding:9px 12px}
+#homeProfileCard{border:1px solid #2c394e;border-radius:14px;background:linear-gradient(120deg,#202d41,#111a28);padding:12px 14px;margin:0 0 21px}
+#homeProfileCard .avatar{width:40px;height:46px;border-radius:7px}
+#homeProfileCard .profileTop{gap:12px}
+#homeProfileCard .profileInfo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px}
+#homeProfileCard .name{font-size:16px;max-width:55%}
+#homeProfileCard .rankRow{margin:0;gap:7px}#homeProfileCard .rank{border:0;background:#33476b;color:#e3ecff;border-radius:5px}#homeProfileCard .timer{font-size:10px}
+#homeProfileCard #homeTitle:empty{display:none}#homeProfileCard .profileInfo>.user{display:none}
+.homeBattleStage .arenaHead{margin:0 0 12px;align-items:center}
+.homeBattleStage .arenaHead h2{font-family:inherit;font-size:29px;font-weight:750;letter-spacing:-1px;line-height:1.1}
+.headingDot{color:#8caaff}.arenaHead>span{font-size:10px;letter-spacing:0}
+#homeFeed .battleCard,.battleCard{background:#121923;border:1px solid #2f3d52;border-radius:16px;padding:10px;margin-top:10px;box-shadow:0 10px 25px #0002}
+#homeFeed .battleFaces,.battleFaces{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:start;margin-top:9px}
+#homeFeed .vs,.battleFaces>.vs{position:absolute;z-index:3;left:50%;top:40%;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;background:#111b2a;border:3px solid #151f2d;width:32px;height:32px;font-size:10px;font-weight:800;letter-spacing:-.6px;color:#d9e5fc}
+#homeFeed .facePhoto,.facePhoto{height:clamp(145px,27dvh,230px);min-height:0;max-height:none;border-radius:9px}
+#homeFeed .face b,.face b{font-size:13px;font-weight:650;margin-top:9px;text-align:left;padding:0 4px}
+.face small{text-align:left;padding:0 4px;color:#9baac1;font-size:10px}
+.battleSplit{height:3px;background:#465269;border-radius:4px;overflow:hidden;margin:12px 3px 6px}.battleSplit i{display:block;height:100%;background:#8fabf4;transition:width .3s ease}
+.tally{font-size:9px;padding:0 3px;color:#9baac1}
+#homeFeed .voteBar,.voteBar{gap:8px;margin-top:9px}
+#homeFeed .vote,.vote{background:#23334e;border:1px solid #405a83;border-radius:8px;min-height:41px;color:#dce8ff;font-size:11px;font-weight:650}
+#homeFeed .vote.selected,.vote.selected{background:#92aff4;color:#111c31;border-color:#b0c6fc}
+.homeModeBar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.homeModeBar button{display:flex;align-items:center;gap:9px;background:linear-gradient(140deg,#223149,#172133);border:1px solid #3d5274;border-radius:11px;color:#eaf0fb;text-align:left;padding:13px 11px;min-width:0}
+.homeModeBar b{font-size:12px}.homeModeBar small{display:block;font-size:9px;color:#a6b5cb;margin-top:4px}
+.modeGlyph{font-size:23px;color:#9eb9f8}.modeArrow{margin-left:auto;color:#a4b8d8}
+#homeView .goalCard{display:none}
+.card:has(.wheelLaunch){background:transparent;border:0;padding:0;margin-top:15px;order:2!important}
+.wheelCardTitle{display:none}.card:has(.wheelLaunch)>.sectionHead{display:none}
+.wheelLaunch{display:flex;width:100%;align-items:center;gap:15px;padding:17px;border:1px solid #485477;border-radius:14px;color:#f0f2fa;background:radial-gradient(ellipse at 0 0,#46517d55,transparent 60%),#1b2033;text-align:left;overflow:hidden}
+.wheelLaunch b{font-size:14px;font-weight:650}.wheelLaunch small{display:block;margin-top:6px;color:#b2b9d2;font-size:10px}.launchArrow{margin-left:auto;font-size:23px;color:#c1c8f5}
+.miniWheel{display:block;flex:0 0 48px;height:48px;border:3px solid #b6c3e8;border-radius:50%;background:conic-gradient(#859bca 0deg 60deg,#30446b 60deg 120deg,#7c90b6 120deg 180deg,#263a60 180deg 240deg,#8299c6 240deg 300deg,#3c517b 300deg);position:relative;transform:rotate(-15deg);box-shadow:0 0 0 4px #ffffff0b}.miniWheel:after{content:'';position:absolute;inset:15px;border-radius:50%;background:#d1dafa}
+.nav{width:min(540px,100%);background:#101722f5;border-color:#33415a;padding-top:9px}
+.nav button{color:#90a0b9;font-size:10px;min-height:46px;border-radius:9px}.nav svg{display:block;margin:0 auto 5px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5}.nav small{margin-top:0;font-size:9px}
+.nav button.active{background:#233650;color:#dce9ff;box-shadow:inset 0 1px #5a77a3}
+.matchBox{border:1px solid #3b5279;border-radius:16px;background:radial-gradient(ellipse at 100% 0,#5978a62b,transparent 60%),#151f2e}
+#rankedBtn{background:linear-gradient(135deg,#afc5f5,#769ce7);color:#132138}
+#quickBtn{background:#26354b;color:#d9e6fa;border-color:#476084}
+.sectionHead h2{font-size:18px;letter-spacing:-.5px}
+.itemPreview{border-radius:9px;background:radial-gradient(ellipse at 50% 0,#33415b,#111925 80%);height:145px}
+.item{background:#162030;border-color:#34445e}
+.starsSection{border-top-color:#7b6c55}.premiumItem{background:linear-gradient(140deg,#332c24,#1c1e29)!important}
+.spinSheet{background:radial-gradient(ellipse at 50% 30%,#263758,#111a2a 70%);border-color:#52678a;border-radius:24px;padding:24px}
+.spinSheet .sectionHead h2{font-size:23px;letter-spacing:-.8px}
+.spinStage{margin:30px auto;filter:drop-shadow(0 16px 16px #0005)}
+#spinDisc{border:7px solid #b0bfd9;box-shadow:0 0 0 2px #3d5274,0 0 0 10px #17263e,0 0 0 11px #586f94;background:conic-gradient(#314d78 0 60deg,#142944 60deg 120deg,#4a6590 120deg 180deg,#203b63 180deg 240deg,#344e77 240deg 300deg,#6681ad 300deg 360deg)}
+#spinDisc span{font-weight:650;font-size:12px;text-shadow:0 1px 3px #0007}
+.spinCenter{inset:91px;background:linear-gradient(145deg,#d5dfed,#7185a6);border:5px solid #20314d;box-shadow:0 0 0 1px #a2b7d6;display:flex;flex-direction:column;justify-content:center;color:#15263e}
+.spinCenter b{font-size:22px;line-height:1}.spinCenter small{font-size:7px;letter-spacing:1.5px;margin-top:4px}
+.spinPointer{top:-17px;border-top-color:#e1ebfa;filter:drop-shadow(0 2px 3px #000a)}
+#spinRun{background:linear-gradient(130deg,#b8cef6,#7fa5ef);color:#132440;font-size:12px;font-weight:750}
+#spinResult{font-weight:600;color:#dbe8ff}.spinOdds{border-top:1px solid #3b4d68;padding-top:15px}
+@media(max-width:365px){.app{padding-left:10px;padding-right:10px}.homeModeBar button{padding:11px 8px}.modeGlyph{font-size:18px}#homeProfileCard .profileInfo{display:block}#homeProfileCard .name{max-width:none}#homeProfileCard .rankRow{margin-top:4px}}
+@media(prefers-reduced-motion:reduce){.battleSplit i{transition:none}}
 </style>
 </head>
 <body>
@@ -523,22 +582,22 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-ser
       <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 SCORE TO GO</div></div>
       <div class="progress"><i id="nextRankProgress"></i></div>
       <div class="goalCopy" id="goalCopy">Win Ranked battles to raise your MOGG Score.</div>
-      <button id="battleNowBtn" class="primary pink battleNow">ПЕРЕЙТИ К БОЯМ</button>
+
       <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
     </div>
 
     <div class="card homeBattleStage">
-      <div class="sectionHead"><h2>Голосование</h2><span><span class="liveDot">●</span> LIVE</span></div>
+      <div class="sectionHead arenaHead"><h2>Баттлы<span class="headingDot">.</span></h2><span><span class="liveDot">●</span> Голосование</span></div>
       <div class="feedTabs">
         <button class="tab active" data-feed="all">LIVE</button>
         <button class="tab" data-feed="promotion">PROMOTION</button>
         <button class="tab" data-feed="high">HIGH ELO</button>
       </div>
-      <div id="homeFeed"></div>
+      <div id="homeFeed"></div><div class="homeModeBar"><button id="homeRanked"><span class="modeGlyph">↗</span><span><b>Ranked</b><small>С рейтингом</small></span><span class="modeArrow">→</span></button><button id="homeQuick"><span class="modeGlyph">⌁</span><span><b>Quick</b><small>Без рейтинга</small></span><span class="modeArrow">→</span></button></div>
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Ежедневный спин</h2></div>
+      <div class="sectionHead"><h2 class="wheelCardTitle">Ежедневный спин</h2></div>
       <div class="sponsor" hidden>
         <b style="font-size:11px">@mbgbchannel</b>
         <p class="muted">Бонус за подписку на канал.</p>
@@ -547,7 +606,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-ser
           <span class="rewardValue">+150 POINTS</span>
         </div>
       </div>
-      <p class="muted">Один бесплатный спин в сутки.</p><button id="appDailyBtn" class="primary pink">ОТКРЫТЬ КОЛЕСО</button>
+      <button id="appDailyBtn" class="wheelLaunch"><span class="miniWheel" aria-hidden="true"></span><span><b>Ежедневный спин</b><small>Бесплатно · один раз в сутки</small></span><span class="launchArrow">↗</span></button>
     </div>
     <div class="card dailyRun">
       <div class="runTop">
@@ -678,7 +737,7 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-ser
     </div>
   </section>
 </main>
-<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg">50 P</span><span style="--a:90deg">100 P</span><span style="--a:150deg">200 P</span><span style="--a:210deg">400 P</span><span style="--a:270deg">Энергия</span><span style="--a:330deg">Образ</span></div><div class="spinCenter">M</div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><details class="spinOdds"><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>Косметика за Points — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Косметика выбирается среди неполученных предметов ценой до 1 600 Points, без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
+<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg">50 P</span><span style="--a:90deg">100 P</span><span style="--a:150deg">200 P</span><span style="--a:210deg">400 P</span><span style="--a:270deg">Энергия</span><span style="--a:330deg">Образ</span></div><div class="spinCenter"><b>M</b><small>DAILY</small></div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><details class="spinOdds"><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>Косметика за Points — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Косметика выбирается среди неполученных предметов ценой до 1 600 Points, без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
 
 
 
@@ -706,11 +765,11 @@ html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-ser
 </div>
 
 <nav class="nav">
-  <button class="active" data-view="home">⌂<small>Главная</small></button>
-  <button data-view="battle">⚔<small>Бои</small></button>
-  <button data-view="tap">///<small>Студия</small></button>
-  <button data-view="rewards">◇<small>Магазин</small></button>
-  <button data-view="profile">○<small>Профиль</small></button>
+  <button class="active" data-view="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></svg><small>Главная</small></button>
+  <button data-view="battle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3 20 21M20 3 4 21M3 16l5 5m8 0 5-5"/></svg><small>Бои</small></button>
+  <button data-view="tap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v14H3ZM7 7l2-4h6l2 4"/><circle cx="12" cy="14" r="4"/></svg><small>Студия</small></button>
+  <button data-view="rewards"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l1 13H3ZM8 8V6a4 4 0 0 1 8 0v2"/></svg><small>Магазин</small></button>
+  <button data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg><small>Профиль</small></button>
 </nav>
 
 <div id="tryModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="tryTitle"><div class="rankSheet shopSheet"><div class="row"><h2 id="tryTitle">Примерка</h2><button id="tryClose" class="modalClose">Закрыть</button></div><div id="tryPreview"></div><p id="tryDescription" class="muted"></p><p class="muted">Примерка бесплатна. Покупка — отдельной кнопкой в магазине.</p></div></div>
@@ -933,14 +992,14 @@ function battleHtml(b){
   const total=Number(b.votes_a||0)+Number(b.votes_b||0),pa=total?Math.round(Number(b.votes_a||0)/total*100):50,pb=100-pa;
   const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
   const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="row timer"><span>${pa}%</span><span>${pb}%</span></div>${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
+  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="battleSplit" aria-label="Голоса: ${Number(b.votes_a||0)} против ${Number(b.votes_b||0)}"><i style="width:${pa}%"></i></div><div class="row timer tally"><span>${total?pa+"%":"—"}</span><span>${total} голосов</span><span>${total?pb+"%":"—"}</span></div>${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
 }
 
 const sessionVotedBattles=new Set();
 let votePending=false;
 function renderFeed(){
   const own=state.feed.find(isOwnLiveBattle);
-  $('battleNowBtn').textContent=own?'ОТКРЫТЬ ТЕКУЩИЙ БОЙ':'ПЕРЕЙТИ К БОЯМ';
+
   const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now()).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)));
   $("feedCount").textContent=valid.length+" BATTLES";
   $("homeFeed").innerHTML=valid.some(b=>isOwnLiveBattle(b)||!sessionVotedBattles.has(b.id))?valid.filter(b=>isOwnLiveBattle(b)||!sessionVotedBattles.has(b.id)).slice(0,1).map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Можно начать свой бой или вернуться к голосованию позже.</p><button class="secondary emptyBattleBtn">FIND OPPONENT</button></div>`;
@@ -1125,6 +1184,8 @@ function prizeText(p){
  if(p.cosmetic_name)return "Твой приз: "+p.cosmetic_name;
  return [p.points?("+"+p.points+" Points"):"",p.energy?("+"+p.energy+" энергии"):""].filter(Boolean).join(" · ");
 }
+$("homeRanked").onclick=()=>{openView("battle");$("rankedBtn").click();};
+$("homeQuick").onclick=()=>{openView("battle");$("quickBtn").click();};
 $("appDailyBtn").onclick=async()=>{
  $("dailyWheel").hidden=false;$("spinResult").textContent="Проверяем доступность…";$("spinRun").disabled=true;
  try{const d=await call("daily_spin_status");$("spinRun").disabled=d.claimed;$("spinResult").textContent=d.claimed?(d.prize?prizeText(d.prize):"Бонус сегодня уже получен"):"Спин доступен";}catch(e){$("spinResult").textContent="Не удалось проверить. Закрой и открой колесо ещё раз.";}
@@ -1305,7 +1366,7 @@ function profileShareText(){
 
 function openView(view){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>openView(btn.dataset.view)));
-$("battleNowBtn").onclick=()=>{tg?.HapticFeedback?.impactOccurred("medium");openView("battle")};
+
 $("shareProfileBtn").onclick=()=>shareTelegram(profileShareText());
 $("resultShare").onclick=()=>shareTelegram(lastResultShare||profileShareText());
 
