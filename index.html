@@ -504,6 +504,20 @@ body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090
 #spinResult{font-weight:600;color:#dbe8ff}.spinOdds{border-top:1px solid #3b4d68;padding-top:15px}
 @media(max-width:365px){.app{padding-left:10px;padding-right:10px}.homeModeBar button{padding:11px 8px}.modeGlyph{font-size:18px}#homeProfileCard .profileInfo{display:block}#homeProfileCard .name{max-width:none}#homeProfileCard .rankRow{margin-top:4px}}
 @media(prefers-reduced-motion:reduce){.battleSplit i{transition:none}}
+
+/* Readable prize wheel, responsive to the Telegram window width. */
+#dailyWheel{padding:12px}
+.spinSheet{width:min(500px,100%);padding:22px;max-height:calc(100dvh - 24px)}
+.spinStage{width:min(340px,calc(100vw - 92px));height:auto;aspect-ratio:1;margin:28px auto 20px;container-type:inline-size;transform:none}
+#spinDisc span{width:90px;margin-left:-45px;margin-top:-22px;transform:rotate(var(--a)) translateY(-31cqw) rotate(calc(-1 * var(--a)));text-shadow:0 1px 3px #0008;line-height:1.1}
+#spinDisc span b{display:block;font-size:clamp(19px,7cqw,25px);font-weight:800}
+#spinDisc span small{display:block;font-size:clamp(10px,3.5cqw,12px);margin-top:4px;font-weight:550}
+.spinCenter{inset:38%;border-width:4px}
+.spinCenter b{font-size:27px}.spinCenter small{font-size:8px;letter-spacing:1px}
+#spinResult{min-height:42px;padding:6px 0 10px}
+.moggPrizeNote{font-size:12px;color:#c7d4e8;line-height:1.5;padding:12px;background:#101c2e;border:1px solid #3a4e6d;border-radius:9px;margin:14px 0 0}
+.spinOdds{font-size:12px;margin-top:12px}.spinOdds summary{font-size:13px;font-weight:650}
+@supports not (container-type:inline-size){#spinDisc span{transform:rotate(var(--a)) translateY(-90px) rotate(calc(-1 * var(--a)))}}
 </style>
 </head>
 <body>
@@ -737,7 +751,7 @@ body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090
     </div>
   </section>
 </main>
-<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg">50 P</span><span style="--a:90deg">100 P</span><span style="--a:150deg">200 P</span><span style="--a:210deg">400 P</span><span style="--a:270deg">Энергия</span><span style="--a:330deg">Образ</span></div><div class="spinCenter"><b>M</b><small>DAILY</small></div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><details class="spinOdds"><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>Косметика за Points — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Косметика выбирается среди неполученных предметов ценой до 1 600 Points, без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
+<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg"><b>50</b><small>Points</small></span><span style="--a:90deg"><b>100</b><small>Points</small></span><span style="--a:150deg"><b>200</b><small>Points</small></span><span style="--a:210deg"><b>400</b><small>Points</small></span><span style="--a:270deg"><b>30</b><small>энергии</small></span><span style="--a:330deg"><b>1</b><small>предмет</small></span></div><div class="spinCenter"><b>↻</b><small>СПИН</small></div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><p class="moggPrizeNote">MOGG-токены пока не разыгрываются: выплаты ещё не подключены.</p><details class="spinOdds" open><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>1 предмет косметики — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Предмет — рамка, фон, титул, стиль имени или рейтинга из магазина за Points ценой до 1 600. Только то, чего у тебя ещё нет; без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
 
 
 
