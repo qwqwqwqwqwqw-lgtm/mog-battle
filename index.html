@@ -403,6 +403,48 @@ body{background:#0e0e10}
 @keyframes editorialPair{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}
 #homeFeed .facePhoto{animation:editorialPair .28s ease-out}
 @media(prefers-reduced-motion:reduce){#homeFeed .facePhoto{animation:none}}
+
+/* Unified graphite/cobalt, compact mobile battle composition. */
+:root{--accent:#6689ff;--accent2:#cbd7ff;--line:#303a4c;--muted:#a4adbd}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#0c1018}
+.logo,#homeFeed .face b,#homeFeed .vs,#homeView .goalRank,.homeBattleStage .sectionHead h2{font-family:inherit;font-style:normal}
+.logo{font-weight:850;font-size:24px;letter-spacing:-.8px}.logo span{color:#a5b5d4}
+.top{padding-bottom:12px}.app{padding-top:16px}
+#homeProfileCard{padding:10px 0;margin-bottom:4px;background:transparent}
+#homeProfileCard .avatar{width:40px;height:44px}
+#homeProfileCard .name{font-size:16px;letter-spacing:-.3px}
+#homeProfileCard .user,#homeProfileCard .progress{display:none}
+#homeProfileCard .rankRow{margin-top:4px}
+#homeProfileCard .rank{padding:3px 7px;font-size:10px}
+.homeBattleStage .sectionHead h2{font-size:18px;font-weight:650;letter-spacing:-.4px}
+#homeFeed .battleCard{background:linear-gradient(160deg,#171e2c,#111722);border:1px solid #334058;border-radius:14px;padding:11px}
+#homeFeed .facePhoto{height:clamp(140px,28dvh,240px);border-radius:8px;animation:none}
+#homeFeed .face b{font-size:13px;margin-top:7px;font-weight:650}
+#homeFeed .face small{font-size:10px}
+#homeFeed .battleFaces{margin-top:8px}
+#homeFeed .voteBar{margin-top:9px}
+#homeFeed .vote{border-radius:8px;min-height:40px;background:#222e44;border-color:#475c80}
+#homeFeed .vote.selected{background:#4765b8;color:white}
+#homeView .goalCard{padding:10px 0;margin-top:6px}
+#homeView .goalCard .kicker,#homeView .goalCard .goalTop,#homeView .goalCard>.progress{display:none}
+#homeView .battleNow,.primary.pink{background:#577bea;color:#fff;border-radius:10px}
+#homeView .battleNow{margin-top:4px}
+.nav button.active{background:#233351;color:#cfddff;box-shadow:inset 0 1px #7894ce}
+.progress i{background:#6d91ff}
+.matchBox{background:linear-gradient(135deg,#1c2941,#121b2a);border-color:#3c5278;padding:16px}
+.matchBox>h2{font-size:21px!important}.matchBox>p{margin:7px 0}
+#rankedBtn,#quickBtn{min-height:78px!important;padding:13px;font-size:14px}#rankedBtn{background:#577bea;color:white}#quickBtn{background:#202d43;border-color:#4a628a}
+#dailyWheel{position:fixed;inset:0;z-index:125;background:#030712cf;display:flex;align-items:center;justify-content:center;padding:16px}
+#dailyWheel[hidden]{display:none}
+.spinSheet{width:min(420px,100%);max-height:90dvh;overflow:auto;background:#141d2b;border:1px solid #415572;border-radius:20px;padding:20px}
+.spinStage{position:relative;width:250px;height:250px;margin:20px auto}
+#spinDisc{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#2d466d 0deg 60deg,#172a47 60deg 120deg,#385580 120deg 180deg,#192f50 180deg 240deg,#344261 240deg 300deg,#4b628d 300deg 360deg);border:5px solid #7690b5;box-shadow:0 0 0 6px #0b1422}
+#spinDisc span{position:absolute;left:50%;top:50%;width:76px;margin-left:-38px;margin-top:-8px;text-align:center;transform:rotate(var(--a)) translateY(-83px);font-size:12px;color:#fff;font-weight:700}
+.spinCenter{position:absolute;inset:96px;border-radius:50%;display:grid;place-items:center;background:#111d30;border:1px solid #7189af;font-size:22px;font-weight:800}
+.spinPointer{position:absolute;z-index:2;top:-9px;left:calc(50% - 10px);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:22px solid #e1ebff}
+#spinResult{min-height:48px;text-align:center;font-size:15px;line-height:1.5;padding:10px 0}
+.spinOdds{margin-top:16px;color:#b6c5db;font-size:11px;line-height:1.6}.spinOdds summary{cursor:pointer;font-size:12px}
+@media(max-height:650px){#homeFeed .facePhoto{height:140px}.app{padding-top:10px}.spinStage{transform:scale(.85);margin:0 auto}}
 </style>
 </head>
 <body>
@@ -486,7 +528,7 @@ body{background:#0e0e10}
     </div>
 
     <div class="card homeBattleStage">
-      <div class="sectionHead"><h2>Кто кого?</h2><span><span class="liveDot">●</span> LIVE</span></div>
+      <div class="sectionHead"><h2>Голосование</h2><span><span class="liveDot">●</span> LIVE</span></div>
       <div class="feedTabs">
         <button class="tab active" data-feed="all">LIVE</button>
         <button class="tab" data-feed="promotion">PROMOTION</button>
@@ -496,8 +538,8 @@ body{background:#0e0e10}
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Ежедневный бонус</h2></div>
-      <div class="sponsor">
+      <div class="sectionHead"><h2>Ежедневный спин</h2></div>
+      <div class="sponsor" hidden>
         <b style="font-size:11px">@mbgbchannel</b>
         <p class="muted">Бонус за подписку на канал.</p>
         <div class="row">
@@ -505,7 +547,7 @@ body{background:#0e0e10}
           <span class="rewardValue">+150 POINTS</span>
         </div>
       </div>
-      <button id="appDailyBtn" class="primary pink">ПРОВЕРИТЬ И ЗАБРАТЬ</button>
+      <p class="muted">Один бесплатный спин в сутки.</p><button id="appDailyBtn" class="primary pink">ОТКРЫТЬ КОЛЕСО</button>
     </div>
     <div class="card dailyRun">
       <div class="runTop">
@@ -636,6 +678,8 @@ body{background:#0e0e10}
     </div>
   </section>
 </main>
+<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg">50 P</span><span style="--a:90deg">100 P</span><span style="--a:150deg">200 P</span><span style="--a:210deg">400 P</span><span style="--a:270deg">Энергия</span><span style="--a:330deg">Образ</span></div><div class="spinCenter">M</div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><details class="spinOdds"><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>Косметика за Points — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Косметика выбирается среди неполученных предметов ценой до 1 600 Points, без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
+
 
 
 <div id="caseModal" class="caseModal">
@@ -1075,15 +1119,35 @@ $("tapBtn").addEventListener("click",async(e)=>{
 
 $("openChannel").addEventListener("click",()=>{tg?.openTelegramLink?.("https://t.me/mbgbchannel")||window.open("https://t.me/mbgbchannel","_blank")});
 
-$("appDailyBtn").addEventListener("click",async()=>{
-  try{
-    const d=await call("app_daily");state.player=d.player;renderPlayer();$("appDailyBtn").disabled=true;$("appDailyBtn").textContent="CLAIMED";toast("+"+d.reward+" POINTS");
-  }catch(e){
-    if(e.message==="subscription_required")toast("Сначала подпишись на @"+(e.data?.channel||"mbgbchannel"));
-    else if(String(e.message).includes("already"))toast("Уже получено сегодня");
-    else toast("Не удалось проверить подписку");
-  }
-});
+
+let wheelBusy=false,wheelAngle=0;
+function prizeText(p){
+ if(p.cosmetic_name)return "Твой приз: "+p.cosmetic_name;
+ return [p.points?("+"+p.points+" Points"):"",p.energy?("+"+p.energy+" энергии"):""].filter(Boolean).join(" · ");
+}
+$("appDailyBtn").onclick=async()=>{
+ $("dailyWheel").hidden=false;$("spinResult").textContent="Проверяем доступность…";$("spinRun").disabled=true;
+ try{const d=await call("daily_spin_status");$("spinRun").disabled=d.claimed;$("spinResult").textContent=d.claimed?(d.prize?prizeText(d.prize):"Бонус сегодня уже получен"):"Спин доступен";}catch(e){$("spinResult").textContent="Не удалось проверить. Закрой и открой колесо ещё раз.";}
+};
+$("spinClose").onclick=()=>{if(!wheelBusy)$("dailyWheel").hidden=true;};
+$("spinRun").onclick=async()=>{
+ if(wheelBusy)return;wheelBusy=true;$("spinRun").disabled=true;$("spinClose").disabled=true;$("spinResult").textContent="Получаем результат…";
+ try{
+  const d=await call("daily_spin"),p=d.prize;
+  const target=(360-(Number(p.slot)*60+30))%360;
+  wheelAngle=wheelAngle+1440+((target-wheelAngle%360+360)%360);
+  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  $("spinDisc").style.transition=reduced?"none":"transform 2.6s cubic-bezier(.16,.7,.2,1)";
+  $("spinDisc").style.transform="rotate("+wheelAngle+"deg)";
+  if(!reduced)await new Promise(r=>setTimeout(r,2700));
+  $("spinResult").textContent=prizeText(p)+(d.replayed?" · получено сегодня":"");
+  await refresh();
+ }catch(e){
+  $("spinResult").textContent=String(e.message).includes("already_claimed")?"Бонус сегодня уже получен. Новый спин — в 00:00 UTC.":"Не удалось получить результат. Повтори: повторного начисления не будет.";
+  $("spinRun").disabled=String(e.message).includes("already_claimed");
+ }finally{wheelBusy=false;$("spinClose").disabled=false;}
+};
+
 
 
 function showBattleIntro(mode){
