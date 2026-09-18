@@ -518,6 +518,32 @@ body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090
 .moggPrizeNote{font-size:12px;color:#c7d4e8;line-height:1.5;padding:12px;background:#101c2e;border:1px solid #3a4e6d;border-radius:9px;margin:14px 0 0}
 .spinOdds{font-size:12px;margin-top:12px}.spinOdds summary{font-size:13px;font-weight:650}
 @supports not (container-type:inline-size){#spinDisc span{transform:rotate(var(--a)) translateY(-90px) rotate(calc(-1 * var(--a)))}}
+
+/* Wheel v2: fit the sheet, counter-rotate labels, keep the action visible. */
+#dailyWheel{padding:10px;background:#04070cea;backdrop-filter:blur(12px)}
+#dailyWheel .spinSheet{width:min(460px,100%);min-width:0;padding:20px;max-height:calc(100dvh - 20px);overflow-x:hidden;overflow-y:auto;background:radial-gradient(ellipse at 50% 28%,#202d40,#0d131d 70%);border:1px solid #3e4b60;border-radius:22px;box-shadow:0 24px 80px #0009}
+#dailyWheel .sectionHead{align-items:center}
+#dailyWheel .sectionHead h2{font-size:22px;letter-spacing:-.6px}
+.spinEyebrow{font-size:9px;letter-spacing:2px;color:#aebdd1;margin-bottom:5px}
+#dailyWheel .spinStage{width:calc(100% - 24px);max-width:360px;height:auto;aspect-ratio:1;margin:28px auto 20px;container-type:inline-size;transform:none}
+#dailyWheel #spinDisc{border:2px solid #acb7c7;box-shadow:0 0 0 5px #131b27,0 0 0 6px #67758a,0 0 0 10px #0b111b;background:conic-gradient(#24364e 0deg 29.6deg,#8594a3 29.6deg 30deg,#1c2a3d 30deg 59.6deg,#8594a3 59.6deg 60deg,#30435b 60deg 89.6deg,#8594a3 89.6deg 90deg,#20334c 90deg 119.6deg,#8594a3 119.6deg 120deg,#36587b 120deg 149.6deg,#8594a3 149.6deg 150deg,#68523a 150deg 179.6deg,#8594a3 179.6deg 180deg,#214c53 180deg 209.6deg,#8594a3 209.6deg 210deg,#2e6268 210deg 239.6deg,#8594a3 239.6deg 240deg,#304668 240deg 269.6deg,#8594a3 269.6deg 270deg,#58485e 270deg 299.6deg,#8594a3 299.6deg 300deg,#3f4863 300deg 329.6deg,#8594a3 329.6deg 330deg,#625046 330deg 359.6deg,#8594a3 359.6deg 360deg)}
+#dailyWheel #spinDisc .spinLabel{width:18%;margin:0;transform:translate(-50%,-50%);line-height:1.05;font-weight:600}
+#dailyWheel #spinDisc .spinLabel b{font-size:clamp(14px,5.8cqw,21px);font-weight:800;letter-spacing:-.6px}
+#dailyWheel #spinDisc .spinLabel small{font-size:clamp(7px,2.6cqw,10px);margin-top:3px;letter-spacing:0}
+#dailyWheel .spinCenter{inset:38%;border:2px solid #8d9fb8;background:radial-gradient(circle at 35% 25%,#e0e7ef,#8a9cb5 70%,#52627a);box-shadow:0 0 0 6px #0d172b;color:#102036}
+#dailyWheel .spinPointer{top:-13px;left:calc(50% - 8px);border-left-width:8px;border-right-width:8px;border-top:19px solid #f6e5c8}
+#dailyWheel #spinResult{font-size:15px;min-height:46px;overflow-wrap:anywhere}
+#dailyWheel #spinRun{min-height:48px;border-radius:12px;background:linear-gradient(110deg,#d5e0ef,#9cb6df);color:#15243a;font-size:12px}
+#dailyWheel #spinRun:disabled{opacity:.6}
+.spinAction{position:sticky;bottom:-20px;margin:0 -4px;padding:9px 4px 16px;background:linear-gradient(#0d131df2,#0d131d);z-index:3}
+.spinCaption{text-align:center;font-size:11px;color:#99abc2;margin:9px 0 0}
+.spinOddsGrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:12px}
+.spinOddsGrid>div{display:flex;justify-content:space-between;gap:6px;padding:8px 0;border-bottom:1px solid #ffffff12;font-size:11px}
+.spinOddsGrid b{color:#e1eaf7;white-space:nowrap}
+#dailyWheel .spinOdds p{font-size:11px;color:#9eacc0}
+#dailyWheel .moggPrizeNote{font-size:11px;border:0;padding:0;background:none;color:#99abc2}
+@media(max-width:340px){#dailyWheel .spinSheet{padding:15px}.spinOddsGrid{grid-template-columns:1fr}.spinAction{bottom:-15px}#dailyWheel .sectionHead h2{font-size:20px}}
+
 </style>
 </head>
 <body>
@@ -751,7 +777,17 @@ body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090
     </div>
   </section>
 </main>
-<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet"><div class="sectionHead"><h2 id="spinTitle">Ежедневный спин</h2><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div><p class="muted">Бесплатно · обновление в 00:00 UTC</p><div class="spinStage"><div class="spinPointer"></div><div id="spinDisc"><span style="--a:30deg"><b>50</b><small>Points</small></span><span style="--a:90deg"><b>100</b><small>Points</small></span><span style="--a:150deg"><b>200</b><small>Points</small></span><span style="--a:210deg"><b>400</b><small>Points</small></span><span style="--a:270deg"><b>30</b><small>энергии</small></span><span style="--a:330deg"><b>1</b><small>предмет</small></span></div><div class="spinCenter"><b>↻</b><small>СПИН</small></div></div><div id="spinResult" role="status" aria-live="polite"></div><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><p class="moggPrizeNote">MOGG-токены пока не разыгрываются: выплаты ещё не подключены.</p><details class="spinOdds" open><summary>Призы и вероятности</summary><p>50 Points — 35%<br>100 Points — 30%<br>200 Points — 15%<br>400 Points — 5%<br>30 энергии — 10%<br>1 предмет косметики — 5%</p><p>Излишек энергии превращается в Points: 1 к 1. Предмет — рамка, фон, титул, стиль имени или рейтинга из магазина за Points ценой до 1 600. Только то, чего у тебя ещё нет; без предметов за Stars. Если подходящих нет — 150 Points.</p><p>Размеры секторов не обозначают вероятность. Приз начисляется сервером до анимации. MOGG и платных вращений сейчас нет.</p></details></div></div>
+<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet">
+<div class="sectionHead"><div><div class="spinEyebrow">MOGG DAILY</div><h2 id="spinTitle">Твой ежедневный приз</h2></div><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div>
+<p class="spinCaption">Один бесплатный спин · каждый день</p>
+<div class="spinStage" aria-hidden="true"><div class="spinPointer"></div><div id="spinDisc"><span class="spinLabel" style="left:59.83512371389579%;top:13.294818601015407%"><b>50</b><small>Points</small></span><span class="spinLabel" style="left:76.8700576850888%;top:23.129942314911194%"><b>75</b><small>Points</small></span><span class="spinLabel" style="left:86.70518139898459%;top:40.16487628610421%"><b>100</b><small>Points</small></span><span class="spinLabel" style="left:86.70518139898459%;top:59.83512371389579%"><b>150</b><small>Points</small></span><span class="spinLabel" style="left:76.87005768508881%;top:76.8700576850888%"><b>200</b><small>Points</small></span><span class="spinLabel" style="left:59.8351237138958%;top:86.70518139898459%"><b>400</b><small>Points</small></span><span class="spinLabel" style="left:40.164876286104224%;top:86.70518139898459%"><b>20</b><small>энергии</small></span><span class="spinLabel" style="left:23.129942314911197%;top:76.87005768508881%"><b>50</b><small>энергии</small></span><span class="spinLabel" style="left:13.294818601015407%;top:59.83512371389578%"><b>100</b><small>P + 20 ⚡</small></span><span class="spinLabel" style="left:13.294818601015407%;top:40.164876286104196%"><b>▣</b><small>рамка</small></span><span class="spinLabel" style="left:23.129942314911187%;top:23.1299423149112%"><b>▧</b><small>фон</small></span><span class="spinLabel" style="left:40.16487628610422%;top:13.294818601015407%"><b>Aa</b><small>титул</small></span></div><div class="spinCenter"><b>↻</b><small>DAILY</small></div></div>
+<div id="spinResult" role="status" aria-live="polite"></div>
+<div class="spinAction"><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><p class="spinCaption">Следующий спин — в 03:00 МСК · 00:00 UTC</p></div>
+<details class="spinOdds"><summary>Все 12 призов и шансы</summary><div class="spinOddsGrid"><div><span>50 Points</span><b>18%</b></div><div><span>75 Points</span><b>15%</b></div><div><span>100 Points</span><b>15%</b></div><div><span>150 Points</span><b>10%</b></div><div><span>200 Points</span><b>8%</b></div><div><span>400 Points</span><b>3%</b></div><div><span>20 энергии</span><b>10%</b></div><div><span>50 энергии</span><b>6%</b></div><div><span>100 Points + 20 энергии</span><b>5%</b></div><div><span>Рамка</span><b>4%</b></div><div><span>Фон профиля</span><b>3%</b></div><div><span>Титул</span><b>3%</b></div></div>
+<p>Рамка: FOCUS или FACE CARD. Фон: CONTACT GRID. Титул: MOGGER, PRETTYBOY, NATURAL или FACE CARD. Выбирается случайный ещё не открытый предмет соответствующего вида из магазина за Points ценой до 1 600. Предметы за Stars и лимитированные коллекции не выпадают.</p>
+<p>Если все подходящие предметы этого вида уже есть — 150 Points. Излишек энергии при полном запасе — Points в соотношении 1:1. Размер сектора не означает его вероятность.</p></details>
+<p class="moggPrizeNote">Points — игровые очки. MOGG-токены пока не разыгрываются: выплаты не подключены.</p>
+</div></div>
 
 
 
@@ -1193,36 +1229,74 @@ $("tapBtn").addEventListener("click",async(e)=>{
 $("openChannel").addEventListener("click",()=>{tg?.openTelegramLink?.("https://t.me/mbgbchannel")||window.open("https://t.me/mbgbchannel","_blank")});
 
 
-let wheelBusy=false,wheelAngle=0;
+let wheelBusy=false,wheelAngle=0,wheelOpener=null,wheelScroll="";
 function prizeText(p){
  if(p.cosmetic_name)return "Твой приз: "+p.cosmetic_name;
- return [p.points?("+"+p.points+" Points"):"",p.energy?("+"+p.energy+" энергии"):""].filter(Boolean).join(" · ");
+ const reward=[p.points?("+"+p.points+" Points"):"",p.energy?("+"+p.energy+" энергии"):""].filter(Boolean).join(" · ");
+ return reward+(p.fallback?" · все предметы этого вида уже открыты":p.energy_overflow?" · включая компенсацию энергии":"");
+}
+function wheelTarget(slot){return (360-(slot*30+15))%360;}
+function positionWheel(p,animate){
+ if(Number(p?.version)!==2 || !Number.isInteger(Number(p.slot)) || Number(p.slot)<0 || Number(p.slot)>11)return false;
+ const target=wheelTarget(Number(p.slot));
+ wheelAngle=animate?wheelAngle+1440+((target-wheelAngle%360+360)%360):target;
+ const transition=animate?"transform 2.6s cubic-bezier(.16,.7,.2,1)":"none";
+ $("spinDisc").style.transition=transition;
+ $("spinDisc").style.transform="rotate("+wheelAngle+"deg)";
+ $("spinDisc").querySelectorAll(".spinLabel").forEach(el=>{
+   el.style.transition=transition;
+   el.style.transform="translate(-50%,-50%) rotate("+(-wheelAngle)+"deg)";
+ });
+ return true;
+}
+function closeWheel(){
+ if(wheelBusy)return;
+ $("dailyWheel").hidden=true;document.body.style.overflow=wheelScroll;wheelOpener?.focus();
 }
 $("homeRanked").onclick=()=>{openView("battle");$("rankedBtn").click();};
 $("homeQuick").onclick=()=>{openView("battle");$("quickBtn").click();};
 $("appDailyBtn").onclick=async()=>{
- $("dailyWheel").hidden=false;$("spinResult").textContent="Проверяем доступность…";$("spinRun").disabled=true;
- try{const d=await call("daily_spin_status");$("spinRun").disabled=d.claimed;$("spinResult").textContent=d.claimed?(d.prize?prizeText(d.prize):"Бонус сегодня уже получен"):"Спин доступен";}catch(e){$("spinResult").textContent="Не удалось проверить. Закрой и открой колесо ещё раз.";}
-};
-$("spinClose").onclick=()=>{if(!wheelBusy)$("dailyWheel").hidden=true;};
-$("spinRun").onclick=async()=>{
- if(wheelBusy)return;wheelBusy=true;$("spinRun").disabled=true;$("spinClose").disabled=true;$("spinResult").textContent="Получаем результат…";
+ if(!$("dailyWheel").hidden)return;
+ wheelOpener=document.activeElement;wheelScroll=document.body.style.overflow;document.body.style.overflow="hidden";
+ $("dailyWheel").hidden=false;$("spinClose").focus();$("spinResult").textContent="Проверяем доступность…";$("spinRun").disabled=true;
+ $("spinRun").textContent="КРУТИТЬ БЕСПЛАТНО";
  try{
-  const d=await call("daily_spin"),p=d.prize;
-  const target=(360-(Number(p.slot)*60+30))%360;
-  wheelAngle=wheelAngle+1440+((target-wheelAngle%360+360)%360);
-  const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  $("spinDisc").style.transition=reduced?"none":"transform 2.6s cubic-bezier(.16,.7,.2,1)";
-  $("spinDisc").style.transform="rotate("+wheelAngle+"deg)";
-  if(!reduced)await new Promise(r=>setTimeout(r,2700));
-  $("spinResult").textContent=prizeText(p)+(d.replayed?" · получено сегодня":"");
-  await refresh();
- }catch(e){
-  $("spinResult").textContent=String(e.message).includes("already_claimed")?"Бонус сегодня уже получен. Новый спин — в 00:00 UTC.":"Не удалось получить результат. Повтори: повторного начисления не будет.";
-  $("spinRun").disabled=String(e.message).includes("already_claimed");
- }finally{wheelBusy=false;$("spinClose").disabled=false;}
+  const d=await call("daily_spin_status");$("spinRun").disabled=d.claimed;
+  $("spinRun").textContent=d.claimed?"НА СЕГОДНЯ ПОЛУЧЕНО":"КРУТИТЬ БЕСПЛАТНО";
+  $("spinResult").textContent=d.claimed?(d.prize?prizeText(d.prize):"Бонус сегодня уже получен"):"От 50 до 400 Points, энергия или косметика";
+  if(d.claimed && d.prize)positionWheel(d.prize,false);
+ }catch(e){$("spinResult").textContent="Не удалось проверить. Закрой и открой колесо ещё раз.";}
 };
-
+$("spinClose").onclick=closeWheel;
+$("dailyWheel").addEventListener("keydown",e=>{
+ if(e.key==="Escape"){e.preventDefault();closeWheel();}
+ if(e.key==="Tab"){
+  const all=[...$("dailyWheel").querySelectorAll("button:not(:disabled),summary")];
+  const first=all[0],last=all[all.length-1];
+  if(e.shiftKey && document.activeElement===first){e.preventDefault();last?.focus();}
+  else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first?.focus();}
+ }
+});
+$("spinRun").onclick=async()=>{
+ if(wheelBusy || $("spinRun").disabled)return;
+ wheelBusy=true;$("spinRun").disabled=true;$("spinClose").disabled=true;$("spinResult").textContent="Получаем результат…";
+ let awarded=false;
+ try{
+  const d=await call("daily_spin_v2"),p=d.prize;
+  if(!p)throw new Error("missing_prize");
+  awarded=true;
+  const animate=!d.replayed && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(positionWheel(p,animate) && animate)await new Promise(r=>setTimeout(r,2700));
+  $("spinResult").textContent=prizeText(p)+(d.replayed?" · получено сегодня":"");
+  $("spinRun").textContent="НА СЕГОДНЯ ПОЛУЧЕНО";
+  try{await refresh();}catch(e){$("spinResult").textContent+=" · баланс обновится при следующем входе";}
+ }catch(e){
+  const claimed=String(e.message).includes("already_claimed");
+  $("spinResult").textContent=claimed?"Бонус сегодня уже получен. Новый спин — в 03:00 МСК.":"Не удалось получить результат. Повтори — двойного начисления не будет.";
+  $("spinRun").disabled=awarded||claimed;
+  $("spinRun").textContent=claimed?"НА СЕГОДНЯ ПОЛУЧЕНО":"ПОВТОРИТЬ";
+ }finally{wheelBusy=false;$("spinClose").disabled=false;$("spinClose").focus();}
+};
 
 
 function showBattleIntro(mode){
