@@ -544,6 +544,59 @@ body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090
 #dailyWheel .moggPrizeNote{font-size:11px;border:0;padding:0;background:none;color:#99abc2}
 @media(max-width:340px){#dailyWheel .spinSheet{padding:15px}.spinOddsGrid{grid-template-columns:1fr}.spinAction{bottom:-15px}#dailyWheel .sectionHead h2{font-size:20px}}
 
+
+/* Midnight electric — colour and motion, with gameplay untouched. */
+:root{--accent:#8d9bff;--accent2:#dae1ff;--muted:#a6b3cd}
+body{background:radial-gradient(ellipse at 0 0,#443aa32b,transparent 48%),radial-gradient(ellipse at 100% 18%,#167bce24,transparent 42%),#080d18;background-attachment:fixed}
+.logo{color:#f4f6ff;text-shadow:0 2px 22px #6281ff35}
+.logo span{color:#99aaff}
+.scorePill{background:linear-gradient(120deg,#23294c,#151e36);border-color:#505b8b;color:#edf0ff}
+#homeProfileCard:not([class*="bg-"]){background:linear-gradient(115deg,#242d53,#142038 72%);border-color:#455384}
+#homeProfileCard .rank{background:#394c8b;color:#edf2ff}
+.homeBattleStage{border-top-color:#5262a5}
+.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#5369e8,#7356dc);color:#fff;border-color:#8a91f5;box-shadow:0 5px 22px #5366e82b}
+.homeModeBar #homeQuick,#quickBtn{background:linear-gradient(120deg,#122d40,#17334b);color:#e1f8ff;border-color:#38748c}
+#homeRanked .modeGlyph,#homeRanked .modeArrow{color:#e1dcff}
+#homeQuick .modeGlyph,#homeQuick .modeArrow{color:#79e4ed}
+.homeModeBar small{color:#d0dafa}
+#homeFeed .vote,.vote{background:#1b2945;border-color:#465e98;color:#e9efff}
+#homeFeed .vote.selected,.vote.selected{background:#8b9fff;border-color:#b2bfff;color:#101834}
+.battleSplit i:first-child{background:#8398ff}.battleSplit i:last-child{background:#57c8d8}
+.progress i{background:linear-gradient(90deg,#657dff,#a286ff);box-shadow:0 0 12px #7d82ff35}
+.wheelLaunch{position:relative;isolation:isolate;background:radial-gradient(ellipse at 10% 0,#8059df42,transparent 65%),linear-gradient(110deg,#2b234d,#171e38);border-color:#7865b3;box-shadow:0 8px 28px #070a1740}
+.wheelLaunch>span{position:relative;z-index:1}
+.wheelLaunch::before{content:"";position:absolute;inset:-80% -40%;background:linear-gradient(110deg,transparent 42%,#c3b4ff18 49%,transparent 56%);transform:translateX(-65%);pointer-events:none;animation:moggSheen 9s ease-in-out infinite}
+.wheelLaunch small{color:#c6bddf}.launchArrow{color:#d8c5ff}
+.miniWheel{background:conic-gradient(#a18afa 0 60deg,#4257ba 60deg 120deg,#67ccdf 120deg 180deg,#4a5caa 180deg 240deg,#9d84df 240deg 300deg,#38447d 300deg);border-color:#c7b9ff;animation:moggWheelTease 9s ease-in-out infinite}
+.nav{background:#101628f2;border-top-color:#414976;box-shadow:0 -10px 32px #05091655}
+.nav button.active{color:#f0edff;background:linear-gradient(145deg,#383064,#222d4c);box-shadow:inset 0 1px #9689d2}
+.nav button.active svg{filter:drop-shadow(0 0 5px #b49aff70)}
+.shopFilters button.active{background:#30284d;border-color:#8671bb;color:#e5dcff}
+.farmHero{background:radial-gradient(ellipse at top right,#635aca2b,transparent 65%),#111b2c;border-color:#465579}
+.studioLight:not(.locked){box-shadow:0 0 34px #d9bcff50;background:#eee2ff}
+.studioMonitor:not(.locked){background:linear-gradient(145deg,#88d8ef,#7163c4)}
+#dailyWheel .spinSheet{background:radial-gradient(ellipse at 50% 22%,#30244c,#101727 65%);border-color:#655787}
+#dailyWheel #spinRun{background:linear-gradient(110deg,#b4baff,#99d8ee);color:#142039}
+#dailyWheel .spinCenter{background:radial-gradient(circle at 35% 25%,#eee7ff,#b2addf 65%,#7185b5)}
+#dailyWheel .spinPointer{border-top-color:#e6d7ff}
+.primary,.secondary,.vote,.homeModeBar button,.wheelLaunch,.nav button{transition:transform .18s ease,border-color .18s ease,background-color .18s ease}
+button:not(:disabled):active{transform:scale(.975)}
+button:focus-visible,summary:focus-visible{outline:2px solid #a9bbff;outline-offset:4px}
+.view.active{animation:moggViewEnter .32s ease-out both}
+#dailyWheel:not([hidden]) .spinSheet{animation:moggSheetEnter .28s ease-out both}
+@media(hover:hover) and (pointer:fine){
+ .homeModeBar button:not(:disabled):hover,.wheelLaunch:not(:disabled):hover{transform:translateY(-2px);border-color:#baa9ff}
+ .vote:not(:disabled):hover,.secondary:not(:disabled):hover{border-color:#9aa9ee}
+}
+@keyframes moggViewEnter{from{opacity:.45;translate:0 7px}to{opacity:1;translate:0 0}}
+@keyframes moggSheetEnter{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+@keyframes moggSheen{0%,55%{transform:translateX(-65%)}85%,100%{transform:translateX(65%)}}
+@keyframes moggWheelTease{0%,55%{transform:rotate(-15deg)}85%,100%{transform:rotate(45deg)}}
+@media(prefers-reduced-motion:reduce){
+ .view.active,#dailyWheel:not([hidden]) .spinSheet,.wheelLaunch::before,.miniWheel{animation:none}
+ .primary,.secondary,.vote,.homeModeBar button,.wheelLaunch,.nav button{transition:none}
+}
+
 </style>
 </head>
 <body>
