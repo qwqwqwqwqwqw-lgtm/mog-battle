@@ -597,6 +597,30 @@ button:focus-visible,summary:focus-visible{outline:2px solid #a9bbff;outline-off
  .primary,.secondary,.vote,.homeModeBar button,.wheelLaunch,.nav button{transition:none}
 }
 
+
+/* Nocturne: darker surfaces; retain electric accents and motion. */
+:root{--bg:#07080c;--card:#11131b;--line:#2a2e3c;--accent:#929dea;--accent2:#d7dcf8}
+body{background:radial-gradient(ellipse at 0 0,#30345416,transparent 48%),#07080c}
+.logo{text-shadow:none}.logo span{color:#a3acc7}
+.scorePill{background:#141720;border-color:#363b4c}
+#homeProfileCard:not([class*="bg-"]){background:linear-gradient(120deg,#191d2a,#10131b);border-color:#343a4d}
+#homeProfileCard .rank{background:#2a314a;color:#e2e7fc}
+.homeBattleStage{border-top-color:#353b50}
+.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#354ba2,#4b3985);border-color:#6f76b4;box-shadow:0 4px 18px #3b45a51a}
+.homeModeBar #homeQuick,#quickBtn{background:linear-gradient(115deg,#14212a,#151d29);border-color:#385260}
+#homeQuick .modeGlyph,#homeQuick .modeArrow{color:#90c9d3}
+#homeFeed .vote,.vote{background:#171e2c;border-color:#384663}
+.wheelLaunch{background:radial-gradient(ellipse at 0 0,#63518920,transparent 65%),#14151f;border-color:#514763;box-shadow:none}
+.wheelLaunch::before{opacity:.55}
+.miniWheel{filter:saturate(.65);border-color:#a9a6c5}
+.nav{background:#0d1019f5;border-top-color:#303446;box-shadow:0 -8px 28px #0004}
+.nav button.active{background:linear-gradient(135deg,#28263d,#1b2232);box-shadow:inset 0 1px #686889}
+.nav button.active svg{filter:none}
+.farmHero{background:radial-gradient(ellipse at top right,#4b42721c,transparent 60%),#11151e;border-color:#333b4c}
+#dailyWheel .spinSheet{background:radial-gradient(ellipse at 50% 24%,#222335,#0c1019 70%);border-color:#47495e}
+#dailyWheel .spinCenter{background:radial-gradient(circle at 35% 25%,#d9dbea,#9a9fb9 65%,#64718f)}
+#dailyWheel #spinRun{background:linear-gradient(110deg,#a7b1e7,#93b7cb)}
+
 </style>
 </head>
 <body>
