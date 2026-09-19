@@ -668,6 +668,7 @@ body{background:radial-gradient(ellipse at 50% -12%,#5844a32b,transparent 44%),#
 
 
 html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#0b0e16}::-webkit-scrollbar-thumb{background:#454257;border-radius:8px}
+.supportCard summary{cursor:pointer;font-weight:650;padding:8px 0}.supportCard p{font-size:13px;line-height:1.6;overflow-wrap:anywhere}.supportCard a{color:#bdb0ff;overflow-wrap:anywhere}.supportCard details{border-top:1px solid #ffffff14;padding:6px 0}.supportCard a:focus-visible,.supportCard summary:focus-visible{outline:2px solid #bdb0ff;outline-offset:3px}
 </style>
 </head>
 <body>
@@ -875,7 +876,7 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
       <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> MOGG</span></div>
     </div>
 
-    <div class="card photoReviewCard"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Разбор фото</h2><p class="muted">Свет, ракурс и кадрирование — советы по фото.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
+    <div class="card photoReviewCard" hidden style="display:none"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Разбор фото</h2><p class="muted">Свет, ракурс и кадрирование — советы по фото.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
 
     <div class="card">
       <div class="sectionHead"><h2>Profile</h2></div>
@@ -899,6 +900,16 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
       <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
       <div class="walletNet">TON MAINNET · ON-CHAIN BALANCE</div><div id="walletHelp" class="walletHelp">Баланс MOGG в кошельке.</div>
     </div>
+
+    <details class="card supportCard">
+      <summary>Помощь и связь · Mogg Labs</summary>
+      <p>MOGG BATTLE — игра бренда Mogg Labs.</p>
+      <p class="muted">Владелец: Смирнов Роман Артурович<br>Поддержка: <a href="mailto:mogglabs@gmail.com">mogglabs@gmail.com</a></p>
+      <details><summary>Покупки и возвраты</summary><p>Напиши название предмета, дату покупки и приложи квитанцию Telegram. Обращения разбираются вручную; отправка письма не означает автоматический возврат.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20payment">Написать по оплате</a></details>
+      <details><summary>Пожаловаться на фото или игрока</summary><p>Укажи имя игрока, время боя и причину жалобы. При необходимости приложи скриншот.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20report">Отправить жалобу</a></details>
+      <details><summary>Удаление фото и аккаунта</summary><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
+      <p class="muted">Не отправляй пароли, seed-фразы или приватные ключи. Если почтовое приложение не открывается, напиши на адрес выше вручную.</p>
+    </details>
   </section>
 </main>
 <div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet">
