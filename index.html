@@ -757,7 +757,7 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
         <button class="tab" data-feed="promotion">PROMOTION</button>
         <button class="tab" data-feed="high">HIGH ELO</button>
       </div>
-      <div id="homeFeed"></div><div class="homeModeBar"><button id="homeRanked"><span class="modeGlyph">↗</span><span><b>Ranked</b><small>С рейтингом</small></span><span class="modeArrow">→</span></button><button id="homeQuick"><span class="modeGlyph">⌁</span><span><b>Quick</b><small>Без рейтинга</small></span><span class="modeArrow">→</span></button></div>
+      <div id="homeFeed"></div>
     </div>
 
     <div class="card">
@@ -1377,8 +1377,6 @@ function closeWheel(){
  if(wheelBusy)return;
  $("dailyWheel").hidden=true;document.body.style.overflow=wheelScroll;wheelOpener?.focus();
 }
-$("homeRanked").onclick=()=>{openView("battle");$("rankedBtn").click();};
-$("homeQuick").onclick=()=>{openView("battle");$("quickBtn").click();};
 $("appDailyBtn").onclick=async()=>{
  if(!$("dailyWheel").hidden)return;
  wheelOpener=document.activeElement;wheelScroll=document.body.style.overflow;document.body.style.overflow="hidden";
