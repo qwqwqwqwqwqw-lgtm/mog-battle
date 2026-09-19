@@ -669,6 +669,16 @@ body{background:radial-gradient(ellipse at 50% -12%,#5844a32b,transparent 44%),#
 
 html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#0b0e16}::-webkit-scrollbar-thumb{background:#454257;border-radius:8px}
 .supportCard summary{cursor:pointer;font-weight:650;padding:8px 0}.supportCard p{font-size:13px;line-height:1.6;overflow-wrap:anywhere}.supportCard a{color:#bdb0ff;overflow-wrap:anywhere}.supportCard details{border-top:1px solid #ffffff14;padding:6px 0}.supportCard a:focus-visible,.supportCard summary:focus-visible{outline:2px solid #bdb0ff;outline-offset:3px}
+
+.supportFooter{text-align:center;margin:16px 0 4px}
+#supportOpen{display:inline-block;width:auto;min-height:36px;padding:8px 12px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#9395a5;font:inherit;font-size:12px;font-weight:400;letter-spacing:0;transform:none}
+#supportOpen:hover{color:#ddd8ee}
+#supportDialog{position:fixed;inset:0;margin:auto;width:calc(100% - 40px);max-width:360px;max-height:70dvh;box-sizing:border-box;padding:18px;border:1px solid #363441;border-radius:18px;background:#15151c;color:#eee;overflow-y:auto;box-shadow:0 20px 60px #0009}
+#supportDialog:not([open]){display:none}
+#supportDialog::backdrop{background:#0009}
+.supportHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.supportHeading h2{font-size:17px;margin:0}
+#supportClose{width:36px;height:36px;min-height:36px;padding:0;border:0;background:transparent;color:#aaa;font-size:25px;box-shadow:none}
 </style>
 </head>
 <body>
@@ -901,17 +911,16 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
       <div class="walletNet">TON MAINNET · ON-CHAIN BALANCE</div><div id="walletHelp" class="walletHelp">Баланс MOGG в кошельке.</div>
     </div>
 
-    <details class="card supportCard">
-      <summary>Помощь и связь · Mogg Labs</summary>
+    <div class="supportFooter"><button id="supportOpen" type="button" aria-haspopup="dialog">Помощь и связь</button></div>
+  </section>
+</main>
+<dialog id="supportDialog" class="supportCard" aria-labelledby="supportTitle"><div class="supportHeading"><h2 id="supportTitle">Помощь и связь</h2><button id="supportClose" type="button" aria-label="Закрыть">×</button></div>
       <p>MOGG BATTLE — игра бренда Mogg Labs.</p>
       <p class="muted">Владелец: Смирнов Роман Артурович<br>Поддержка: <a href="mailto:mogglabs@gmail.com">mogglabs@gmail.com</a></p>
       <details><summary>Покупки и возвраты</summary><p>Напиши название предмета, дату покупки и приложи квитанцию Telegram. Обращения разбираются вручную; отправка письма не означает автоматический возврат.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20payment">Написать по оплате</a></details>
       <details><summary>Пожаловаться на фото или игрока</summary><p>Укажи имя игрока, время боя и причину жалобы. При необходимости приложи скриншот.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20report">Отправить жалобу</a></details>
       <details><summary>Удаление фото и аккаунта</summary><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
-      <p class="muted">Не отправляй пароли, seed-фразы или приватные ключи. Если почтовое приложение не открывается, напиши на адрес выше вручную.</p>
-    </details>
-  </section>
-</main>
+      <p class="muted">Не отправляй пароли, seed-фразы или приватные ключи. Если почтовое приложение не открывается, напиши на адрес выше вручную.</p></dialog>
 <div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet">
 <div class="sectionHead"><div><div class="spinEyebrow">MOGG DAILY</div><h2 id="spinTitle">Твой ежедневный приз</h2></div><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div>
 <p class="spinCaption">Один бесплатный спин · каждый день</p>
@@ -1676,6 +1685,15 @@ setInterval(()=>{
 setInterval(refresh,15000);
 initTonConnect();
 init();
+</script>
+<script>
+(()=>{
+const open=document.getElementById("supportOpen"),dialog=document.getElementById("supportDialog"),close=document.getElementById("supportClose");
+open.addEventListener("click",()=>{if(!dialog.open)dialog.showModal();});
+close.addEventListener("click",()=>dialog.close());
+dialog.addEventListener("click",e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
+dialog.addEventListener("close",()=>open.focus());
+})();
 </script>
 </body>
 </html>
