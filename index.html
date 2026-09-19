@@ -621,6 +621,53 @@ body{background:radial-gradient(ellipse at 0 0,#30345416,transparent 48%),#07080
 #dailyWheel .spinCenter{background:radial-gradient(circle at 35% 25%,#d9dbea,#9a9fb9 65%,#64718f)}
 #dailyWheel #spinRun{background:linear-gradient(110deg,#a7b1e7,#93b7cb)}
 
+
+/* Night arena: concentrated light, distinct dock, motion on interaction. */
+body{background:radial-gradient(ellipse at 50% -12%,#5844a32b,transparent 44%),#07090e}
+.top{padding-bottom:18px;border-bottom:1px solid #ffffff0a}
+.logo{font-weight:900;letter-spacing:-1px}.logo span{color:#a7a6bf;letter-spacing:2.8px}
+#homeProfileCard:not([class*="bg-"]){background:linear-gradient(110deg,#171a27,#10131c);border:1px solid #343749;box-shadow:inset 3px 0 #a29aff}
+.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#7260dd,#5441ac);border-color:#b7a2ff;color:#fff;box-shadow:0 5px 24px #7758e82b,inset 0 1px #e7d8ff40}
+.homeModeBar #homeQuick,#quickBtn{background:#131c27;border-color:#426375;color:#effcff}
+#homeQuick .modeGlyph{color:#99e8ed}
+.homeModeBar button{border-radius:13px}
+.homeModeBar .modeGlyph{transition:transform .25s ease;filter:drop-shadow(0 0 8px #ae99ff35)}
+.wheelLaunch{background:radial-gradient(ellipse at 0 50%,#63518d25,transparent 65%),#15151f;border-color:#625675}
+.wheelLaunch .launchArrow{transition:transform .25s ease}
+.wheelLaunch:active .launchArrow{transform:translate(3px,-3px)}
+#homeFeed .vote.selected,.vote.selected{background:#b7abf3;color:#151225;border-color:#dfd1ff}
+.progress i{background:linear-gradient(90deg,#7178cd,#b9a5f5);box-shadow:none}
+.nav{--dock-index:0;bottom:calc(10px + env(safe-area-inset-bottom));width:min(520px,calc(100% - 20px));padding:8px;gap:0;border:1px solid #49465f;border-radius:21px;background:linear-gradient(135deg,#1b1a28ed,#101720f5);box-shadow:0 12px 40px #0009,inset 0 1px #ffffff0b;backdrop-filter:blur(20px)}
+.nav:has(button[data-view="battle"].active){--dock-index:1}
+.nav:has(button[data-view="tap"].active){--dock-index:2}
+.nav:has(button[data-view="rewards"].active){--dock-index:3}
+.nav:has(button[data-view="profile"].active){--dock-index:4}
+.nav::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:calc((100% - 16px)/5);border-radius:14px;background:radial-gradient(ellipse at 50% 0,#a399f43d,transparent 80%),#29283b;box-shadow:inset 0 1px #c7b8ff70;transform:translateX(calc(var(--dock-index)*100%));transition:transform .35s cubic-bezier(.22,.8,.25,1);pointer-events:none}
+.nav button{position:relative;z-index:1;min-height:52px;border-radius:14px;padding:7px 0 5px;color:#a5a9bd;overflow:visible;isolation:isolate;-webkit-tap-highlight-color:transparent}
+.nav button.active{background:transparent;color:#f1eaff;box-shadow:none;transform:none}
+.nav button svg{width:21px;height:21px;stroke-width:1.7;transition:transform .25s ease,filter .25s ease;color:inherit}
+.nav button.active svg{transform:translateY(-2px);filter:drop-shadow(0 0 6px #b59bff80)}
+.nav button small{font-size:9px;transition:color .2s;letter-spacing:.1px}
+.nav button.active::before{content:"";position:absolute;bottom:2px;left:calc(50% - 7px);width:14px;height:2px;border-radius:2px;background:#c5afff;box-shadow:0 0 8px #ac87ff60}
+.nav button:active{transform:scale(.94)}
+.navPulse{position:absolute;left:50%;top:35%;width:38px;height:38px;margin:-19px;border:1px solid #d1bdff;border-radius:50%;pointer-events:none;z-index:-1;animation:moggNavPulse .5s ease-out forwards}
+@keyframes moggNavPulse{from{transform:scale(.5);opacity:.65}to{transform:scale(1.65);opacity:0}}
+@media(hover:hover) and (pointer:fine){
+ .nav button:hover{color:#f0eaff}
+ .nav button:hover svg{transform:translateY(-4px) scale(1.12);filter:drop-shadow(0 0 7px #b19afc80)}
+ .homeModeBar button:hover .modeGlyph{transform:rotate(-7deg) scale(1.12)}
+ .wheelLaunch:hover .launchArrow{transform:translate(3px,-3px)}
+}
+@supports not selector(:has(*)){
+ .nav::before{display:none}.nav button.active{background:#29283b}
+}
+@media(prefers-reduced-motion:reduce){
+ .nav::before,.nav button svg,.nav button small,.homeModeBar .modeGlyph,.wheelLaunch .launchArrow{transition:none}
+ .navPulse{display:none}
+}
+
+
+html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#0b0e16}::-webkit-scrollbar-thumb{background:#454257;border-radius:8px}
 </style>
 </head>
 <body>
@@ -1531,6 +1578,24 @@ function profileShareText(){
 
 function openView(view){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>openView(btn.dataset.view)));
+
+// Dock feedback is decorative only; navigation continues through openView.
+document.querySelectorAll(".nav button").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  btn.querySelector(".navPulse")?.remove();
+  const pulse=document.createElement("span");
+  pulse.className="navPulse";pulse.setAttribute("aria-hidden","true");
+  btn.appendChild(pulse);setTimeout(()=>pulse.remove(),550);
+  const icon=btn.querySelector("svg");
+  if(icon?.animate)icon.animate([
+   {transform:"translateY(0) scale(1)"},
+   {transform:"translateY(-5px) scale(1.16)",offset:.45},
+   {transform:"translateY(-2px) scale(1)"}
+  ],{duration:360,easing:"ease-out"});
+ });
+});
+
 
 $("shareProfileBtn").onclick=()=>shareTelegram(profileShareText());
 $("resultShare").onclick=()=>shareTelegram(lastResultShare||profileShareText());
