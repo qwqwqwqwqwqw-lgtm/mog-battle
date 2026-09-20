@@ -1183,10 +1183,7 @@ function isOwnLiveBattle(b){
 }
 function npcPractice(b){return !!(b.a?.is_npc||b.b?.is_npc)}
 function practiceProgress(b){
-  const duration=Math.max(1,new Date(b.ends_at)-new Date(b.created_at));
-  const progress=Math.max(0,Math.min(1,(Date.now()-new Date(b.created_at))/duration));
-  const a=2+String(b.id).charCodeAt(0)%4,bb=2+String(b.id).charCodeAt(1)%4;
-  return `Симуляция NPC · ${Math.floor(a*progress)} : ${Math.floor(bb*progress)} · ${b.mode==="quick"?"без рейтинга":"+3 за победу · до 9/сутки и 1100 Score"}`;
+  return `Симуляция NPC · ${b.mode==="quick"?"без рейтинга":"+3 за победу · до 9/сутки и 1100 Score"}`;
 }
 function lastBattleHtml(){
   const b=state.lastBattle;if(!b)return "";
@@ -1194,16 +1191,14 @@ function lastBattleHtml(){
   const delta=mine?b.score_delta_a:b.score_delta_b;
   const title=b.winner_id?(b.winner_id===state.player?.id?"Победа":"Поражение"):"Ничья";
   const simulated=b.result_source==="simulation";
-  const tally=simulated?`${b.simulation_a} : ${b.simulation_b}`:`${b.votes_a} : ${b.votes_b}`;
-  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${practice?"Тренировка · ":""}${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))} · ${tally}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":Number(b.votes_a)+Number(b.votes_b)===0?"Нет голосов игроков — рейтинг сохранён":"По голосам игроков"}${practice?" · без потери Score и изменения серии побед":""}</small></div>`;
+  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${practice?"Тренировка · ":""}${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":Number(b.votes_a)+Number(b.votes_b)===0?"Нет голосов игроков — рейтинг сохранён":"По голосам игроков"}${practice?" · без потери Score и изменения серии побед":""}</small></div>`;
 }
 
 function battleHtml(b){
   const a=b.a||{}, bb=b.b||{}, sa=a.style||{}, sb=bb.style||{};
-  const total=Number(b.votes_a||0)+Number(b.votes_b||0),pa=total?Math.round(Number(b.votes_a||0)/total*100):50,pb=100-pa;
   const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
   const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${npcPractice(b)?"ТРЕНИРОВКА · NPC":b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div><div class="battleSplit" aria-label="Голоса: ${Number(b.votes_a||0)} против ${Number(b.votes_b||0)}"><i style="width:${pa}%"></i></div><div class="row timer tally"><span>${total?pa+"%":"—"}</span><span>${total?total+" голосов игроков":"Ожидаем голосов игроков"}</span><span>${total?pb+"%":"—"}</span></div>${npcPractice(b)?`<div class="ownBattleHint npcSimulation" data-sim-id="${b.id}">${practiceProgress(b)}</div>`:""}${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
+  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${npcPractice(b)?"ТРЕНИРОВКА · NPC":b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div>${npcPractice(b)?`<div class="ownBattleHint npcSimulation" data-sim-id="${b.id}">${practiceProgress(b)}</div>`:""}${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
 }
 
 const sessionVotedBattles=new Set();
@@ -1704,7 +1699,6 @@ $('reviewRun').onclick=async()=>{
 };
 
 setInterval(()=>{
- document.querySelectorAll('.npcSimulation').forEach(el=>{const b=state.feed.find(b=>b.id===el.dataset.simId);if(b)el.textContent=practiceProgress(b);});
  document.querySelectorAll('.battleTimer').forEach(el=>{const left=Math.max(0,Math.ceil((new Date(el.dataset.ends).getTime()-Date.now())/1000));el.textContent=left?`${left}s`:'Подводим итог…';});
 },1000);
 setInterval(refresh,15000);
