@@ -1182,23 +1182,20 @@ function isOwnLiveBattle(b){
   return !!me && (b.player_a===me || b.player_b===me) && b.status==="active" && new Date(b.ends_at).getTime()>Date.now();
 }
 function npcPractice(b){return !!(b.a?.is_npc||b.b?.is_npc)}
-function practiceProgress(b){
-  return `Симуляция NPC · ${b.mode==="quick"?"без рейтинга":"+3 за победу · до 9/сутки и 1100 Score"}`;
-}
 function lastBattleHtml(){
   const b=state.lastBattle;if(!b)return "";
   const practice=npcPractice(b),mine=b.player_a===state.player?.id;
   const delta=mine?b.score_delta_a:b.score_delta_b;
   const title=b.winner_id?(b.winner_id===state.player?.id?"Победа":"Поражение"):"Ничья";
   const simulated=b.result_source==="simulation";
-  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${practice?"Тренировка · ":""}${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":Number(b.votes_a)+Number(b.votes_b)===0?"Нет голосов игроков — рейтинг сохранён":"По голосам игроков"}${practice?" · без потери Score и изменения серии побед":""}</small></div>`;
+  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":Number(b.votes_a)+Number(b.votes_b)===0?"Нет голосов игроков — рейтинг сохранён":"По голосам игроков"}${practice?" · без потери Score и изменения серии побед":""}</small></div>`;
 }
 
 function battleHtml(b){
   const a=b.a||{}, bb=b.b||{}, sa=a.style||{}, sb=bb.style||{};
   const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
   const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${npcPractice(b)?"ТРЕНИРОВКА · NPC":b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div>${npcPractice(b)?`<div class="ownBattleHint npcSimulation" data-sim-id="${b.id}">${practiceProgress(b)}</div>`:""}${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
+  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${sec}s</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div>${isOwnLiveBattle(b)?`<div class="ownBattleHint">Ты участвуешь в этом бою. Голосуют другие игроки.</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div>`}</div>`;
 }
 
 const sessionVotedBattles=new Set();
@@ -1492,8 +1489,8 @@ async function startMatchmaking(mode,retry=false){
     }
     if(d.matched){
       if(actualMode==='quick')bumpDaily('quick',1);
-      $("matchStatus").textContent=npcPractice(d.battle||{})?"Соперник NPC · ограниченный бонус, без потери Score":actualMode!=="quick"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
-      toast(npcPractice(d.battle||{})?"Тренировка с NPC":actualMode!=="quick"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
+      $("matchStatus").textContent=npcPractice(d.battle||{})?"Бой найден · ограниченный бонус за победу":actualMode!=="quick"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
+      toast(npcPractice(d.battle||{})?"Бой найден":actualMode!=="quick"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
       if(d.battle){state.feed=[d.battle,...state.feed.filter(b=>b.id!==d.battle.id)];renderFeed();}
       if(!npcPractice(d.battle||{}))await showBattleIntro(actualMode);
       openView("battle");
@@ -1645,7 +1642,7 @@ $("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("ra
 
 const guideSteps=[
  {tag:'01 · ТВОЯ ЦЕЛЬ',title:'Создай образ. Выходи на баттл.',lead:'MOGG BATTLE — игра с фото-баттлами, голосованием и развитием профиля.',detail:'<b>Начни с фото</b><br>Заверши профиль и загрузи своё фото. Затем попробуй Quick, чтобы познакомиться с боем без изменения рейтинга.'},
- {tag:'02 · ПЕРВЫЙ БОЙ',title:'Quick для старта. Ranked для рейтинга.',lead:'В баттле сравниваются два профиля. Голоса определяют результат.',detail:'<b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свой активный бой ищи первым в ленте. В игре также есть NPC-соперники.'},
+ {tag:'02 · ПЕРВЫЙ БОЙ',title:'Quick для старта. Ranked для рейтинга.',lead:'В баттле сравниваются два профиля. Голоса определяют результат.',detail:'<b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свой активный бой ищи первым в ленте. В игре также есть NPC-соперники, но голосуют только игроки. Без голосов победитель не назначается. За победу над игровым соперником в Ranked — до 3 Score, максимум 9 за сутки UTC и до достижения 1100 Score; поражение без потери Score.'},
  {tag:'03 · ПРОГРЕСС',title:'Развивай свою студию.',lead:'Тапы, задания и голосование дают игровые Points. Вкладывай их в улучшения MOGG STUDIO.',detail:'<b>Монтажная станция</b> производит Points каждые 10 минут и учитывает до 12 часов офлайн.<br>Улучшай добычу, запас энергии и восстановление. Цена и эффект следующего уровня видны до покупки.'},
  {tag:'04 · ВАЛЮТЫ И СТИЛЬ',title:'Три разных показателя.',lead:'Рейтинг, игровые ресурсы и токен выполняют разные задачи.',detail:'<b>Score</b> — рейтинг и ранги.<br><b>Points</b> — улучшения и игровые покупки.<br><b>MOGG в кошельке</b> — отдельный токен в TON; автоматического обмена Points в MOGG сейчас нет.<br><br>Косметику можно примерить бесплатно. Предметы за Stars оформляются через платёжное окно Telegram.'},
  {tag:'05 · ГОТОВО К СТАРТУ',title:'Твой первый шаг — Quick.',lead:'Профиль → фото → Quick → результат. После первого боя попробуй Ranked или развивай студию.',detail:'<b>Дальше</b><br>Голосуй в чужих боях, собирай Points и подбирай оформление профиля. Обучение можно снова открыть кнопкой «Как играть».'}
