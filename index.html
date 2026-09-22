@@ -683,6 +683,11 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 </head>
 <body>
 <div id="toast" class="toast"></div>
+<div id="connectionNotice" role="status" hidden style="max-width:512px;margin:12px auto;padding:12px 16px;background:#181923;border:1px solid #49415d;border-radius:12px">
+  <span id="connectionText"></span>
+  <button id="connectionRetry" class="secondary" style="margin-top:8px">Повторить</button>
+  <a id="connectionTelegram" href="https://t.me/MoggBattleGameBot?startapp" hidden style="display:none;color:#c9bcff">Открыть в Telegram</a>
+</div>
 
 <div id="onboard" class="onboard">
   <div class="sheet">
@@ -1091,15 +1096,29 @@ function initials(name){return (name||"?").trim().charAt(0).toUpperCase()||"?"}
 
 async function call(action,extra={}){
   if(!tg?.initData)throw new Error("open_in_telegram");
-  const r=await fetch(API,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({initData:tg.initData,action,...extra})
-  });
-  const d=await r.json();
-  if(!r.ok||d.error){const e=new Error(d.error||"request_failed");e.data=d;throw e}
-  return d;
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+  try{
+    const r=await fetch(API,{
+      method:"POST",signal:controller.signal,
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({initData:tg.initData,action,...extra})
+    });
+    let d;try{d=await r.json();}catch{throw new Error("invalid_response");}
+    if(!r.ok||d.error){const e=new Error(d.error||"request_failed");e.data=d;throw e}
+    return d;
+  }catch(e){if(e.name==="AbortError")throw new Error("request_timeout");throw e;}
+  finally{clearTimeout(timer);}
 }
+let bootReady=false,bootBusy=false,refreshBusy=false;
+function showConnectionError(e){
+  const auth=["open_in_telegram","invalid_auth"].includes(e?.message);
+  $("connectionNotice").hidden=false;
+  $("connectionText").textContent=auth?"Открой игру заново через Telegram.":"Не удалось обновить данные. Проверь интернет и повтори.";
+  $("connectionRetry").hidden=auth;
+  $("connectionTelegram").hidden=!auth;
+  $("connectionTelegram").style.display=auth?"inline-block":"none";
+}
+$("connectionRetry").onclick=()=>bootReady?refresh():init();
 
 function avatarInto(el,p){
   if(p?.profile_photo_url)el.innerHTML=`<img src="${p.profile_photo_url}" alt="">`;
@@ -1262,7 +1281,7 @@ function renderV7(){
   const p=state.player||{};renderFarm(p);
   document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`LV ${lvl} → ${lvl+1} · ${cost.toLocaleString()} P`;b.disabled=upgradeBusy||Number(p.mogg_points||0)<cost;});
   const c=state.crew,box=$("crewContent");if(!box)return;
-  if(c)box.innerHTML=`<b class="crewTag">[${c.tag}] ${c.name}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
+  if(c)box.innerHTML=`<b class="crewTag">[${htmlText(c.tag)}] ${htmlText(c.name)}</b><p class="muted">HQ LV ${c.level} · TREASURY ${Number(c.treasury||0).toLocaleString()} P</p><button id="crewDonate" class="secondary">CONTRIBUTE 500 P</button>`;
   else box.innerHTML=`<p class="muted">Создать команду — 5 000 Points.</p><input id="crewName" class="v7input" maxlength="24" placeholder="CREW NAME"><input id="crewTag" class="v7input" maxlength="5" placeholder="TAG"><button id="createCrew" class="secondary">CREATE · 5,000 P</button>`;
   $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await refresh();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
   $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await refresh();toast("+500 CREW")}catch(e){toast(String(e.message))}});
@@ -1328,6 +1347,7 @@ function openRankModal(){
 }
 
 async function init(){
+  if(bootBusy)return;bootBusy=true;
   try{
     const d=await call("me");
     state.player=d.player;state.feed=d.feed||[];state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];state.drops=d.drops||null;state.crew=d.crew||null;
@@ -1335,14 +1355,16 @@ async function init(){
 
     const start=tg?.initDataUnsafe?.start_param||"";
     if(start.startsWith("ref_")){
-      const id=Number(start.slice(4));if(id)call("apply_ref",{ref_telegram_id:id}).catch(()=>{});
+      const id=Number(start.slice(4));if(id)await call("apply_ref",{ref_telegram_id:id});
     }
 
     if(!state.player.gender || !state.player.profile_photo_url){
       $("onboard").classList.add("show");
       if(state.player.gender){state.gender=state.player.gender;$("genderStep").style.display="none";$("photoStep").style.display="block"}
     }
-  }catch(e){console.error(e);toast("Ошибка подключения")}
+    bootReady=true;$("connectionNotice").hidden=true;
+  }catch(e){console.error(e);showConnectionError(e)}
+  finally{bootBusy=false;}
 }
 
 document.querySelectorAll(".gender").forEach(b=>b.addEventListener("click",async()=>{
@@ -1601,9 +1623,12 @@ function maybeShowScoreResult(newScore,gender){
 $("resultClose").onclick=()=>$("resultFlash").classList.remove("show");
 
 async function refresh(){
+  if(!bootReady||refreshBusy)return;refreshBusy=true;
   try{
     const d=await call("me");state.player=d.player;maybeShowScoreResult(Number(d.player?.mogg_score||0),d.player?.gender);state.feed=d.feed||[];state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.drops=d.drops||null;state.crew=d.crew||null;renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
-  }catch(e){}
+    $("connectionNotice").hidden=true;
+  }catch(e){showConnectionError(e)}
+  finally{refreshBusy=false;}
 }
 
 
