@@ -1596,7 +1596,7 @@ function animateDrop(result){
 $("caseClose").onclick=()=>{$("caseModal").classList.remove("show");refresh()};
 $("dropBtn").addEventListener("click",async()=>{
   $("dropBtn").disabled=true;
-  try{const d=await call("open_drop");const c=d.drop?.cosmetics;if(!c)throw new Error("drop_missing");animateDrop(c)}
+  try{const d=await call("open_drop");const c=d.drop?.cosmetics;if(!c)throw new Error("drop_missing");if(d.replayed){toast("Эта награда уже получена");await refresh();$("dropBtn").disabled=false;}else if(Number(d.compensation)>0){toast("Предмет уже есть · +"+Number(d.compensation)+" Points");await refresh();$("dropBtn").disabled=false;}else animateDrop(c)}
   catch(e){if(e.message==="no_drop_available")toast("Первый drop после SUB5");else if(e.message==="all_rank_drops_claimed")toast("Все доступные drops уже получены");else toast("Drop error: "+String(e.message||"unknown"));$("dropBtn").disabled=false}
 });
 
