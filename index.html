@@ -1590,9 +1590,9 @@ function maybeShowScoreResult(newScore,gender){
     $("resultHeadline").textContent=rankUp?"RANK UP":"SCORE UPDATED";
     $("resultScore").textContent=(diff>0?"+":"")+diff;
     $("resultScore").style.color=diff>0?"var(--good)":"var(--bad)";
-    $("resultRank").textContent=rankUp?oldRank+" → "+newRank:newRank+" · "+newScore.toLocaleString()+" MOGG";
+    $("resultRank").textContent=rankUp?oldRank+" → "+newRank:newRank+" · "+newScore.toLocaleString()+" Score";
     $("resultScore").classList.toggle("rankUpBurst",rankUp);
-    lastResultShare=`${rankUp?"RANK UP · "+newRank:"MOGG BATTLE · "+(diff>0?"+":"")+diff+" SCORE"}\n${newScore.toLocaleString()} MOGG`;
+    lastResultShare=`${rankUp?"RANK UP · "+newRank:"MOGG BATTLE · "+(diff>0?"+":"")+diff+" SCORE"}\n${newScore.toLocaleString()} Score`;
     $("resultFlash").classList.add("show");
     tg?.HapticFeedback?.notificationOccurred(diff>0?"success":"warning");
   }
@@ -1608,13 +1608,16 @@ async function refresh(){
 
 
 function shareTelegram(text){
-  const url="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/";
+  const inviter=String(state.player?.telegram_id||tg?.initDataUnsafe?.user?.id||"");
+  const url=/^[1-9]\d*$/.test(inviter)
+    ? "https://t.me/MoggBattleGameBot?startapp=ref_"+inviter
+    : "https://t.me/MoggBattleGameBot?startapp";
   const share="https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(text);
   if(tg?.openTelegramLink)tg.openTelegramLink(share);else window.open(share,"_blank");
 }
 function profileShareText(){
   const p=state.player||{},score=Number(p.mogg_score||0),rank=rankFor(score,p.gender);
-  return `${p.first_name||p.username||"Player"} · ${rank}\n${score.toLocaleString()} MOGG\nСможешь могнуть меня? 😈`;
+  return `${p.first_name||p.username||"Player"} · ${rank}\n${score.toLocaleString()} Score\nСможешь могнуть меня? 😈`;
 }
 
 function openView(view){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
