@@ -932,7 +932,7 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 </form><button id="supportHistory" type="button">Мои обращения</button><div id="supportHistoryList" aria-live="polite"></div></details>
       <details><summary>Покупки и возвраты</summary><p>Напиши название предмета, дату покупки и приложи квитанцию Telegram. Обращения разбираются вручную; отправка письма не означает автоматический возврат.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20payment">Написать по оплате</a></details>
       <details><summary>Пожаловаться на фото или игрока</summary><p>Укажи имя игрока, время боя и причину жалобы. При необходимости приложи скриншот.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20report">Отправить жалобу</a></details>
-      <details><summary>Удаление фото и аккаунта</summary><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
+      <details><summary>Удаление фото и аккаунта</summary><p>Удалить текущее фото из профиля и хранилища. Аккаунт и очки сохранятся. Старые загрузки, сообщения Telegram и чужие копии сюда не входят — для них отправь обращение.</p><button id="deleteOwnPhoto" type="button">Удалить текущее фото</button><p id="deletePhotoStatus" role="status"></p><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
       <p class="muted">Не отправляй пароли, seed-фразы или приватные ключи. Если почтовое приложение не открывается, напиши на адрес выше вручную.</p></dialog>
 <div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet">
 <div class="sectionHead"><div><div class="spinEyebrow">MOGG DAILY</div><h2 id="spinTitle">Твой ежедневный приз</h2></div><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div>
@@ -1779,5 +1779,21 @@ document.getElementById("supportHistory").addEventListener("click",async()=>{
  }catch{box.textContent="Не удалось загрузить. Попробуй ещё раз.";}
 });
 </script>
-</body>
+<script>
+let pendingPhotoDeletion=null;
+document.getElementById("deleteOwnPhoto").addEventListener("click",async()=>{
+ const btn=document.getElementById("deleteOwnPhoto"),out=document.getElementById("deletePhotoStatus");
+ const url=pendingPhotoDeletion||state.player?.profile_photo_url;
+ if(btn.disabled)return;
+ if(!url){out.textContent="В профиле нет фото.";return;}
+ if(!pendingPhotoDeletion&&!window.confirm("Удалить текущее фото? Для новых боёв понадобится загрузить другое. Очки и аккаунт сохранятся."))return;
+ pendingPhotoDeletion=url;btn.disabled=true;out.textContent="Удаляем…";
+ try{const d=await call("delete_photo",{photo_url:url});
+ if(state.player?.profile_photo_url===url){state.player.profile_photo_url=null;state.player.onboarding_completed=false;renderPlayer();}
+ if(d.storage_removed){pendingPhotoDeletion=null;out.textContent="Текущее фото удалено. Кэш уже открытых страниц может обновиться не сразу.";}
+ else out.textContent="Фото скрыто из профиля. Удаление файла ещё не подтверждено — нажми повторно.";
+ }catch(e){out.textContent=String(e.message).includes("photo_changed")?"Фото изменилось. Обнови приложение и повтори.":"Удаление не подтверждено. Повтори или отправь обращение в помощь.";if(String(e.message).includes("photo_changed"))pendingPhotoDeletion=null;}
+ finally{btn.disabled=false;}
+});
+</script></body>
 </html>
