@@ -922,6 +922,14 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 <dialog id="supportDialog" class="supportCard" aria-labelledby="supportTitle"><div class="supportHeading"><h2 id="supportTitle">Помощь и связь</h2><button id="supportClose" type="button" aria-label="Закрыть">×</button></div>
       <p>MOGG BATTLE — игра бренда Mogg Labs.</p>
       <p class="muted">Владелец: Смирнов Роман Артурович<br>Поддержка: <a href="mailto:mogglabs@gmail.com">mogglabs@gmail.com</a></p>
+<details><summary>Отправить обращение в игре</summary>
+<form id="supportForm">
+<label for="supportCategory">Тема</label>
+<select id="supportCategory" style="width:100%;margin:8px 0"><option value="report">Жалоба на фото или игрока</option><option value="payment">Покупка или возврат</option><option value="delete_photo">Удаление моего фото</option><option value="delete_account">Удаление моего аккаунта</option><option value="other">Другой вопрос</option></select>
+<label for="supportMessage">Что произошло?</label><textarea id="supportMessage" minlength="5" maxlength="1500" required rows="4" style="width:100%;box-sizing:border-box;margin:8px 0" placeholder="Опиши вопрос. Для жалобы укажи имя игрока и время боя."></textarea>
+<p class="muted">Запрос привязан к твоему аккаунту. Удаление и возвраты выполняются после ручного разбора. Не отправляй пароли и ключи кошелька.</p>
+<button id="supportSubmit" type="submit" class="primary">Отправить</button><p id="supportFeedback" role="status" aria-live="polite"></p>
+</form><button id="supportHistory" type="button">Мои обращения</button><div id="supportHistoryList" aria-live="polite"></div></details>
       <details><summary>Покупки и возвраты</summary><p>Напиши название предмета, дату покупки и приложи квитанцию Telegram. Обращения разбираются вручную; отправка письма не означает автоматический возврат.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20payment">Написать по оплате</a></details>
       <details><summary>Пожаловаться на фото или игрока</summary><p>Укажи имя игрока, время боя и причину жалобы. При необходимости приложи скриншот.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20report">Отправить жалобу</a></details>
       <details><summary>Удаление фото и аккаунта</summary><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
@@ -1745,6 +1753,31 @@ close.addEventListener("click",()=>dialog.close());
 dialog.addEventListener("click",e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
 dialog.addEventListener("close",()=>open.focus());
 })();
+
+let supportRequestKey=null;
+document.getElementById("supportForm").addEventListener("input",()=>{supportRequestKey=null});
+document.getElementById("supportForm").addEventListener("submit",async e=>{
+ e.preventDefault();const button=document.getElementById("supportSubmit"),feedback=document.getElementById("supportFeedback");
+ if(button.disabled)return;
+ const message=document.getElementById("supportMessage").value.trim(),category=document.getElementById("supportCategory").value;
+ if(message.length<5){feedback.textContent="Добавь описание: минимум 5 символов.";return;}
+ supportRequestKey=supportRequestKey||crypto.randomUUID();button.disabled=true;
+ const fields=[document.getElementById("supportMessage"),document.getElementById("supportCategory")];fields.forEach(x=>x.disabled=true);
+ feedback.textContent="Отправляем…";
+ try{const d=await call("support_submit",{request_key:supportRequestKey,category,message});
+ feedback.textContent="Обращение №"+d.request.id.slice(0,8)+" принято. Статус — в «Мои обращения».";
+ document.getElementById("supportMessage").value="";supportRequestKey=null;
+ }catch(err){feedback.textContent=String(err.message||err).includes("support_daily_limit")?"До 5 обращений за 24 часа. Срочный вопрос: mogglabs@gmail.com.":"Не удалось подтвердить отправку. Нажми ещё раз — повтор не создаст дубль.";}
+ finally{button.disabled=false;fields.forEach(x=>x.disabled=false);}
+});
+document.getElementById("supportHistory").addEventListener("click",async()=>{
+ const box=document.getElementById("supportHistoryList");box.textContent="Загружаем…";
+ try{const d=await call("support_list");box.replaceChildren();
+ if(!d.requests.length){box.textContent="Пока нет обращений.";return;}
+ const labels={open:"Принято",in_progress:"В работе",resolved:"Закрыто"};
+ for(const r of d.requests){const p=document.createElement("p");p.textContent="№"+r.id.slice(0,8)+" · "+(labels[r.status]||r.status)+(r.response?" — "+r.response:"");box.appendChild(p);}
+ }catch{box.textContent="Не удалось загрузить. Попробуй ещё раз.";}
+});
 </script>
 </body>
 </html>
