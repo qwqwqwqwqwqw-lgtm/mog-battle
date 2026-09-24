@@ -680,6 +680,54 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 .supportHeading h2{font-size:17px;margin:0}
 #supportClose{width:36px;height:36px;min-height:36px;padding:0;border:0;background:transparent;color:#aaa;font-size:25px;box-shadow:none}
 </style>
+
+<style id="ui-clarity-september">
+/* Shared interface hierarchy; cosmetic display styles retain their own fonts. */
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+.muted,.timer,.kicker,.reward small,.missionText small,.upgradeCard small,.wheelLaunch small,.homeModeBar small,.walletHelp{font-family:inherit;letter-spacing:0;line-height:1.5}
+.muted,.reward small,.missionText small,.upgradeCard small,.walletHelp{font-size:14px;font-weight:400;color:#acafc3}
+.kicker{font-size:11px;font-weight:650;letter-spacing:.07em}
+.sectionHead h2{font-size:21px;letter-spacing:-.45px}
+.card{margin-bottom:16px}
+button.primary,button.secondary,a.secondary,.vote{min-height:48px;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;border-radius:14px;cursor:pointer;transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}
+button.secondary,a.secondary{background:#222332;border:1px solid #44455d;color:#f2f0ff}
+a.secondary{display:flex;align-items:center;justify-content:center;text-decoration:none;padding:12px;box-sizing:border-box}
+button.primary,#claimChannelRequest{background:linear-gradient(135deg,#8b6cf0,#654acb);color:white;border:1px solid #a28aef;box-shadow:0 4px 16px #503ca32b}
+button:focus-visible,a.secondary:focus-visible{outline:2px solid #c5b6ff;outline-offset:3px}
+button:disabled{opacity:.48;cursor:default;box-shadow:none}
+button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
+@media(hover:hover){button.secondary:not(:disabled):hover,a.secondary:hover,.vote:not(:disabled):hover{background:#34304c;border-color:#9c86df}button.primary:not(:disabled):hover,#claimChannelRequest:not(:disabled):hover{filter:brightness(1.12)}}
+#homeView .homeBattleStage .arenaHead h2{font-size:24px;letter-spacing:-.6px}
+.arenaHead>span{display:none}
+#homeView .homeBonuses{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.homeBonuses .sectionHead{display:none}
+.sponsor{margin:0 0 12px;padding:18px;background:#181622;border:1px solid #40364f;border-radius:20px}
+.channelRewardHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.channelRewardHead b{font-size:17px}.channelRewardHead span{font-size:14px;color:#c4afff;font-weight:650;white-space:nowrap}
+.sponsor>p{margin:7px 0 14px}.sponsor .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#channelRewardStatus{font-size:13px;margin:10px 0 0;line-height:1.4}
+.wheelLaunch{margin:0!important;min-height:92px;border-radius:20px;padding:18px;background:linear-gradient(115deg,#272037,#191824);border:1px solid #51436b}
+.wheelLaunch b{font-size:17px;font-weight:650}.wheelLaunch small{font-size:13px;color:#bcb4ce;margin-top:4px}
+.dailyRun{padding:16px 18px!important;background:#15161e}
+.dailyRun>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:16px;font-weight:600;list-style:none}
+.dailyRun>summary::-webkit-details-marker{display:none}.dailyRun>summary span{font-size:12px;color:#bbb0d3}
+.dailyRun[open]>.runTop{margin-top:18px}.dailyRun[open]>summary span{font-size:0}.dailyRun[open]>summary span:after{content:"Свернуть";font-size:12px}
+.dailyRun .runTop .kicker{display:none}.missionFoot{font-size:12px}.missionText b{font-size:14px;letter-spacing:0}
+#rankedBtn,#quickBtn{min-height:96px!important;font-size:17px;padding:16px 10px!important}
+#rankedBtn span,#quickBtn span{display:block;font-size:12px;font-weight:400;margin-top:5px;line-height:1.35}
+#quickBtn{background:#232532;border:1px solid #4a4c63;color:#f0edff;box-shadow:none}
+.voteBar .vote{background:#272636;border:1px solid #625579;color:#f1ebff;font-size:14px!important;min-height:48px!important}
+.face small,#homeFeed .face small{font-size:12px}.face b,#homeFeed .face b{font-size:15px}
+#battleFeed>.battleCard[aria-live]{padding:16px;background:#171820;border-color:#343544}
+#battleFeed>.battleCard[aria-live]>.row b{font-size:16px}
+#battleFeed>.battleCard[aria-live] p{margin:8px 0}
+#battleFeed>.battleCard[aria-live] small{display:block;font-size:13px;line-height:1.45}
+#rankedQueuePanel{padding:12px 0 0}#cancelRankedQueue{font-size:13px;background:transparent;color:#bfb7d4;min-height:40px;border:1px solid #4a405b;border-radius:10px;padding:8px 12px}
+.nav button small{font-family:inherit;font-size:11px;letter-spacing:0}.nav button{min-height:52px}
+@media(prefers-reduced-motion:reduce){button,a.secondary{transition:none!important;transform:none!important}}
+@media(max-width:360px){#rankedBtn,#quickBtn{font-size:15px}.sponsor{padding:14px}.channelRewardHead b{font-size:16px}.nav button small{font-size:10px}}
+</style>
 </head>
 <body>
 <div id="toast" class="toast"></div>
@@ -691,14 +739,14 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 
 <div id="onboard" class="onboard">
   <div class="sheet">
-    <div class="kicker">WELCOME TO MOGG BATTLE</div>
+    <div class="kicker">ДОБРО ПОЖАЛОВАТЬ</div>
     <h2 style="margin:5px 0 0;font-size:20px">Создай профиль</h2>
     <p class="muted">Сначала выбери пол и загрузи фото для баттлов. Рейтинг начинается с 0.</p>
 
     <div id="genderStep">
       <div class="genderGrid">
-        <button class="gender" data-g="male">MALE<br><small class="muted">MTN · CHAD · GIGACHAD</small></button>
-        <button class="gender f" data-g="female">FEMALE<br><small class="muted">MTB · STACY · TRUE STACY</small></button>
+        <button class="gender" data-g="male">Мужской<br><small class="muted">MTN · CHAD · GIGACHAD</small></button>
+        <button class="gender f" data-g="female">Женский<br><small class="muted">MTB · STACY · TRUE STACY</small></button>
       </div>
     </div>
 
@@ -717,11 +765,11 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 <div id="rankModal" class="rankModal">
   <div class="rankSheet">
     <div class="sectionHead">
-      <div><div class="kicker">MOGG RANK LADDER</div><h2 style="margin-top:4px">Твой путь</h2></div>
+      <div><div class="kicker">РАНГИ</div><h2 style="margin-top:4px">Твой путь</h2></div>
       <button id="closeRankModal" class="modalClose" type="button">ЗАКРЫТЬ</button>
     </div>
     <div class="rankCurrent">
-      <small>CURRENT</small>
+      <small>ТВОЙ РАНГ</small>
       <b id="modalRank">SUB3</b>
       <small><span id="modalScore">0</span> MOGG · до следующего ранга <span id="modalNeed">700</span></small>
       <div class="progress"><i id="modalRankProgress"></i></div>
@@ -767,7 +815,7 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
     </div>
 
     <div class="card homeBattleStage">
-      <div class="sectionHead arenaHead"><h2>Баттлы<span class="headingDot">.</span></h2><span><span class="liveDot">●</span> Голосование</span></div>
+      <div class="sectionHead arenaHead"><h2>Выбери победителя</h2><span><span class="liveDot">●</span> Голосование</span></div>
       <div class="feedTabs">
         <button class="tab active" data-feed="all">LIVE</button>
         <button class="tab" data-feed="promotion">PROMOTION</button>
@@ -776,25 +824,25 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
       <div id="homeFeed"></div>
     </div>
 
-    <div class="card">
-      <div class="sectionHead"><h2 class="wheelCardTitle">Ежедневный спин</h2></div>
+    <div class="card homeBonuses">
+      <div class="sectionHead"><h2 class="wheelCardTitle">Бонусы</h2></div>
       <div class="sponsor">
-        <b>Канал MOGG BATTLE</b>
-        <p class="muted">Подай заявку в канал · +150 Points один раз</p>
+        <div class="channelRewardHead"><b>Наш канал</b><span>+150 Points</span></div>
+        <p class="muted">Награда за заявку · один раз</p>
         <div class="row"><a id="openChannel" class="secondary" href="https://t.me/+QZ86AoSdXBJlMDIy" target="_blank" rel="noopener">Подать заявку</a>
-        <button id="claimChannelRequest" class="secondary">Забрать 150 Points</button></div>
+        <button id="claimChannelRequest" class="secondary">Забрать</button></div>
         <p id="channelRewardStatus" class="muted"></p>
       </div>
-      <button id="appDailyBtn" class="wheelLaunch"><span class="miniWheel" aria-hidden="true"></span><span><b>Ежедневный спин</b><small>Бесплатно · один раз в сутки</small></span><span class="launchArrow">↗</span></button>
+      <button id="appDailyBtn" class="wheelLaunch"><span class="miniWheel" aria-hidden="true"></span><span><b>Ежедневный спин</b><small>Бесплатно каждый день</small></span><span class="launchArrow">↗</span></button>
     </div>
-    <div class="card dailyRun">
+    <details class="card dailyRun"><summary>Задания на сегодня <span>Открыть</span></summary>
       <div class="runTop">
         <div><div class="kicker">ЗАДАНИЯ НА СЕГОДНЯ</div><div class="runScore" id="dailyDone">0 / 4</div></div>
         <div style="text-align:right"><div class="runLabel">STREAK</div><div class="streak" id="dailyStreak">🔥 1 DAY</div></div>
       </div>
       <div id="dailyMissions" class="missionList"></div>
-      <div class="missionFoot"><span>Прогресс за день сохраняется на этом устройстве.</span><span id="dailyReset">RESET · —</span></div>
-    </div>
+      <div class="missionFoot"><span>Прогресс за день сохраняется на этом устройстве.</span><span id="dailyReset">Обновление · —</span></div>
+    </details>
 
   </section>
 
@@ -802,10 +850,10 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
     <div class="card matchBox">
       <div class="matchIcon">⚔</div>
       <h2 style="font-size:18px;margin:0 0 6px">Начать бой</h2>
-      <p class="muted">Можно вести один Ranked и один Quick одновременно.</p>
+      <p class="muted">Выбери режим боя.</p>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
-        <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">С рейтингом</span></button>
-        <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">Без рейтинга</span></button>
+        <button id="rankedBtn" class="primary pink" style="min-height:92px">Рейтинговый<br><span>Поднимай ранг</span></button>
+        <button id="quickBtn" class="primary" style="min-height:92px">Быстрый<br><span>Без изменения рейтинга</span></button>
       </div>
       <div id="matchStatus" class="muted" style="margin-top:10px"></div><div id="rankedQueuePanel" hidden><p id="rankedQueueText" class="muted"></p><button id="cancelRankedQueue" type="button">Отменить заявку</button></div>
     </div>
@@ -836,10 +884,10 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
       <div class="sectionHead"><div><h2 style="margin-top:4px">MOGG STUDIO</h2></div></div>
       <div class="farmHero"><div class="kicker">ТВОЯ СТУДИЯ</div><div id="studioLabel" class="studioLabel"></div><div id="farmStage" class="farmStage"></div><p id="studioGoal" class="muted"></p><div class="farmStats"><div><b id="farmRate">0</b><small>POINTS / ЧАС</small></div><div><b id="farmBalance">0</b><small>ТВОИ POINTS</small></div></div><p id="farmHint" class="muted"></p><div class="progress"><i id="farmProgress"></i></div><p id="farmNext" class="muted"></p></div>
       <div class="v7grid" id="upgradeGrid">
-        <div class="upgradeCard"><b>КАМЕРА</b><small id="effect-tap"></small><button class="secondary upg" data-kind="tap">UPGRADE</button></div>
-        <div class="upgradeCard"><b>БАТАРЕИ</b><small id="effect-energy"></small><button class="secondary upg" data-kind="energy">UPGRADE</button></div>
-        <div class="upgradeCard"><b>ЗАРЯДНАЯ СТАНЦИЯ</b><small id="effect-recovery"></small><button class="secondary upg" data-kind="recovery">UPGRADE</button></div>
-        <div class="upgradeCard"><b>МОНТАЖНАЯ СТАНЦИЯ</b><small id="effect-idle"></small><button class="secondary upg" data-kind="idle">UPGRADE</button></div>
+        <div class="upgradeCard"><b>КАМЕРА</b><small id="effect-tap"></small><button class="secondary upg" data-kind="tap">Улучшить</button></div>
+        <div class="upgradeCard"><b>БАТАРЕИ</b><small id="effect-energy"></small><button class="secondary upg" data-kind="energy">Улучшить</button></div>
+        <div class="upgradeCard"><b>ЗАРЯДНАЯ СТАНЦИЯ</b><small id="effect-recovery"></small><button class="secondary upg" data-kind="recovery">Улучшить</button></div>
+        <div class="upgradeCard"><b>МОНТАЖНАЯ СТАНЦИЯ</b><small id="effect-idle"></small><button class="secondary upg" data-kind="idle">Улучшить</button></div>
       </div>
       <button id="prestigeBtn" class="primary" style="margin-top:10px">ЗАБРАТЬ БОНУС</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
       
@@ -851,14 +899,14 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 
   <section id="rewardsView" class="view">
     <div class="card">
-      <div class="sectionHead"><h2>Ascension Drop</h2><span>RANK REWARD</span></div>
+      <div class="sectionHead"><h2>Награда за ранг</h2></div>
       <div class="chest">
         <div class="chestIcon">◇</div>
         <b id="dropTitle">Первый drop после SUB5</b>
-        <p class="muted" id="dropText">6 milestone Drops: SUB5, LTN/LTB, MTN/MTB, HTN/HTB, CHAD/STACY и GIGACHAD/TRUE STACY.</p>
+        <p class="muted" id="dropText">Поднимай ранг и открывай новые предметы.</p>
         <div class="dropMeta"><span id="dropAvailable">0 AVAILABLE</span><span id="dropTier">RANK LOCKED</span></div>
         <div id="dropRates" class="dropRates"></div>
-        <button id="dropBtn" class="secondary" style="margin-top:10px">OPEN ASCENSION DROP</button>
+        <button id="dropBtn" class="secondary" style="margin-top:10px">Открыть награду</button>
       </div>
     </div>
 
@@ -893,10 +941,10 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
     <div class="card photoReviewCard" hidden style="display:none"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Разбор фото</h2><p class="muted">Свет, ракурс и кадрирование — советы по фото.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Profile</h2></div>
-      <div class="reward"><div><b>Photo</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
-      <div class="reward"><div><b>Gender</b><small>Влияет только на названия рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
-      <div class="reward"><div><b>Referrals</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
+      <div class="sectionHead"><h2>Профиль</h2></div>
+      <div class="reward"><div><b>Фото</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
+      <div class="reward"><div><b>Пол</b><small>Для подбора соперников и рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
+      <div class="reward"><div><b>Приглашённые друзья</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
       <div class="profileActions">
         <button id="changePhotoBtn" class="secondary">СМЕНИТЬ ФОТО</button>
         <button id="shareProfileBtn" class="secondary shareBtn">ПОДЕЛИТЬСЯ</button>
@@ -1072,10 +1120,10 @@ function nextMidnightLabel(){
 }
 function renderDaily(){
   const missions=[
-    {icon:"⚡",name:"TAP SESSION",sub:"Build Points and momentum",key:"taps",goal:50},
-    {icon:"◉",name:"RATE THE FEED",sub:"Vote on other players",key:"votes",goal:3},
-    {icon:"⚔",name:"QUICK WARM-UP",sub:"Start Quick battles",key:"quick",goal:2},
-    {icon:"▲",name:"GAIN SCORE",sub:"Move your Ranked Score today",key:"scoreGain",goal:20},
+    {icon:"⚡",name:"Сделай 50 тапов",sub:"В разделе «Студия»",key:"taps",goal:50},
+    {icon:"◉",name:"Оцени 3 боя",sub:"Выбирай победителей",key:"votes",goal:3},
+    {icon:"⚔",name:"Начни 2 быстрых боя",sub:"В разделе «Бои»",key:"quick",goal:2},
+    {icon:"▲",name:"Подними рейтинг на 20",sub:"В рейтинговых боях",key:"scoreGain",goal:20},
   ];
   const done=missions.filter(m=>Number(daily[m.key]||0)>=m.goal).length;
   $("dailyDone").textContent=done+" / "+missions.length;
@@ -1083,7 +1131,7 @@ function renderDaily(){
     const v=Math.min(m.goal,Number(daily[m.key]||0)),ok=v>=m.goal;
     return `<div class="missionRow ${ok?"done":""}"><div class="missionIcon">${ok?"✓":m.icon}</div><div class="missionText"><b>${m.name}</b><small>${m.sub}</small></div><div class="missionProgress">${v} / ${m.goal}</div></div>`;
   }).join("");
-  $("dailyReset").textContent="RESET · "+nextMidnightLabel();
+  $("dailyReset").textContent="Обновление · "+nextMidnightLabel();
   const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
   const ykey="mogg_daily_"+yesterday.toISOString().slice(0,10);
   let streak=1;try{const y=JSON.parse(localStorage.getItem(ykey)||"{}");if(Object.values(y).some(v=>Number(v)>0))streak=2}catch{}
@@ -1213,9 +1261,9 @@ function lastBattleHtml(){
   const b=state.lastBattle;if(!b)return "";
   const practice=npcPractice(b),mine=b.player_a===state.player?.id;
   const delta=mine?b.score_delta_a:b.score_delta_b;
-  const title=b.result_reason==="insufficient_votes"?"Недостаточно оценок":b.result_reason==="delivery_failed"?"Бой не начался":b.winner_id?(b.winner_id===state.player?.id?"Победа":"Поражение"):"Ничья";
+  const title=b.result_reason==="insufficient_votes"?"Бой без результата":b.result_reason==="delivery_failed"?"Бой не начался":b.winner_id?(b.winner_id===state.player?.id?"Победа":"Поражение"):"Ничья";
   const simulated=b.result_source==="simulation";
-  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":b.result_reason==="insufficient_votes"?"Рейтинг сохранён · следующий вход свободный":b.result_reason==="pair_limit"?"Повторная пара за сутки · без изменения Score":Number(b.votes_a)+Number(b.votes_b)===0?"Рейтинг сохранён":"По голосам игроков"}</small></div>`;
+  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":b.result_reason==="insufficient_votes"?"Мало голосов. Рейтинг не изменился. Можно снова искать бой.":b.result_reason==="pair_limit"?"Повторная пара за сутки · без изменения Score":Number(b.votes_a)+Number(b.votes_b)===0?"Рейтинг сохранён":"По голосам игроков"}</small></div>`;
 }
 
 function battleHtml(b){
@@ -1232,14 +1280,14 @@ function renderFeed(){
   const own=state.feed.find(isOwnLiveBattle);
 
   const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now() && (isOwnLiveBattle(b)||(!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id)))).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)) || Number(npcPractice(a))-Number(npcPractice(b)));
-  $("feedCount").textContent=valid.length+" BATTLES";
+  $("feedCount").textContent=valid.length+" в ленте";
   const choices=valid.filter(b=>!isOwnLiveBattle(b)&&!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id));
   $("homeFeed").innerHTML=choices.length?choices.slice(0,1).map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Можно начать свой бой или вернуться к голосованию позже.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
   $("battleFeed").innerHTML=valid.length?valid.map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Начни свой бой выше или верни пропущенные пары.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
   document.querySelectorAll('.skipBattle').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.add(btn.dataset.id);renderFeed();});
   document.querySelectorAll('.revisitBattles').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.clear();renderFeed();});
   const result=lastBattleHtml();
-  if(result){$("homeFeed").insertAdjacentHTML("beforeend",result);$("battleFeed").insertAdjacentHTML("afterbegin",result);}
+  if(result){$("battleFeed").insertAdjacentHTML("beforeend",result);}
   document.querySelectorAll(".vote").forEach(btn=>btn.addEventListener("click",()=>vote(btn.dataset.id,btn.dataset.side,btn)));document.querySelectorAll(".emptyBattleBtn").forEach(btn=>btn.onclick=()=>openView("battle"));
 }
 
@@ -1247,8 +1295,8 @@ function renderDropInfo(){
   const d=state.drops||{}, rates=d.rates||{};const av=d.available_tiers||[];
   const labels={1:"SUB5",3:(state.player?.gender==="female"?"LTB":"LTN"),6:(state.player?.gender==="female"?"MTB":"MTN"),9:(state.player?.gender==="female"?"HTB":"HTN"),11:(state.player?.gender==="female"?"STACY":"CHAD"),12:(state.player?.gender==="female"?"TRUE STACY":"GIGACHAD")};
   const dropScore={1:700,3:1100,6:1700,9:2350,11:2900,12:3300}; const milestones=d.milestones||[1,3,6,9,11,12]; const future=milestones.find(t=>t>Number(d.current_tier||0)); const score=Number(state.player?.mogg_score||0);
-  $("dropAvailable").textContent=av.length+" AVAILABLE";$("dropTier").textContent=d.next_tier?(labels[d.next_tier]||"DROP"):(future?"NEXT · "+labels[future]:"ALL CLAIMED");
-  $("dropBtn").disabled=!d.next_tier;$("dropBtn").textContent=d.next_tier?`OPEN ${labels[d.next_tier]||"ASCENSION"} DROP`:(future?`NEXT DROP · ${labels[future]}`:"ALL ASCENSION DROPS CLAIMED");
+  $("dropAvailable").textContent=av.length+" доступно";$("dropTier").textContent=d.next_tier?(labels[d.next_tier]||"DROP"):(future?"NEXT · "+labels[future]:"ALL CLAIMED");
+  $("dropBtn").disabled=!d.next_tier;$("dropBtn").textContent=d.next_tier?`Забрать награду ${labels[d.next_tier]||""}`:(future?`Доступно с ${labels[future]}`:"Все награды получены");
   $("dropTitle").textContent=d.next_tier?`Ascension Drop · ${labels[d.next_tier]}`:(future?`Следующий Ascension Drop · ${labels[future]} · ${Math.max(0,(dropScore[future]||0)-score).toLocaleString()} SCORE TO GO`:"Все 6 Ascension Drops получены");
   $("dropRates").innerHTML=Object.entries(rates).filter(([k,v])=>Number(v)>0).map(([k,v])=>`<div class="rateChip"><b>${v}%</b><small>${k}</small></div>`).join("");
 }
@@ -1685,7 +1733,7 @@ $("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("ra
 
 const guideSteps=[
  {tag:'01 · ТВОЯ ЦЕЛЬ',title:'Создай образ. Выходи на баттл.',lead:'MOGG BATTLE — игра с фото-баттлами, голосованием и развитием профиля.',detail:'<b>Начни с фото</b><br>Заверши профиль и загрузи своё фото. Затем попробуй Quick, чтобы познакомиться с боем без изменения рейтинга.'},
- {tag:'02 · ПЕРВЫЙ БОЙ',title:'Quick для старта. Ranked для рейтинга.',lead:'В баттле сравниваются два профиля. Голоса определяют результат.',detail:'<b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свои бои — во вкладке «Бои». Можно вести один Ranked и один Quick одновременно.<br><br>В игре есть NPC-соперники; голосуют только игроки. Правила рейтинга одинаковы для всех соперников. При равном рейтинге — +24 победителю и −24 проигравшему, диапазон изменения 8–40; Score не опускается ниже нуля. Одна и та же пара меняет рейтинг только один раз за сутки UTC.<br><br>Ranked ждёт минимум 5 оценок, затем ещё 10 минут. Максимальная длительность — 24 часа. Если оценок не хватило, рейтинг сохраняется и следующий вход свободный. Ничья не меняет Score.<br><br>Первый Ranked свободный; перед следующим оцени 3 чужих боя. Если доступных пар нет, ограничение снимается. Пропуск оценкой не считается.'},
+ {tag:'02 · ПЕРВЫЙ БОЙ',title:'Quick для старта. Ranked для рейтинга.',lead:'В баттле сравниваются два профиля. Голоса определяют результат.',detail:'<b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свои бои — во вкладке «Бои». Выбери режим боя.<br><br>В игре есть NPC-соперники; голосуют только игроки. Правила рейтинга одинаковы для всех соперников. При равном рейтинге — +24 победителю и −24 проигравшему, диапазон изменения 8–40; Score не опускается ниже нуля. Одна и та же пара меняет рейтинг только один раз за сутки UTC.<br><br>Ranked ждёт минимум 5 оценок, затем ещё 10 минут. Максимальная длительность — 24 часа. Если оценок не хватило, рейтинг сохраняется и следующий вход свободный. Ничья не меняет Score.<br><br>Первый Ranked свободный; перед следующим оцени 3 чужих боя. Если доступных пар нет, ограничение снимается. Пропуск оценкой не считается.'},
  {tag:'03 · ПРОГРЕСС',title:'Развивай свою студию.',lead:'Тапы, задания и голосование дают игровые Points. Вкладывай их в улучшения MOGG STUDIO.',detail:'<b>Монтажная станция</b> производит Points каждые 10 минут и учитывает до 12 часов офлайн.<br>Улучшай добычу, запас энергии и восстановление. Цена и эффект следующего уровня видны до покупки.'},
  {tag:'04 · ВАЛЮТЫ И СТИЛЬ',title:'Три разных показателя.',lead:'Рейтинг, игровые ресурсы и токен выполняют разные задачи.',detail:'<b>Score</b> — рейтинг и ранги.<br><b>Points</b> — улучшения и игровые покупки. Голосование даёт 2 Points, студия — ежедневный бонус Points; они не повышают рейтинг.<br><b>MOGG в кошельке</b> — отдельный токен в TON; автоматического обмена Points в MOGG сейчас нет.<br><br>Косметику можно примерить бесплатно. Предметы за Stars оформляются через платёжное окно Telegram.'},
  {tag:'05 · ГОТОВО К СТАРТУ',title:'Твой первый шаг — Quick.',lead:'Профиль → фото → Quick → результат. После первого боя попробуй Ranked или развивай студию.',detail:'<b>Дальше</b><br>Голосуй в чужих боях, собирай Points и подбирай оформление профиля. Обучение можно снова открыть кнопкой «Как играть».'}
@@ -1800,7 +1848,7 @@ function renderRankedQueue(){
  const active=(state.feed||[]).some(b=>isOwnLiveBattle(b)&&b.mode!=="quick");
  const q=state.rankedQueue,panel=$("rankedQueuePanel");
  panel.hidden=active||!q||new Date(q.expires_at).getTime()<=Date.now();
- if(!panel.hidden)$("rankedQueueText").textContent="Заявка Ranked действует до "+new Date(q.expires_at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+". Можно закрыть приложение: сервер продолжит поиск. Результат появится в игре.";
+ if(!panel.hidden)$("rankedQueueText").textContent= "Ищем соперника до "+new Date(q.expires_at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+". Можно выйти — поиск продолжится.";
 }
 $("cancelRankedQueue").addEventListener("click",async()=>{
  const b=$("cancelRankedQueue");b.disabled=true;
@@ -1812,13 +1860,13 @@ $("cancelRankedQueue").addEventListener("click",async()=>{
 async function updateChannelReward(){
  const label=$("channelRewardStatus"),button=$("claimChannelRequest");
  try{const r=await call("channel_reward_status");button.disabled=!!r.claimed||!r.ready;
- label.textContent=r.claimed?"150 Points уже получены":!r.ready?"Задание подключается. Награда пока недоступна.":r.requested?"Заявка получена — забери награду":"После подачи заявки нажми «Забрать». Одобрение не требуется.";
+ label.textContent=r.claimed?"Бонус получен":!r.ready?"Задание подключается. Награда пока недоступна.":r.requested?"Готово. Бонус можно забрать.":"Подай заявку и забери бонус.";
  }catch{label.textContent="Не удалось проверить задание. Попробуй забрать награду позже.";}
 }
 $("claimChannelRequest").addEventListener("click",async()=>{
  const b=$("claimChannelRequest");b.disabled=true;
  try{const r=await call("claim_channel_request");
- if(r.pending){$("channelRewardStatus").textContent="Заявка пока не получена. Подай её по ссылке и повтори проверку через несколько секунд.";return;}
+ if(r.pending){$("channelRewardStatus").textContent="Пока не видим заявку. Подай её и нажми «Забрать» ещё раз.";return;}
  toast(r.already?"Награда уже получена":"+150 Points");await refresh();await updateChannelReward();
  }catch{toast("Не удалось проверить заявку. Попробуй ещё раз.");}
  finally{b.disabled=false;}
