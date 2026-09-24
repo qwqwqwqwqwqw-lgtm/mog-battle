@@ -808,7 +808,7 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
         <button id="rankedBtn" class="primary pink" style="min-height:92px">🏆 RANKED<br><span style="font-size:11px;font-weight:600">С рейтингом</span></button>
         <button id="quickBtn" class="primary" style="min-height:92px">⚡ QUICK<br><span style="font-size:11px;font-weight:600">Без рейтинга</span></button>
       </div>
-      <div id="matchStatus" class="muted" style="margin-top:10px"></div>
+      <div id="matchStatus" class="muted" style="margin-top:10px"></div><div id="rankedQueuePanel" hidden><p id="rankedQueueText" class="muted"></p><button id="cancelRankedQueue" type="button">Отменить заявку</button></div>
     </div>
 
     <div class="card">
@@ -1358,7 +1358,7 @@ async function init(){
   if(bootBusy)return;bootBusy=true;
   try{
     const d=await call("me");
-    state.player=d.player;state.feed=d.feed||[];state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];state.drops=d.drops||null;state.crew=d.crew||null;
+    state.player=d.player;state.feed=d.feed||[];state.rankedQueue=d.ranked_queue||null;renderRankedQueue();state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];state.drops=d.drops||null;state.crew=d.crew||null;
     renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
 
     const start=tg?.initDataUnsafe?.start_param||"";
@@ -1534,7 +1534,8 @@ async function startMatchmaking(mode,retry=false){
     }else{
       $("matchStatus").textContent=mode==="ranked"?"Ты в Ranked очереди. Ждём соперника.":"Ты в Quick очереди. Ждём соперника.";
       if(!retry)toast("Поиск запущен");
-      if(Date.now()<matchSearchUntil)matchSearchTimer=setTimeout(()=>startMatchmaking(mode,true),3000);
+      if(mode==="ranked"){state.rankedQueue=d.request;renderRankedQueue();$("matchStatus").textContent="Заявка принята";}
+      else if(Date.now()<matchSearchUntil)matchSearchTimer=setTimeout(()=>startMatchmaking(mode,true),3000);
       else $("matchStatus").textContent="Пока нет соперника. Попробуй Quick или повтори поиск позже.";
     }
   }catch(e){
@@ -1633,7 +1634,7 @@ $("resultClose").onclick=()=>$("resultFlash").classList.remove("show");
 async function refresh(){
   if(!bootReady||refreshBusy)return;refreshBusy=true;
   try{
-    const d=await call("me");state.player=d.player;maybeShowScoreResult(Number(d.player?.mogg_score||0),d.player?.gender);state.feed=d.feed||[];state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.drops=d.drops||null;state.crew=d.crew||null;renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
+    const d=await call("me");state.player=d.player;maybeShowScoreResult(Number(d.player?.mogg_score||0),d.player?.gender);state.feed=d.feed||[];state.rankedQueue=d.ranked_queue||null;renderRankedQueue();state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.drops=d.drops||null;state.crew=d.crew||null;renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
     $("connectionNotice").hidden=true;
   }catch(e){showConnectionError(e)}
   finally{refreshBusy=false;}
@@ -1794,6 +1795,18 @@ document.getElementById("deleteOwnPhoto").addEventListener("click",async()=>{
  else out.textContent="Фото скрыто из профиля. Удаление файла ещё не подтверждено — нажми повторно.";
  }catch(e){out.textContent=String(e.message).includes("photo_changed")?"Фото изменилось. Обнови приложение и повтори.":"Удаление не подтверждено. Повтори или отправь обращение в помощь.";if(String(e.message).includes("photo_changed"))pendingPhotoDeletion=null;}
  finally{btn.disabled=false;}
+});
+</script><script>
+function renderRankedQueue(){
+ const active=(state.feed||[]).some(b=>isOwnLiveBattle(b)&&b.mode!=="quick");
+ const q=state.rankedQueue,panel=$("rankedQueuePanel");
+ panel.hidden=active||!q||new Date(q.expires_at).getTime()<=Date.now();
+ if(!panel.hidden)$("rankedQueueText").textContent="Заявка Ranked действует до "+new Date(q.expires_at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+". Можно закрыть приложение: сервер продолжит поиск. Результат появится в игре.";
+}
+$("cancelRankedQueue").addEventListener("click",async()=>{
+ const b=$("cancelRankedQueue");b.disabled=true;
+ try{await call("cancel_ranked");state.rankedQueue=null;renderRankedQueue();$("matchStatus").textContent="Заявка снята. Уже начавшийся бой не отменяется.";await refresh();}
+ catch{toast("Не удалось отменить. Попробуй ещё раз.");}finally{b.disabled=false;}
 });
 </script></body>
 </html>
