@@ -778,13 +778,12 @@ html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-w
 
     <div class="card">
       <div class="sectionHead"><h2 class="wheelCardTitle">Ежедневный спин</h2></div>
-      <div class="sponsor" hidden>
-        <b style="font-size:11px">@mbgbchannel</b>
-        <p class="muted">Бонус за подписку на канал.</p>
-        <div class="row">
-          <button class="secondary" id="openChannel" style="width:auto">ОТКРЫТЬ КАНАЛ</button>
-          <span class="rewardValue">+150 POINTS</span>
-        </div>
+      <div class="sponsor">
+        <b>Канал MOGG BATTLE</b>
+        <p class="muted">Подай заявку в канал · +150 Points один раз</p>
+        <div class="row"><a id="openChannel" class="secondary" href="https://t.me/+QZ86AoSdXBJlMDIy" target="_blank" rel="noopener">Подать заявку</a>
+        <button id="claimChannelRequest" class="secondary">Забрать 150 Points</button></div>
+        <p id="channelRewardStatus" class="muted"></p>
       </div>
       <button id="appDailyBtn" class="wheelLaunch"><span class="miniWheel" aria-hidden="true"></span><span><b>Ежедневный спин</b><small>Бесплатно · один раз в сутки</small></span><span class="launchArrow">↗</span></button>
     </div>
@@ -1416,7 +1415,7 @@ $("tapBtn").addEventListener("click",async(e)=>{
   catch(e){toast(String(e.message).includes("no_energy")?"Нет энергии":"Ошибка")}
 });
 
-$("openChannel").addEventListener("click",()=>{tg?.openTelegramLink?.("https://t.me/mbgbchannel")||window.open("https://t.me/mbgbchannel","_blank")});
+$("openChannel").addEventListener("click",(e)=>{if(tg?.openTelegramLink){e.preventDefault();tg.openTelegramLink("https://t.me/+QZ86AoSdXBJlMDIy");}});
 
 
 let wheelBusy=false,wheelAngle=0,wheelOpener=null,wheelScroll="";
@@ -1808,5 +1807,23 @@ $("cancelRankedQueue").addEventListener("click",async()=>{
  try{await call("cancel_ranked");state.rankedQueue=null;renderRankedQueue();$("matchStatus").textContent="Заявка снята. Уже начавшийся бой не отменяется.";await refresh();}
  catch{toast("Не удалось отменить. Попробуй ещё раз.");}finally{b.disabled=false;}
 });
-</script></body>
+</script>
+<script>
+async function updateChannelReward(){
+ const label=$("channelRewardStatus"),button=$("claimChannelRequest");
+ try{const r=await call("channel_reward_status");button.disabled=!!r.claimed||!r.ready;
+ label.textContent=r.claimed?"150 Points уже получены":!r.ready?"Задание подключается. Награда пока недоступна.":r.requested?"Заявка получена — забери награду":"После подачи заявки нажми «Забрать». Одобрение не требуется.";
+ }catch{label.textContent="Не удалось проверить задание. Попробуй забрать награду позже.";}
+}
+$("claimChannelRequest").addEventListener("click",async()=>{
+ const b=$("claimChannelRequest");b.disabled=true;
+ try{const r=await call("claim_channel_request");
+ if(r.pending){$("channelRewardStatus").textContent="Заявка пока не получена. Подай её по ссылке и повтори проверку через несколько секунд.";return;}
+ toast(r.already?"Награда уже получена":"+150 Points");await refresh();await updateChannelReward();
+ }catch{toast("Не удалось проверить заявку. Попробуй ещё раз.");}
+ finally{b.disabled=false;}
+});
+const channelReadyTimer=setInterval(()=>{if(state.player){clearInterval(channelReadyTimer);updateChannelReward();}},1000);
+</script>
+</body>
 </html>
