@@ -746,7 +746,36 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
 .groupInvite:focus-visible{outline:2px solid #e0c9ff;outline-offset:4px}@media(hover:hover){.groupInvite:hover{filter:brightness(1.1)}}
 @media(max-width:360px){.groupInvite{font-size:14px}.friendsHeading h2{font-size:18px}}
 </style>
-</head>
+<style id="arena-four-tabs">
+.nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important}
+.nav::before{width:calc((100% - 16px)/4)}
+.nav:has(button[data-view="home"].active){--dock-index:0}.nav:has(button[data-view="tap"].active){--dock-index:1}.nav:has(button[data-view="rewards"].active){--dock-index:2}.nav:has(button[data-view="profile"].active){--dock-index:3}
+#homeView.active{display:flex;flex-direction:column}
+#homeView>#homeProfileCard{order:0}
+#homeView>.matchBox{order:1!important}
+#homeView>#arenaOwnCard{order:2!important}
+#homeView>.homeBattleStage{order:3!important}
+#homeView>.friendsBattle{order:4!important}
+#homeView>#arenaBonuses{order:5!important}
+#homeView>[hidden],#arenaHistory[hidden]{display:none!important}
+#arenaBonuses>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;min-height:44px}
+#arenaBonuses>summary::-webkit-details-marker{display:none}
+#arenaBonuses>summary span{font-size:17px;font-weight:650}
+#arenaBonuses>summary small{font-size:12px;color:#b8b0ca;line-height:1.4}
+#arenaBonuses[open]>summary{margin-bottom:16px}
+#arenaBonuses .homeBonuses{margin-bottom:12px}
+#arenaBonuses .dailyRun{margin-bottom:0}
+#arenaHistory summary{font-size:16px;font-weight:600;cursor:pointer;padding:6px 0}
+#arenaLastResult{margin-top:14px}
+#profileRankRewards .chest{padding:16px}
+#homeView .matchBox{padding:18px}
+#homeView .matchBox .matchIcon{display:none}
+#homeView .matchBox>h2{font-size:20px!important}
+#homeView .matchBox>p{display:none}
+#homeView .homeBattleStage{margin-top:4px}
+#homeView .homeBattleStage .arenaHead h2{font-size:21px}
+#homeView #rankedBtn,#homeView #quickBtn{min-height:76px!important}
+</style></head>
 <body>
 <div id="toast" class="toast"></div>
 <div id="connectionNotice" role="status" hidden style="max-width:512px;margin:12px auto;padding:12px 16px;background:#181923;border:1px solid #49415d;border-radius:12px">
@@ -883,7 +912,7 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
     </div>
 
     <div class="card">
-      <div class="sectionHead"><h2>Текущие бои</h2><span id="feedCount">0 BATTLES</span></div>
+      <div class="sectionHead"><h2>Твои бои</h2><span id="feedCount">0 BATTLES</span></div>
       <div id="battleFeed"></div>
     </div>
   </section>
@@ -1043,8 +1072,7 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
 </div>
 
 <nav class="nav">
-  <button class="active" data-view="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></svg><small>Главная</small></button>
-  <button data-view="battle"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3 20 21M20 3 4 21M3 16l5 5m8 0 5-5"/></svg><small>Бои</small></button>
+  <button class="active" data-view="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></svg><small>Арена</small></button>
   <button data-view="tap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v14H3ZM7 7l2-4h6l2 4"/><circle cx="12" cy="14" r="4"/></svg><small>LAB</small></button>
   <button data-view="rewards"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l1 13H3ZM8 8V6a4 4 0 0 1 8 0v2"/></svg><small>Магазин</small></button>
   <button data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg><small>Профиль</small></button>
@@ -1052,6 +1080,23 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
 
 <div id="tryModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="tryTitle"><div class="rankSheet shopSheet"><div class="row"><h2 id="tryTitle">Примерка</h2><button id="tryClose" class="modalClose">Закрыть</button></div><div id="tryPreview"></div><p id="tryDescription" class="muted"></p><p class="muted">Примерка бесплатна. Покупка — отдельной кнопкой в магазине.</p></div></div>
 <script>
+// Preserve existing IDs and event handlers while grouping related actions.
+(function arrangeArena(){
+ const home=document.getElementById('homeView'),battle=document.getElementById('battleView'),profile=document.getElementById('profileView');
+ const stage=home.querySelector('.homeBattleStage'),match=battle.querySelector('.matchBox');
+ const ownCard=document.getElementById('battleFeed').closest('.card');
+ ownCard.id='arenaOwnCard';ownCard.querySelector('h2').textContent='Твои бои';
+ home.insertBefore(match,stage);home.insertBefore(ownCard,stage);
+ const bonuses=document.createElement('details');bonuses.id='arenaBonuses';bonuses.className='card arenaBonuses';
+ const summary=document.createElement('summary');summary.innerHTML='<span>Бонусы</span><small>Колесо · задания · канал</small>';bonuses.append(summary);
+ bonuses.append(home.querySelector('.homeBonuses'),home.querySelector('.dailyRun'));home.append(bonuses);
+ const basics=home.querySelector('.gameBasics');profile.insertBefore(basics,profile.querySelector('.walletCard'));
+ const drop=document.getElementById('dropBtn').closest('.card');drop.id='profileRankRewards';profile.insertBefore(drop,profile.querySelector('.walletCard'));
+ const ref=document.querySelector('#rewardsView .refbox').closest('.card');profile.insertBefore(ref,profile.querySelector('.walletCard'));
+ const history=document.createElement('details');history.id='arenaHistory';history.className='card';history.innerHTML='<summary>Последний бой</summary><div id="arenaLastResult"></div>';profile.insertBefore(history,profile.querySelector('.walletCard'));
+ battle.hidden=true;
+})();
+
 const API="https://zjznmcydpngceiblqtwj.supabase.co/functions/v1/player-api";
 const tg=window.Telegram?.WebApp;
 if(tg){tg.ready();tg.expand();}
@@ -1146,7 +1191,7 @@ function renderDaily(){
   const missions=[
     {icon:"⚡",name:"Сделай 50 тапов",sub:"В разделе «LAB»",key:"taps",goal:50},
     {icon:"◉",name:"Оцени 3 боя",sub:"Выбирай победителей",key:"votes",goal:3},
-    {icon:"⚔",name:"Начни 2 быстрых боя",sub:"В разделе «Бои»",key:"quick",goal:2},
+    {icon:"⚔",name:"Начни 2 быстрых боя",sub:"На Арене",key:"quick",goal:2},
     {icon:"▲",name:"Подними рейтинг на 20",sub:"В рейтинговых боях",key:"scoreGain",goal:20},
   ];
   const done=missions.filter(m=>Number(daily[m.key]||0)>=m.goal).length;
@@ -1306,12 +1351,15 @@ function renderFeed(){
   const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now() && (isOwnLiveBattle(b)||(!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id)))).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)) || Number(npcPractice(a))-Number(npcPractice(b)));
   $("feedCount").textContent=valid.length+" в ленте";
   const choices=valid.filter(b=>!isOwnLiveBattle(b)&&!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id));
-  $("homeFeed").innerHTML=choices.length?choices.slice(0,1).map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Можно начать свой бой или вернуться к голосованию позже.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
-  $("battleFeed").innerHTML=valid.length?valid.map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Начни свой бой выше или верни пропущенные пары.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
+  $("homeFeed").innerHTML=choices.length?choices.slice(0,1).map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Новые пары появятся здесь. Пока можно вызвать друга в беседе.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
+  const ownBattles=valid.filter(isOwnLiveBattle);
+  $("battleFeed").innerHTML=ownBattles.map(battleHtml).join("");
+  $("arenaOwnCard").hidden=!ownBattles.length;
+  $("feedCount").textContent=ownBattles.length?ownBattles.length+" активных":"";
   document.querySelectorAll('.skipBattle').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.add(btn.dataset.id);renderFeed();});
   document.querySelectorAll('.revisitBattles').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.clear();renderFeed();});
   const result=lastBattleHtml();
-  if(result){$("battleFeed").insertAdjacentHTML("beforeend",result);}
+  $("arenaLastResult").innerHTML=result; $("arenaHistory").hidden=!result;
   document.querySelectorAll(".vote").forEach(btn=>btn.addEventListener("click",()=>vote(btn.dataset.id,btn.dataset.side,btn)));document.querySelectorAll(".emptyBattleBtn").forEach(btn=>btn.onclick=()=>openView("battle"));
 }
 
@@ -1725,7 +1773,7 @@ function profileShareText(){
   return `${p.first_name||p.username||"Player"} · ${rank}\n${score.toLocaleString()} Score\nСможешь могнуть меня? 😈`;
 }
 
-function openView(view){document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
+function openView(view){if(view==="battle")view="home";document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
 document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>openView(btn.dataset.view)));
 
 // Dock feedback is decorative only; navigation continues through openView.
@@ -1756,7 +1804,7 @@ $("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove
 $("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
 
 const guideSteps=[
-{tag:'01 · БАТЛЫ',title:'Выбирай победителей. Участвуй сам.',lead:'На главной голосуй за чужие фото. Во вкладке «Бои» запускай свой матч.',detail:'<b>Быстрый</b> — без изменения рейтинга.<br><b>Рейтинговый</b> — победы поднимают ранг. После заявки можно выйти: поиск продолжится.<details class="guideRules"><summary>Правила боя и рейтинга</summary><p><b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свои бои — во вкладке «Бои». Выбери режим боя.<br><br>В игре есть NPC-соперники; голосуют только игроки. Правила рейтинга одинаковы для всех соперников. При равном рейтинге — +24 победителю и −24 проигравшему, диапазон изменения 8–40; Score не опускается ниже нуля. Одна и та же пара меняет рейтинг только один раз за сутки UTC.<br><br>Ranked ждёт минимум 5 оценок, затем ещё 10 минут. Максимальная длительность — 24 часа. Если оценок не хватило, рейтинг сохраняется и можно снова искать бой. Ничья не меняет Score.<br><br>Первый рейтинговый бой доступен сразу; перед следующим оцени 3 чужих боя. Если доступных пар нет, ограничение снимается. Пропуск оценкой не считается.</p></details>'},
+{tag:'01 · БАТЛЫ',title:'Выбирай победителей. Участвуй сам.',lead:'На главной голосуй за чужие фото. На Арене запускай свой матч.',detail:'<b>Быстрый</b> — без изменения рейтинга.<br><b>Рейтинговый</b> — победы поднимают ранг. После заявки можно выйти: поиск продолжится.<details class="guideRules"><summary>Правила боя и рейтинга</summary><p><b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свои бои — на Арене. Выбери режим боя.<br><br>В игре есть NPC-соперники; голосуют только игроки. Правила рейтинга одинаковы для всех соперников. При равном рейтинге — +24 победителю и −24 проигравшему, диапазон изменения 8–40; Score не опускается ниже нуля. Одна и та же пара меняет рейтинг только один раз за сутки UTC.<br><br>Ranked ждёт минимум 5 оценок, затем ещё 10 минут. Максимальная длительность — 24 часа. Если оценок не хватило, рейтинг сохраняется и можно снова искать бой. Ничья не меняет Score.<br><br>Первый рейтинговый бой доступен сразу; перед следующим оцени 3 чужих боя. Если доступных пар нет, ограничение снимается. Пропуск оценкой не считается.</p></details>'},
 {tag:'02 · POINTS',title:'LAB — твои игровые ресурсы.',lead:'Нажимай в LAB, голосуй и забирай ежедневные бонусы, чтобы получать Points.',detail:'Улучшения LAB дают больше Points за нажатие, энергии или пассивного дохода. Генератор учитывает до 12 часов офлайн.<br><br>Трать Points на модули и косметику. Они не повышают рейтинг и не являются токенами.'},
 {tag:'03 · MOGG И ДРУЗЬЯ',title:'Играй с друзьями в беседе.',lead:'Добавь бота и ответь на сообщение друга командой /battle. Друг принимает вызов — остальные выбирают победителя.',detail:'<b>Что с MOGG?</b><br>Токен проекта существует в TON. Выплаты за игру и обмен Points пока не запущены. Подключение кошелька само по себе токены не начисляет.'}
 ];
