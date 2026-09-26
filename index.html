@@ -789,7 +789,7 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
     <div class="rankCurrent">
       <small>ТВОЙ РАНГ</small>
       <b id="modalRank">SUB3</b>
-      <small><span id="modalScore">0</span> MOGG · до следующего ранга <span id="modalNeed">700</span></small>
+      <small><span id="modalScore">0</span> рейтинга · до следующего ранга <span id="modalNeed">700</span></small>
       <div class="progress"><i id="modalRankProgress"></i></div>
     </div>
     <div id="rankLadder" class="ladder"></div>
@@ -825,9 +825,9 @@ button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
 
     <div class="card goalCard">
       <div class="kicker">СЛЕДУЮЩИЙ РАНГ</div>
-      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 SCORE TO GO</div></div>
+      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 до следующего ранга</div></div>
       <div class="progress"><i id="nextRankProgress"></i></div>
-      <div class="goalCopy" id="goalCopy">Win Ranked battles to raise your MOGG Score.</div>
+      <div class="goalCopy" id="goalCopy">Побеждай в рейтинговых боях, чтобы поднять ранг.</div>
 
       <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
     </div>
@@ -1265,7 +1265,7 @@ function renderPlayer(){
   $("genderState").textContent=p.gender==="female"?"FEMALE":"MALE";$("photoState").textContent=p.profile_photo_url?"✓":"MISSING";$("refCount").textContent=p.referral_count||0;
   const idx=rankIndex(score), nextIdx=Math.min(idx+1,cuts.length-1), atMax=idx>=cuts.length-1;
   $("nextRankName").textContent=atMax?rank:ranksFor(p.gender)[nextIdx];
-  $("nextRankNeed").textContent=atMax?"MAX RANK":Math.max(0,cuts[nextIdx]-score).toLocaleString()+" SCORE TO GO";
+  $("nextRankNeed").textContent=atMax?"MAX RANK":Math.max(0,cuts[nextIdx]-score).toLocaleString()+" до следующего ранга";
   $("nextRankProgress").style.width=pct+"%";
   $("loopPhoto").classList.toggle("done",!!p.profile_photo_url);$("loopBattle").classList.toggle("done",Number(p.battles_played||0)>0);$("loopRank").classList.toggle("done",score>=700);
   const statusNext=atMax?"ELITE STATUS":ranksFor(p.gender)[nextIdx];
@@ -1321,7 +1321,7 @@ function renderDropInfo(){
   const dropScore={1:700,3:1100,6:1700,9:2350,11:2900,12:3300}; const milestones=d.milestones||[1,3,6,9,11,12]; const future=milestones.find(t=>t>Number(d.current_tier||0)); const score=Number(state.player?.mogg_score||0);
   $("dropAvailable").textContent=av.length+" доступно";$("dropTier").textContent=d.next_tier?(labels[d.next_tier]||"DROP"):(future?"NEXT · "+labels[future]:"ALL CLAIMED");
   $("dropBtn").disabled=!d.next_tier;$("dropBtn").textContent=d.next_tier?`Забрать награду ${labels[d.next_tier]||""}`:(future?`Доступно с ${labels[future]}`:"Все награды получены");
-  $("dropTitle").textContent=d.next_tier?`Ascension Drop · ${labels[d.next_tier]}`:(future?`Следующий Ascension Drop · ${labels[future]} · ${Math.max(0,(dropScore[future]||0)-score).toLocaleString()} SCORE TO GO`:"Все 6 Ascension Drops получены");
+  $("dropTitle").textContent=d.next_tier?`Ascension Drop · ${labels[d.next_tier]}`:(future?`Следующий Ascension Drop · ${labels[future]} · ${Math.max(0,(dropScore[future]||0)-score).toLocaleString()} до следующего ранга`:"Все награды за ранги получены");
   $("dropRates").innerHTML=Object.entries(rates).filter(([k,v])=>Number(v)>0).map(([k,v])=>`<div class="rateChip"><b>${v}%</b><small>${k}</small></div>`).join("");
 }
 function renderShopFilters(){
