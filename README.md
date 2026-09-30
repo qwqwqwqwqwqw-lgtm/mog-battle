@@ -32,7 +32,7 @@ deno test --allow-read --allow-env tests/portrait_test.ts
 
 ## Operations
 
-Deploy both migrations before the new Edge Functions. Function entrypoints are under `supabase/functions/<name>/index.ts`; include `_shared/portrait.ts` and `_shared/raster.ts`. `player-api` authenticates signed Telegram initData, `telegram-bot` verifies the existing webhook secret, and `game-worker` verifies its private per-project secret; they use custom authentication instead of Supabase user JWTs.
+Deploy the migrations before the new Edge Functions. Function entrypoints are under `supabase/functions/<name>/index.ts`; include `_shared/portrait.ts` and `_shared/raster.ts`. `player-api` authenticates signed Telegram initData, `telegram-bot` verifies the existing webhook secret, and `game-worker` verifies its private per-project secret; they use custom authentication instead of Supabase user JWTs.
 
 Required project secrets: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `TELEGRAM_BOT_TOKEN`. They are already managed by the project. The result-worker secret is generated in a private database schema and is never shipped to the browser. Cron leases group result deliveries with bounded retries. It sends only when a finished battle has an actual Telegram message to update.
 

@@ -230,6 +230,7 @@
         request_timeout: "Сервер отвечает долго. Попробуй ещё раз.",
         onboarding_required: "Добавь своё фото перед участием.",
         photo_required: "Для боя нужно фото.",
+      invalid_photo: "Не удалось прочитать фото. Выбери другой снимок.",
         not_enough_points: "Пока не хватает Points.",
         no_energy: "Энергия закончилась. Она восстанавливается.",
         already_owned: "Этот предмет уже в коллекции.",
@@ -305,6 +306,10 @@
     .querySelectorAll("[data-view]")
     .forEach((b) => (b.onclick = () => openView(b.dataset.view)));
   $("profileShortcut").onclick = () => openView("profile");
+  document.querySelector(".wordmark").onclick = (e) => {
+    e.preventDefault();
+    openView("arena");
+  };
 
   function renderPlayer() {
     const p = state.player || {},
@@ -1356,7 +1361,10 @@
     c.width = 900;
     c.height = 1200;
     const ctx = c.getContext("2d");
-    ctx.fillStyle = "#101211";
+    ctx.fillStyle =
+      { midnight: "#221d32", liquidchrome: "#252b34", goldroom: "#302719" }[
+        key(p.style?.profile_bg)
+      ] || "#101211";
     ctx.fillRect(0, 0, 900, 1200);
     ctx.fillStyle = "#d9ff67";
     ctx.font = "900 49px Arial";

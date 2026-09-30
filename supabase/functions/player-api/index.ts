@@ -1,5 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import { validatePng, cleanupCards } from "../_shared/portrait.ts";
+import { decodePhoto } from "../_shared/raster.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -364,12 +365,20 @@ async function enrichFeed(db: any, battles: any[]) {
   });
   if (counts.error) throw counts.error;
   const tally = new Map((counts.data || []).map((x: any) => [x.battle_id, x]));
-  return battles.map((b: any) => ({
-    ...b,
-    ...(tally.get(b.id) || {}),
-    a: map.get(b.player_a) || null,
-    b: map.get(b.player_b) || null,
-  }));
+  return battles.map((b: any) => {
+    const {
+      telegram_chat_id,
+      telegram_message_id,
+      telegram_poll_id,
+      ...visible
+    } = b;
+    return {
+      ...visible,
+      ...(tally.get(b.id) || {}),
+      a: map.get(b.player_a) || null,
+      b: map.get(b.player_b) || null,
+    };
+  });
 }
 
 async function retryPhotoDeletions(db: any, player: any) {
@@ -806,7 +815,7 @@ Deno.serve(async (req) => {
         );
       const mime = String(body.mime || "");
       const base64 = String(body.base64 || "");
-      if (!["image/jpeg", "image/png", "image/webp"].includes(mime))
+      if (!["image/jpeg", "image/png"].includes(mime))
         return Response.json(
           { error: "unsupported_image" },
           { status: 400, headers: cors },
@@ -822,6 +831,14 @@ Deno.serve(async (req) => {
           { error: "image_too_large" },
           { status: 413, headers: cors },
         );
+      try {
+        decodePhoto(bytes);
+      } catch {
+        return Response.json(
+          { error: "invalid_photo" },
+          { status: 400, headers: cors },
+        );
+      }
       const ext =
         mime === "image/png" ? "png" : mime === "image/webp" ? "webp" : "jpg";
       const path = `${p.telegram_id}/${crypto.randomUUID()}.${ext}`;
