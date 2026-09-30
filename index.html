@@ -1,1950 +1,312 @@
 <!doctype html>
 <html lang="ru">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#09090b">
-<title>MOGG BATTLE</title>
-<script src="https://telegram.org/js/telegram-web-app.js">
-</script>
-<script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
-<style>
-:root{
-  --bg:#09090b;--card:#111216;--card2:#15161a;--line:#272830;
-  --text:#f5f5f5;--muted:#8f9098;--accent:#d78da6;--accent2:#f1d7df;
-  --cream:#d8c4ae;--good:#8bc7a2;--bad:#d88181;
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{background:radial-gradient(circle at 50% -10%,#1a1418 0,#0b0b0e 36%,#09090b 65%)}
-button,input{font:inherit}
-button{cursor:pointer}
-.app{max-width:540px;margin:auto;padding:16px 14px calc(92px + env(safe-area-inset-bottom))}
-.top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-.logo{font-weight:900;font-size:22px;letter-spacing:.06em}
-.logo span{color:var(--accent)}
-.kicker{font-size:8px;letter-spacing:.18em;color:var(--muted);margin-bottom:2px}
-.scorePill{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:9px 11px;font-size:11px;white-space:nowrap}
-.card{background:linear-gradient(180deg,#121318,#0e0f12);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
-.row,.sectionHead,.profileTop,.battleRow{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.sectionHead h2{font-size:15px;margin:0}
-.sectionHead span{font-size:9px;color:var(--muted)}
-.avatar{width:64px;height:64px;border-radius:50%;background:#1c1d22;border:1px solid #34353d;display:grid;place-items:center;font-weight:800;font-size:23px;overflow:hidden;flex:0 0 auto}
-.avatar img{width:100%;height:100%;object-fit:cover}
-.profileInfo{flex:1;min-width:0}
-.name{font-weight:800;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.user{font-size:9px;color:var(--muted);margin-top:2px}
-.rankRow{display:flex;align-items:center;gap:8px;margin-top:9px}
-.rank{font-size:10px;font-weight:800;border:1px solid #544539;color:var(--cream);padding:5px 8px;border-radius:8px}
-.rank.f{border-color:#613442;color:#f0a7bc}
-.rankBtn{background:transparent;cursor:pointer}
-.rankBtn:active{transform:scale(.97)}
-.rankModal{position:fixed;inset:0;background:#06070aeb;z-index:95;display:none;align-items:flex-end;justify-content:center;padding:14px}
-.rankModal.show{display:flex}
-.rankSheet{width:min(520px,100%);max-height:78%;overflow:auto;background:#101116;border:1px solid var(--line);border-radius:22px;padding:16px}
-.rankCurrent{padding:14px;border:1px solid #40313a;background:#161116;border-radius:14px;margin-top:10px}
-.rankCurrent b{font-size:26px}
-.rankCurrent small{display:block;color:var(--muted);font-size:9px;margin-top:3px}
-.ladder{margin-top:12px}
-.ladderRow{display:grid;grid-template-columns:28px 1fr auto;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid #202126}
-.ladderRow:last-child{border-bottom:0}
-.ladderRow .dot{width:10px;height:10px;border-radius:50%;background:#34363d;margin:auto}
-.ladderRow.current .dot{background:var(--accent);box-shadow:0 0 0 4px #d78da61f}
-.ladderRow.current{color:var(--accent2)}
-.ladderRow b{font-size:11px}
-.ladderRow span{font-size:9px;color:var(--muted)}
-.modalClose{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:10px;padding:9px 12px;font-size:10px}
-.progress{height:5px;border-radius:99px;background:#222329;overflow:hidden;margin-top:10px}
-.progress i{display:block;height:100%;background:var(--accent);width:0%}
-.miniStats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
-.stat{background:#0d0e11;border:1px solid #222329;border-radius:12px;padding:11px;text-align:center}
-.stat b{font-size:14px;display:block} .stat small{font-size:7px;color:var(--muted)}
-.primary{width:100%;border:0;border-radius:12px;background:#f3f1f1;color:#0b0b0d;padding:13px;font-weight:800;font-size:11px}
-.primary.pink{background:var(--accent);color:#160f12}
-.secondary{width:100%;border:1px solid var(--line);border-radius:12px;background:#14151a;color:#fff;padding:12px;font-size:10px}
-.primary:disabled,.secondary:disabled{opacity:.45;cursor:default}
-.feedTabs{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:10px}
-.feedTabs::-webkit-scrollbar{display:none}
-.tab{border:1px solid var(--line);background:#0e0f12;color:var(--muted);border-radius:9px;padding:8px 11px;font-size:9px;white-space:nowrap}
-.tab.active{color:#fff;border-color:#555761}
-.battleCard{padding:12px;border:1px solid #25262c;background:#0e0f12;border-radius:14px;margin-top:9px}
-.battleFaces{display:grid;grid-template-columns:1fr 32px 1fr;gap:8px;align-items:center;margin-top:10px}
-.face{text-align:center;min-width:0;overflow:hidden}
-.facePhoto{height:128px;min-height:128px;max-height:128px;width:100%;aspect-ratio:4/5;border-radius:12px;background:#1a1b20;overflow:hidden;display:grid;place-items:center;font-size:28px;font-weight:900}
-.facePhoto img{display:block;width:100%!important;height:100%!important;max-width:100%;max-height:100%;object-fit:cover!important;object-position:center;position:absolute;inset:0;border-radius:inherit}.facePhoto{position:relative;contain:paint}.facePhoto.cosmeticFrame{overflow:hidden!important}.facePhoto.cosmeticFrame:after{inset:2px!important;border-radius:10px!important}
-.face b{display:block;font-size:11px;margin-top:7px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.face small{font-size:8px;color:var(--muted)}
-.vs{text-align:center;font-weight:900;color:#777}
-.voteBar{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
-.vote{border:1px solid var(--line);background:#14151a;color:#fff;border-radius:10px;padding:10px;font-size:10px}
-.vote.selected{border-color:var(--accent);color:var(--accent2)}
-.liveDot{color:#97c8a6}
-.timer{font-size:10px;color:var(--muted)}
-.matchBox{text-align:center;padding:18px 12px}
-.matchIcon{width:86px;height:86px;border-radius:50%;margin:4px auto 12px;border:1px solid #3a3b43;display:grid;place-items:center;font-size:30px;background:#131419}
-.tapZone{text-align:center;padding:18px 0 10px}
-.tapCircle{width:190px;height:190px;border-radius:50%;border:1px solid #393a41;background:radial-gradient(circle at 42% 35%,#272830,#111216 68%);margin:auto;display:grid;place-items:center;transition:.08s}
-.tapCircle:active{transform:scale(.95)}
-.claw{font-size:56px;letter-spacing:-.18em;transform:rotate(-8deg);margin-left:-7px}
-.tapText{font-size:10px;letter-spacing:.14em;margin-top:13px}
-.muted{color:var(--muted);font-size:9px;line-height:1.55}
-.reward{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #202126}
-.reward:last-child{border:0}
-.reward b{font-size:11px} .reward small{display:block;color:var(--muted);font-size:8px;margin-top:3px}
-.rewardValue{color:var(--accent2);font-size:10px;white-space:nowrap}
-.inventory{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
-.item{border:1px solid var(--line);background:#0e0f12;border-radius:12px;padding:12px}
-.item .rarity{font-size:7px;text-transform:uppercase;color:var(--muted)} .item b{display:block;font-size:10px;margin-top:4px}
-.item button{margin-top:9px}
-.onboard{position:fixed;inset:0;background:#08090bf5;z-index:80;display:none;align-items:center;justify-content:center;padding:18px}
-.onboard.show{display:flex}
-.sheet{width:min(460px,100%);border:1px solid var(--line);background:#101116;border-radius:20px;padding:18px}
-.genderGrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-.gender{border:1px solid var(--line);background:#15161a;color:#fff;border-radius:14px;padding:18px 10px;font-weight:800}
-.gender.f{border-color:#5b3441;color:#eca2b7}
-.fileLabel{display:block;border:1px dashed #454650;border-radius:14px;padding:18px;text-align:center;margin-top:12px;font-size:10px;color:var(--muted)}
-.fileLabel input{display:none}
-.preview{width:110px;height:110px;border-radius:50%;overflow:hidden;background:#1b1c21;margin:10px auto;display:none}
-.preview img{width:100%;height:100%;object-fit:cover}
-.toast{position:fixed;top:16px;left:50%;transform:translate(-50%,-20px);opacity:0;background:#f4f2f2;color:#0c0c0e;border-radius:10px;padding:9px 13px;font-size:10px;font-weight:800;z-index:100;transition:.2s}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-.view{display:none} .view.active{display:block}
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(540px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:#0b0c0feF;backdrop-filter:blur(18px);border-top:1px solid var(--line);padding:8px 7px calc(8px + env(safe-area-inset-bottom));z-index:50}
-.nav button{border:0;background:none;color:#72747c;font-size:16px;padding:4px 0}
-.nav button.active{color:#fff}
-.nav small{display:block;font-size:7px;margin-top:3px}
-.sponsor{border:1px solid #51313c;background:#171115;border-radius:12px;padding:12px;margin-top:10px}
-.refbox{background:#0d0e11;border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:10px;font-size:9px;word-break:break-word;color:#c9c9ca}
-.chest{border:1px solid #4b3d44;background:linear-gradient(135deg,#181217,#101115);border-radius:14px;padding:15px;text-align:center}
-.chestIcon{font-size:32px;margin-bottom:6px}
-@media(max-width:360px){.facePhoto{height:112px}.tapCircle{width:165px;height:165px}}
-
-.walletCard{background:linear-gradient(180deg,#121318,#0d0e11);border:1px solid var(--line);border-radius:18px;padding:15px;margin-top:10px}
-.walletTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.walletMeta{min-width:0}.walletMeta b{font-size:12px}
-.walletAddress{font-size:9px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.walletBalance{font-size:24px;font-weight:900;margin-top:14px}
-.walletBalance small{font-size:10px;color:var(--accent2);margin-left:4px}
-.walletNet{font-size:8px;color:var(--muted);margin-top:3px;letter-spacing:.08em}
-#ton-connect{display:flex;justify-content:flex-end}
-
-
-/* ── COSMETICS V6 ───────────────────────────────────────── */
-.cosmeticFrame{position:relative;isolation:isolate;overflow:visible!important}
-.cosmeticFrame:after{content:"";position:absolute;inset:-4px;border-radius:inherit;pointer-events:none;border:2px solid transparent;z-index:3}
-.frame-graphite:after{border-color:#656873;box-shadow:0 0 12px #65687355}
-.frame-ice:after{border-color:#bfeaff;box-shadow:0 0 18px #8edfff99,inset 0 0 8px #8edfff44}
-.frame-rose:after{border-color:#f0a3bd;box-shadow:0 0 18px #d78da688}
-.frame-emerald:after{border-color:#70f0bb;box-shadow:0 0 18px #38d89b99}
-.frame-void:after{border-color:#7e63cf;box-shadow:0 0 22px #6d4bd8aa}
-.frame-obsidian:after{border-color:#8b8d96;box-shadow:0 0 0 2px #17181c,0 0 22px #b8bbc533}
-.frame-bloodmoon:after{border-color:#d24855;box-shadow:0 0 24px #c52d3dbb}
-.frame-halo:after{border-color:#f0d38b;box-shadow:0 0 8px #fff,0 0 28px #e6b95dbb}
-.frame-truepeak:after{border-color:#fff;box-shadow:0 0 7px #fff,0 0 22px #d9b4ff,0 0 38px #87dfff}
-.frame-prism:after{border-color:#fff;box-shadow:8px 0 18px #74e8ff,-8px 0 18px #fb7cd7,0 8px 18px #ffe977}
-.frame-celestial:after{border-color:#f6d993;box-shadow:0 0 8px #fff,0 0 28px #d9b8ff,0 0 46px #82cfff}
-.frame-top1:after{border-color:#ffd86b;box-shadow:0 0 10px #fff,0 0 34px #ffcb46}
-.frame-top10:after{border-color:#d9dde8;box-shadow:0 0 24px #d9dde888}
-
-.bg-studio{background:linear-gradient(145deg,#15161a,#08090b)!important}
-.bg-silverfog{background:radial-gradient(circle at 15% 10%,#6d707b55,transparent 40%),linear-gradient(145deg,#23252b,#0d0e11)!important}
-.bg-crimson{background:radial-gradient(circle at 80% 0,#7c1f2d77,transparent 45%),linear-gradient(145deg,#211015,#0b0b0e)!important}
-.bg-noir{background:linear-gradient(135deg,#21232a,#09090b 55%,#1a141d)!important}
-.bg-neoncity{background:radial-gradient(circle at 15% 10%,#1c84a955,transparent 35%),radial-gradient(circle at 90% 20%,#a3227555,transparent 38%),#0b0c11!important}
-.bg-eclipse{background:radial-gradient(circle at 50% -30%,#f1d393 0 4%,#4b315e 15%,transparent 36%),linear-gradient(#121017,#070708)!important}
-.bg-marble{background:linear-gradient(125deg,#080808 0 35%,#303036 36%,#111 39%,#444 41%,#090909 44% 100%)!important}
-.bg-aurora{background:radial-gradient(circle at 20% 0,#49d7b766,transparent 42%),radial-gradient(circle at 80% 0,#9f71ff66,transparent 44%),#0a0c11!important}
-
-.name-glow{text-shadow:0 0 12px #f0b4d0,0 0 24px #d78da6}
-.name-royal{background:linear-gradient(90deg,#fff0a3,#dca851,#fff4c9);-webkit-background-clip:text;background-clip:text;color:transparent!important}
-.name-chrome{background:linear-gradient(180deg,#fff,#8e949f 46%,#fff 52%,#686e78);-webkit-background-clip:text;background-clip:text;color:transparent!important}
-.score-steel{color:#c8ccd4!important;text-shadow:0 0 8px #b9c0cf55}
-.score-fire{color:#ff9971!important;text-shadow:0 0 12px #ff563c88}
-.score-gold{color:#f1d17d!important;text-shadow:0 0 12px #e6b85188}
-.score-cosmic{background:linear-gradient(90deg,#b7f2ff,#e4b4ff,#ffb7d6);-webkit-background-clip:text;background-clip:text;color:transparent!important}
-.cosmeticTitle{display:inline-flex;margin-top:5px;padding:3px 7px;border:1px solid #3a3b43;border-radius:6px;font-size:8px;font-weight:900;letter-spacing:.13em;color:#d9dbe2}
-
-.shopFilters{display:flex;gap:6px;overflow:auto;margin:10px 0 6px;padding-bottom:2px}.shopFilters button{white-space:nowrap;border:1px solid var(--line);background:#101116;color:#8f9098;border-radius:999px;padding:7px 10px;font-size:8px;font-weight:800}.shopFilters button.active{color:#fff;border-color:#6a4050;background:#25171e}
-.item{position:relative;overflow:hidden}.itemPreview{height:78px;border-radius:12px;background:#0c0d10;border:1px solid #24252b;margin-bottom:9px;display:grid;place-items:center;position:relative;overflow:hidden}.previewAvatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(145deg,#32343b,#17181d);position:relative}.previewBg{position:absolute;inset:0}.previewTitle{font-size:11px;font-weight:900;letter-spacing:.08em}.item .rarity{font-weight:900;letter-spacing:.12em}.rarity.common{color:#9da0a8}.rarity.rare{color:#7fd1ff}.rarity.epic{color:#bc8cff}.rarity.elite{color:#ff9fc9}.rarity.legendary{color:#f1c86f}.rarity.mythic{color:#ffb7e9;text-shadow:0 0 10px #e85aaf}.rarity.ascended,.rarity.limited{color:#fff;text-shadow:0 0 8px #fff,0 0 16px #d5a8ff}.sourceTag{font-size:7px;letter-spacing:.1em;color:#777a84;margin-top:4px}.priceStars{color:#f2d36f;font-weight:900}.ownedTag{color:#8bc7a2;font-size:9px;font-weight:900}.exclusiveTag{color:#d9b8ff;font-size:8px;font-weight:900}.equip.isEquipped{border-color:#6aa77f;color:#b9e6c9;background:#132018}
-
-.dropRates{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-top:10px}.rateChip{border:1px solid #25262d;background:#0d0e11;border-radius:9px;padding:7px 4px;text-align:center}.rateChip b{display:block;font-size:10px}.rateChip small{font-size:6px;color:#80828b;text-transform:uppercase}.dropMeta{display:flex;justify-content:center;gap:8px;margin:10px 0}.dropMeta span{font-size:8px;border:1px solid #2a2b31;border-radius:999px;padding:5px 8px;color:#a7a8af}
-
-.caseModal{position:fixed;inset:0;z-index:120;background:#050508f2;display:none;align-items:center;justify-content:center;padding:14px}.caseModal.show{display:flex}.caseSheet{width:min(520px,100%);background:linear-gradient(180deg,#151219,#0b0c10);border:1px solid #35313a;border-radius:24px;padding:17px;overflow:hidden;box-shadow:0 24px 80px #000}.caseTitle{text-align:center;font-size:10px;letter-spacing:.2em;color:#9a919d}.caseWindow{height:132px;margin-top:16px;border:1px solid #31323a;border-radius:16px;background:#090a0d;overflow:hidden;position:relative}.caseWindow:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:#fff;box-shadow:0 0 18px #fff;z-index:4}.caseReel{height:100%;display:flex;align-items:center;gap:8px;padding:0 50%;transform:translateX(0);will-change:transform}.caseItem{flex:0 0 92px;height:104px;border:1px solid #292a31;border-radius:13px;background:#121318;padding:8px;text-align:center;display:flex;flex-direction:column;justify-content:center}.caseItem b{font-size:9px;margin-top:5px}.caseItem small{font-size:7px;color:#8e9098}.caseReveal{text-align:center;padding:18px 8px 4px;opacity:0;transform:translateY(8px);transition:.35s}.caseReveal.show{opacity:1;transform:none}.caseReveal h2{margin:5px 0;font-size:24px}.caseReveal .rarity{font-size:9px;letter-spacing:.16em}.caseClose{display:none;margin-top:12px}.caseClose.show{display:block}
-
-@keyframes legendaryPulse{0%,100%{box-shadow:0 0 0 transparent}50%{box-shadow:0 0 38px #e8bf6188}}
-.caseSheet.legendary,.caseSheet.mythic,.caseSheet.ascended,.caseSheet.limited{animation:legendaryPulse 1s ease-in-out 2}
-.walletHelp{font-size:8px;color:#777a84;margin-top:9px;line-height:1.45}
-
-
-/* V7 progression + culture cosmetics */
-.v7grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.upgradeCard{border:1px solid var(--line);border-radius:12px;padding:12px;background:#0d0e11}.upgradeCard b{font-size:10px}.upgradeCard small{display:block;color:var(--muted);font-size:8px;margin:4px 0 9px}.crewBox{border:1px solid #303139;background:linear-gradient(145deg,#101116,#0b0c0f);border-radius:14px;padding:14px}.crewTag{font-family:monospace;letter-spacing:.15em;color:#d7d7da}.v7input{width:100%;box-sizing:border-box;background:#0b0c0f;border:1px solid #303139;border-radius:9px;padding:10px;color:white;margin:5px 0;font-size:10px}
-.frame-pslscan:after{border-color:#d9f7ff;box-shadow:0 0 0 1px #79dfff88,inset 0 0 18px #7ee5ff33}.frame-facecard:after{border:2px solid #eee;box-shadow:inset 0 0 0 3px #111,0 0 18px #ffffff55}.frame-unfrauded:after{border-color:#ff405d;box-shadow:0 0 18px #ff405d77}.frame-outmog:after{border-color:#ffdf6b;box-shadow:0 0 22px #ffb80088}.frame-appeal:after{border-color:#fff;box-shadow:0 0 10px #fff,0 0 28px #c7a8ff}
-.bg-thirds{background-image:linear-gradient(90deg,transparent 32.8%,#ffffff24 33%,#ffffff24 33.5%,transparent 33.7%,transparent 66%,#ffffff24 66.2%,#ffffff24 66.7%,transparent 67%),linear-gradient(180deg,#17181d,#0b0c0f)!important}.bg-editorial{background:linear-gradient(125deg,#ececec 0 2%,#15161a 2% 48%,#31323a 48% 49%,#0d0e11 49%)!important}.bg-morphlab{background:repeating-linear-gradient(0deg,#0d1114 0 15px,#21343a 16px),linear-gradient(90deg,#0c0d10,#18242a)!important}.bg-pslboard{background:radial-gradient(circle at 50% 40%,#213a42,#0b0c0f 62%)!important}.bg-afterhours{background:linear-gradient(135deg,#090a0d,#28111c 50%,#10131a)!important}
-
-
-/* V7.2 — ENGAGEMENT / FIRST MINUTES */
-.goalCard{position:relative;overflow:hidden;background:linear-gradient(135deg,#171217,#101116 62%,#161117);border-color:#3b2d34}
-.goalCard:before{content:"";position:absolute;width:160px;height:160px;border-radius:50%;right:-70px;top:-90px;background:#d78da61c;filter:blur(8px);pointer-events:none}
-.goalTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-end}.goalRank{font-size:25px;font-weight:950;letter-spacing:.04em}.goalNeed{font-size:9px;color:var(--accent2);text-align:right}.goalCopy{font-size:9px;color:var(--muted);margin-top:7px}
-.battleNow{position:relative;margin-top:12px;overflow:hidden;box-shadow:0 0 0 0 #d78da633;animation:battlePulse 2.6s ease-in-out infinite}.battleNow:after{content:"";position:absolute;inset:-80% -30%;background:linear-gradient(110deg,transparent 42%,#fff5 50%,transparent 58%);transform:translateX(-55%);animation:shine 3.4s ease-in-out infinite;pointer-events:none}
-@keyframes battlePulse{0%,100%{box-shadow:0 0 0 0 #d78da600}50%{box-shadow:0 0 0 7px #d78da614}}@keyframes shine{0%,65%{transform:translateX(-65%)}90%,100%{transform:translateX(65%)}}
-.firstLoop{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.loopStep{padding:9px 6px;border:1px solid #25262c;border-radius:10px;background:#0d0e11;text-align:center;font-size:8px;color:var(--muted)}.loopStep b{display:block;color:#fff;font-size:10px;margin-bottom:3px}.loopStep.done{border-color:#375044;color:#8bc7a2}.loopStep.done b{color:#8bc7a2}
-.emptyAction{border:1px dashed #35363e;border-radius:12px;padding:16px;text-align:center;margin-top:10px}.emptyAction b{font-size:11px}.emptyAction p{margin:5px 0 10px}.emptyAction button{width:auto;min-width:150px}
-.tapCircle{position:relative;overflow:visible}.tapCircle img{width:82%;height:82%;object-fit:contain;border-radius:50%;pointer-events:none;filter:drop-shadow(0 0 16px #d78da62b)}.tapCircle.tapHit{animation:tapHit .18s ease-out}@keyframes tapHit{50%{transform:scale(.91)}100%{transform:scale(1)}}
-.tapFloat{position:fixed;z-index:120;pointer-events:none;font-size:16px;font-weight:950;color:var(--accent2);text-shadow:0 0 14px #d78da6;animation:tapFloat .72s ease-out forwards}@keyframes tapFloat{to{transform:translateY(-52px) scale(1.15);opacity:0}}
-.nav button{transition:transform .16s,color .16s}.nav button:active{transform:scale(.88)}.nav button.active{transform:translateY(-2px)}
-#profileHero{overflow:hidden;position:relative;min-height:0!important;padding:18px!important}#profileHero #bigAvatar{position:relative!important;inset:auto!important;width:112px!important;height:112px!important;min-width:112px!important;min-height:112px!important;max-width:112px!important;max-height:112px!important;margin:0 auto!important;overflow:hidden!important;border-radius:50%!important;contain:paint}#profileHero #bigAvatar img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:cover!important;object-position:center!important;border-radius:inherit!important}#profileHero #bigAvatar.cosmeticFrame:after{inset:3px!important;border-radius:50%!important}
-.resultFlash{position:fixed;inset:0;z-index:110;display:grid;place-items:center;background:#09090bf2;opacity:0;pointer-events:none;transition:.2s}.resultFlash.show{opacity:1;pointer-events:auto}.resultInner{text-align:center;padding:28px}.resultKicker{font-size:9px;letter-spacing:.2em;color:var(--muted)}.resultScore{font-size:54px;font-weight:950;margin:8px 0}.resultRank{font-size:18px;color:var(--accent2)}
-@media(prefers-reduced-motion:reduce){.battleNow,.battleNow:after{animation:none}.nav button{transition:none}}
-
-
-/* V7.3 — RETENTION / GAME FEEL */
-.view.active{animation:viewIn .22s ease-out}
-@keyframes viewIn{from{opacity:.25;transform:translateY(6px)}to{opacity:1;transform:none}}
-.dailyRun{background:linear-gradient(145deg,#111216,#0d0e11);border-color:#302a30}
-.runTop{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.runScore{font-size:22px;font-weight:950;letter-spacing:.03em}
-.runLabel{font-size:8px;color:var(--muted);letter-spacing:.12em}
-.missionList{display:grid;gap:7px;margin-top:11px}
-.missionRow{display:grid;grid-template-columns:26px 1fr auto;align-items:center;gap:9px;padding:10px;border:1px solid #25262c;border-radius:11px;background:#0c0d10}
-.missionRow.done{border-color:#355040;background:#0d1410}
-.missionIcon{width:26px;height:26px;border-radius:8px;background:#17181d;display:grid;place-items:center;font-size:12px}
-.missionRow.done .missionIcon{background:#183022}
-.missionText b{display:block;font-size:9px}.missionText small{display:block;font-size:7px;color:var(--muted);margin-top:2px}
-.missionProgress{font-size:8px;font-weight:900;color:var(--accent2);white-space:nowrap}
-.missionRow.done .missionProgress{color:#8bc7a2}
-.missionFoot{display:flex;justify-content:space-between;gap:10px;margin-top:9px;font-size:8px;color:var(--muted)}
-.streak{color:#f0bd79;font-weight:900}
-.statusPunch{display:flex;align-items:center;gap:8px;margin-top:9px;padding:9px 10px;border-radius:10px;background:#0d0e11;border:1px solid #24252b}
-.statusPunch b{font-size:9px}.statusPunch span{margin-left:auto;font-size:8px;color:var(--accent2)}
-.profileActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.shareBtn{border-color:#543745!important;background:#171116!important}
-.introOverlay{position:fixed;inset:0;z-index:130;background:#07080af4;display:grid;place-items:center;opacity:0;pointer-events:none;transition:.18s}
-.introOverlay.show{opacity:1;pointer-events:auto}
-.introCore{text-align:center;width:min(360px,88vw);position:relative;overflow:hidden;padding:34px 22px;border:1px solid #363039;border-radius:22px;background:linear-gradient(180deg,#141116,#0b0c0f)}
-.introCore:before{content:"";position:absolute;left:0;right:0;height:1px;background:#f3d7e3;box-shadow:0 0 16px #d78da6;animation:scanLine 1.05s ease-in-out infinite}
-@keyframes scanLine{0%{top:18%;opacity:0}20%{opacity:1}80%{opacity:1}100%{top:82%;opacity:0}}
-.introKicker{font-size:8px;letter-spacing:.22em;color:var(--muted)}
-.introTitle{font-size:28px;font-weight:950;margin-top:8px}
-.introSub{font-size:9px;color:var(--accent2);margin-top:6px}
-.introDots{display:flex;justify-content:center;gap:5px;margin-top:16px}.introDots i{width:5px;height:5px;border-radius:50%;background:#4b4148;animation:dotPulse 1s infinite}.introDots i:nth-child(2){animation-delay:.14s}.introDots i:nth-child(3){animation-delay:.28s}
-@keyframes dotPulse{50%{background:#f0d7df;transform:scale(1.35)}}
-.resultInner{width:min(390px,92vw);border:1px solid #343038;background:linear-gradient(180deg,#141116,#0b0c0f);border-radius:24px;padding:28px 20px;box-shadow:0 28px 80px #000}
-.resultHeadline{font-size:11px;font-weight:950;letter-spacing:.16em;margin-top:8px}
-.resultActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
-.rankUpBurst{animation:rankBurst .7s ease-out}
-@keyframes rankBurst{0%{transform:scale(.78);filter:blur(4px)}65%{transform:scale(1.08);filter:none}100%{transform:scale(1)}}
-.tapCircle:after{content:"";position:absolute;inset:-10px;border-radius:50%;border:1px solid #d78da61f;pointer-events:none}
-.tapCircle.tapHit:after{animation:tapRing .42s ease-out}
-@keyframes tapRing{to{inset:-30px;opacity:0}}
-.energyPulse i{transition:width .35s cubic-bezier(.2,.8,.2,1)}
-@media(prefers-reduced-motion:reduce){.view.active,.introCore:before,.introDots i,.rankUpBurst,.tapCircle.tapHit:after{animation:none}}
-
-
-/* TEMP NPC PHOTO CROP */
-.battlePhoto img,.battle-photo img,.fighterPhoto img,.fighter-photo img,.avatar img,.bigAvatar img{object-fit:cover!important;transform:scale(1.07);transform-origin:center center;}
-
-/* === MOGG V8 DYNAMIC UI PATCH === */
-:root{--v8pink:#ff4fa3;--v8line:rgba(255,255,255,.09)}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background:
-radial-gradient(circle at 50% -10%,rgba(255,79,163,.10),transparent 34%),
-linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px);background-size:auto,100% 38px}
-.card{transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
-.primary,.secondary,.nav button{transition:transform .14s ease,opacity .14s ease,filter .14s ease}
-.primary:active,.secondary:active,.nav button:active{transform:scale(.97)}
-.battleNow{position:relative;overflow:hidden;box-shadow:0 0 0 0 rgba(255,79,163,.28);animation:v8Pulse 2.4s infinite}
-.battleNow:after{content:"";position:absolute;top:-50%;left:-35%;width:22%;height:200%;background:rgba(255,255,255,.18);transform:rotate(18deg);animation:v8Sweep 3.2s infinite}
-@keyframes v8Pulse{50%{box-shadow:0 0 0 8px rgba(255,79,163,0)}}
-@keyframes v8Sweep{0%,60%{left:-35%}85%,100%{left:125%}}
-.battle-card,.battleCard{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;overflow:hidden}
-.battle-card:active,.battleCard:active{transform:scale(.985)}
-.v8-own-battle{border-color:rgba(255,79,163,.7)!important;box-shadow:0 0 0 1px rgba(255,79,163,.18),0 16px 42px rgba(0,0,0,.35);transform:scale(1.015);margin-top:10px!important;margin-bottom:22px!important}
-.v8-own-battle:before{content:"YOUR BATTLE · LIVE";display:block;font-size:10px;font-weight:900;letter-spacing:1.7px;color:#ff75b7;margin:0 0 10px}
-.v8-own-battle img{transform:scale(1.07);object-fit:cover!important}
-.introOverlay.show .introCore{animation:v8Match .55s cubic-bezier(.2,.8,.2,1)}
-@keyframes v8Match{0%{opacity:0;transform:scale(.86);filter:blur(8px)}100%{opacity:1;transform:scale(1);filter:blur(0)}}
-.introDots i{animation:v8Dot .8s infinite alternate}
-.introDots i:nth-child(2){animation-delay:.14s}.introDots i:nth-child(3){animation-delay:.28s}
-@keyframes v8Dot{to{transform:translateY(-5px);opacity:.45}}
-.resultFlash.show .resultInner{animation:v8Result .42s cubic-bezier(.2,.9,.2,1)}
-@keyframes v8Result{from{transform:scale(.82);opacity:0}to{transform:scale(1);opacity:1}}
-.progress i{transition:width .65s cubic-bezier(.2,.8,.2,1)}
-@media(max-width:600px){.v8-own-battle{transform:none}.v8-own-battle img{transform:scale(1.07)}}
-
-.farmHero{margin:14px 0;padding:16px;border:1px solid #454035;border-radius:16px;background:radial-gradient(ellipse at top,#34302355,#101116 70%)}.farmStage{display:flex;gap:8px;align-items:end;justify-content:center;min-height:84px;margin:12px 0}.farmRig{width:46px;height:64px;border:1px solid #64624d;border-radius:8px;background:linear-gradient(135deg,#30332b,#151916);display:grid;place-items:center;font-size:22px;color:#cbe2ae;box-shadow:0 0 18px #b3ce6c12}.farmRig.off{opacity:.3;filter:grayscale(1)}.farmStats{display:grid;grid-template-columns:1fr 1fr;text-align:center;gap:8px}.farmStats b{display:block;font-size:23px}.farmStats small{font-size:8px;color:var(--muted)}.upg:disabled{opacity:.45;cursor:default}
-
-/* Cosmetics showroom */
-.itemPreview{height:116px}.previewAvatar{background:radial-gradient(circle at 50% 30%,#aaa 0 20%,transparent 21%),radial-gradient(ellipse at 50% 110%,#676b77 0 52%,transparent 53%),#20222a;width:60px;height:60px;background-size:cover;background-position:center}
-.frame-chromeface:after{border:3px solid #e8eef7;box-shadow:0 0 0 2px #454953,0 0 18px #d3e8ff66,inset 0 0 8px #fff8}
-.frame-prism:after{border:3px solid transparent;background:linear-gradient(130deg,#7cecff,#ed94ff,#fff3a6,#7cecff) border-box;mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);mask-composite:exclude;box-shadow:0 0 24px #da85f877}
-.frame-celestial:after{border:3px double #ffe6a1;box-shadow:0 0 0 3px #a17b3f44,0 0 23px #ffda7c99}
-.bg-contactsheet{background:repeating-linear-gradient(90deg,transparent 0 31%,#eee8 32% 33%),repeating-linear-gradient(0deg,#13151b 0 38px,#b5bccb 39px 41px)!important}
-.bg-marble{background:repeating-linear-gradient(130deg,#090b10 0 23px,#20232d 25px,#b5bdcb 26px,#17191f 28px,#090b10 44px)!important}
-.bg-aurora{background:radial-gradient(ellipse at 15% 20%,#45e4bd99,transparent 55%),radial-gradient(ellipse at 85% 70%,#bc7cffaa,transparent 55%),#111525!important}
-.showroom{margin:12px 0;padding:16px;border-radius:15px;background:linear-gradient(120deg,#272b37,#19131e);border:1px solid #45414c}.showroom b{font-size:18px}.showroom p{line-height:1.6;font-size:10px;color:#b7b8c3}.tryOn{margin-top:8px!important;border-color:#66546c}.tryCard{padding:28px 16px;border-radius:16px;text-align:center;margin:15px 0;background-color:#12141b}.tryCard .previewAvatar{width:100px;height:100px;margin:12px auto}.tryCard .previewTitle{margin-top:16px}.shopDescription{font-size:9px;line-height:1.5;color:#b0b0bb;min-height:40px;margin-top:7px}.shopSheet{max-height:85vh;overflow:auto}
-.guideSheet{padding:22px;max-height:86vh;overflow:auto}.guideProgress{display:flex;gap:6px;margin:22px 0}.guideProgress i{height:4px;flex:1;border-radius:8px;background:#30313a}.guideProgress i.active{background:var(--accent)}.guideStep{font-size:10px;color:var(--accent);letter-spacing:.12em}.guideSheet h2{font-size:26px;line-height:1.15;margin:12px 0}.guideLead{font-size:13px;line-height:1.65;color:#c7c8cf}.guideDetail{padding:14px;margin-top:12px;border:1px solid #34343d;border-radius:12px;font-size:12px;line-height:1.65;color:#d2d3da}.guideDetail b{color:#fff}.guideControls{margin-top:22px}.guideControls button{flex:1}.guideControls button:disabled{opacity:.3}
-
-/* MOGG / graphite + chrome */
-:root{--bg:#0b0d10;--card:#13161c;--card2:#191d24;--line:#2b3039;--text:#f1f3f7;--muted:#a0a8b5;--accent:#c9f66f;--accent2:#e0ffad;--cream:#dce1e9;--good:#c9f66f;--bad:#ff9caa}
-body{background:radial-gradient(ellipse at 85% 0,#c9f66f0b,transparent 35%),#0b0d10}.app{max-width:580px;padding:22px 18px calc(98px + env(safe-area-inset-bottom))}.logo{letter-spacing:-.05em;font-size:25px}.kicker{font-size:9px;letter-spacing:.16em}.muted{font-size:11px;line-height:1.65}.timer{font-size:11px}.card,.walletCard{background:linear-gradient(145deg,#171b22,#101319);border-color:var(--line);border-radius:20px;padding:18px;margin-top:14px}.sectionHead h2{font-size:17px;letter-spacing:-.025em}.primary,.secondary{min-height:44px;font-size:12px;border-radius:12px}.primary.pink{background:#c9f66f;color:#11170a}.secondary{background:#1c2028;border-color:#343b48}.primary:focus-visible,.secondary:focus-visible,.nav button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}.goalCard{background:radial-gradient(ellipse at top right,#c9f66f18,transparent 60%),linear-gradient(135deg,#202630,#101318)!important}.goalRank{font-size:34px;letter-spacing:-.05em}.goalCopy{font-size:12px;line-height:1.6}.goalNeed{font-size:10px}.goalCard .battleNow{margin-top:18px}.firstLoop{gap:7px}.loopStep{font-size:9px;padding:10px 7px}.loopStep b{font-size:9px}.loopStep.done{border-color:#c9f66f55;color:var(--accent2)}.dailyRun .missionFoot{font-size:9px}.miniStats{grid-template-columns:repeat(4,minmax(0,1fr))}.stat{padding:11px 3px}.stat b{font-size:16px}.stat small{font-size:8px}.avatar{border-radius:18px}.rank{font-size:11px;color:#e1e7ee;border-color:#4b5665}.battleCard{padding:15px;border-radius:17px;background:#10141b;margin-top:13px}.battleFaces{grid-template-columns:minmax(0,1fr) 26px minmax(0,1fr);gap:8px}.facePhoto{height:180px;min-height:180px;max-height:180px;border-radius:12px}.face b{font-size:13px;margin-top:10px}.face small{font-size:9px}.vote{min-height:43px;font-size:11px;background:#1d232d}.vote.selected{background:#c9f66f18}.v8-own-battle{border-color:#c9f66f88!important;box-shadow:0 0 0 1px #c9f66f18,0 12px 32px #0004;transform:none}.v8-own-battle:before{content:'ТВОЙ БОЙ · LIVE';color:#c9f66f}.v8-own-battle img{transform:none!important}.matchIcon{border-radius:23px;background:linear-gradient(135deg,#39414c,#171b22);color:#dce4ee}.nav{width:min(580px,100%);background:#0d1016f5;padding-top:12px;border-color:#333a46}.nav small{font-size:9px;margin-top:6px}.nav button.active{color:#c9f66f}.nav button{min-height:43px}.item{border-radius:16px;background:#151a22;padding:13px}.item b{font-size:12px}.itemPreview{height:130px;background:#0d1117}.shopDescription{font-size:10px;min-height:48px}.showroom{background:radial-gradient(ellipse at right,#b1bece24,transparent 65%),#171c24;border-color:#414b5b;padding:20px}.showroom b{font-size:24px;letter-spacing:-.04em}.showroom p{font-size:12px}.farmHero{background:radial-gradient(ellipse at top,#c9f66f18,#10151b 70%);border-color:#424d39}.farmRig{border-color:#77865c;color:#d3f6a0}.upgradeCard{padding:14px;background:#141a21;border-radius:15px}.upgradeCard b{font-size:11px}.upgradeCard small{font-size:10px;line-height:1.5;min-height:32px}.farmStats b{font-size:29px}.farmStats small{font-size:9px}.guideSheet,.rankSheet{background:#141921;border-color:#36404e}.guideDetail{background:#0e131b;border-color:#303a47}.walletBalance{font-size:30px}.walletHelp{font-size:10px}.statusPunch{border-color:#c9f66f33}.feedTabs{display:none}.shopFilters button{font-size:10px;padding:9px 12px}.shopFilters button.active{background:#c9f66f17;border-color:#819b51;color:#d9f6ac}
-@media(max-width:370px){.app{padding-left:12px;padding-right:12px}.card{padding:13px}.facePhoto{height:150px;min-height:150px;max-height:150px}.farmStats b{font-size:24px}.upgradeCard{padding:10px}.miniStats .stat small{font-size:7px}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
-
-.studioLabel{font-size:18px;font-weight:800;margin-top:10px}.farmStage{display:block;position:relative;height:208px;overflow:hidden;border-radius:12px;background:#232c34;border:1px solid #414e58}.studioRoom{position:absolute;inset:0;background:linear-gradient(160deg,#34424b,#20272d 65%)}.studioFloor{position:absolute;bottom:0;height:48px;width:100%;background:repeating-linear-gradient(90deg,#635e50 0 35px,#514e44 36px 37px);border-top:2px solid #777568}.studioBackdrop{position:absolute;left:33%;top:22px;width:33%;height:140px;background:linear-gradient(#c9c6b7,#969d94);border:5px solid #151c22;border-bottom:0;border-radius:4px 4px 22px 22px}.studioLight{position:absolute;left:12%;top:35px;width:38px;height:51px;background:#e5e2c7;transform:rotate(-12deg);border:5px solid #151c22;box-shadow:0 0 30px #ffefba44}.studioLight:after{content:'';position:absolute;top:45px;left:16px;width:3px;height:95px;background:#11181e}.studioCamera{position:absolute;left:45%;bottom:38px;width:44px;height:28px;border-radius:5px;background:#141a20;border:2px solid #6f7b86}.studioCamera:before{content:'';position:absolute;left:12px;top:4px;width:17px;height:17px;border-radius:50%;background:#416273;border:3px solid #8f9da4}.studioCamera:after{content:'';position:absolute;top:26px;left:19px;width:4px;height:34px;background:#11181e}.studioDesk{position:absolute;right:5%;bottom:36px;width:67px;height:7px;background:#a49b80;border-bottom:27px solid #4e514b}.studioMonitor{position:absolute;right:8%;bottom:72px;width:47px;height:33px;border:4px solid #11181e;border-radius:3px;background:linear-gradient(145deg,#91b8a7,#40586e)}.studioBattery{position:absolute;left:5%;bottom:25px;width:22px;height:28px;border:3px solid #11181e;background:repeating-linear-gradient(0deg,#aeca7c 0 5px,#52633d 6px 8px)}.studioCharging{position:absolute;left:15%;bottom:20px;font-size:20px;color:#d4e7a1}.studioRoom .locked{opacity:.2;filter:grayscale(1)}.studioTag{position:absolute;top:8px;right:9px;font-size:8px;color:#dbe4e8;letter-spacing:.1em}.studioRoom.stage-2{background:linear-gradient(155deg,#4b5b62,#242a32)}.studioRoom.stage-3{background:linear-gradient(155deg,#5b655a,#252c2e)}.studioRoom.stage-3 .studioBackdrop{background:linear-gradient(#d6c7a1,#879b8d)}
-
-/* Portrait-first profile */
-#profileHero{display:grid;grid-template-columns:minmax(0,1fr);text-align:left!important;padding:0!important;border-radius:18px;overflow:hidden;background:#15191f}#profileHero #bigAvatar{width:100%!important;height:320px!important;min-width:0!important;max-width:none!important;min-height:0!important;max-height:none!important;border:0;border-radius:0!important;margin:0!important;background:#232830}#profileHero #bigAvatar img{object-position:center 35%!important;transform:none!important;border-radius:0!important}#profileHero #bigAvatar.cosmeticFrame:after{border-radius:0!important}#profileHero h2,#profileHero .user,#profileHero #profileTitle,#profileHero .rankRow{margin-left:18px!important;margin-right:18px!important}#profileHero h2{font-size:26px!important;letter-spacing:-.03em}#profileHero .rankRow{justify-content:flex-start!important;margin-bottom:18px}.photoReviewCard{border:1px solid #475364;background:linear-gradient(150deg,#202934,#12171e)}.photoReviewCard h2{font-size:21px;margin:6px 0}.reviewConsent{display:flex;align-items:flex-start;gap:10px;font-size:11px;line-height:1.6;margin:16px 0;color:#c8cfd9}.reviewConsent input{width:18px;height:18px;flex-shrink:0;margin-top:2px}.reviewMetric{border-top:1px solid #394351;padding:12px 0}.reviewMetric b{font-size:13px}.reviewMetric p{font-size:11px;line-height:1.6;color:#bbc4d0;margin:5px 0}.reviewTips{padding-left:20px;font-size:12px;line-height:1.7}.reviewTips li{margin-bottom:8px}.facePhoto img,.avatar img{transform:none!important}.battleCard .voteBar button:disabled{opacity:.45}.goalCard{background:#151b23!important}.goalRank{font-size:28px}.matchIcon{display:none}.matchBox{text-align:left}.matchBox h2{font-size:24px!important}#guideBtn{margin-top:10px} 
-
-.ownBattleHint{padding:13px 0 2px;font-size:11px;line-height:1.5;color:#b9c4d2;border-top:1px solid #303a47;margin-top:12px}.battleTimer{font-variant-numeric:tabular-nums;font-weight:700;color:#e0e5ed}.vote{white-space:normal;overflow-wrap:anywhere}.face b{overflow-wrap:anywhere}#homeProfileCard .profileTop{align-items:center}#homeProfileCard .avatar{width:76px;height:88px;border-radius:12px}.firstLoop{display:none}.statusPunch{display:none}.battleFaces .vs{font-size:18px;font-style:italic}.battleCard .row.timer{margin-top:12px;border-top:3px solid #414e5e;padding-top:8px}.shopFilters{padding-bottom:8px}.item .sourceTag{font-size:8px}.profileActions .secondary{min-height:46px}
-
-/* Distinct styling for the currently available name and score cosmetics. */
-.name-editorial{font-family:Georgia,serif!important;font-style:italic;letter-spacing:.025em;color:#f0ece4!important}
-.name-unfrauded{color:#f1f1ed!important;text-decoration:underline;text-decoration-color:#e85965;text-underline-offset:5px;text-decoration-thickness:2px}
-.score-psl{font-family:ui-monospace,monospace;font-variant-numeric:tabular-nums;color:#d9e1ea!important;text-shadow:0 1px 0 #667788}
-.score-appeal{color:#edd4a1!important;text-shadow:0 0 10px #cb965544;font-variant-numeric:tabular-nums}
-.frame-pslscan:after{border:2px solid #c6d4da;box-shadow:0 0 0 4px #12171c,inset 0 0 0 1px #e0edf4; border-radius:inherit}
-.bg-pslboard{background:radial-gradient(ellipse at 50% 0,#737d8877,transparent 65%),#0d1015!important}
-@media(prefers-reduced-motion:reduce){.cosmeticFrame:after{animation:none!important}}
-
-.shopSection{margin:22px 0 0}.shopSection h3{font-size:15px;margin:0 0 12px}.starsSection{margin-top:30px;padding-top:22px;border-top:1px solid #746344}.starsSection h3{color:#ead3a2}.premiumItem{border-color:#756449!important;background:linear-gradient(145deg,#29251e,#15171c)!important}
-@keyframes premiumMetal{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-@keyframes premiumHalo{0%,100%{box-shadow:0 0 9px #f4dca766,inset 0 0 5px #fff4}50%{box-shadow:0 0 24px #f4dca7aa,inset 0 0 9px #fff6}}
-@keyframes premiumChrome{0%,100%{border-color:#7c8998;box-shadow:3px -2px 12px #dfeeff66}50%{border-color:#f5faff;box-shadow:-3px 2px 18px #dfeeff99}}
-.frame-chromeface:after{animation:premiumChrome 5s ease-in-out infinite}
-.frame-prism:after{animation:premiumChrome 6s ease-in-out infinite;border-color:#d4b7f4}
-.frame-celestial:after{animation:premiumHalo 5s ease-in-out infinite}
-.bg-marble,.bg-aurora,.bg-contactsheet{background-size:180% 180%!important;animation:premiumMetal 14s ease-in-out infinite}
-.name-chrome,.title-founder,.title-ogmogger{background:linear-gradient(110deg,#8e98a8,#fff 35%,#aab9cd 50%,#fff 65%,#8e98a8);background-size:240% 100%;background-clip:text;-webkit-background-clip:text;color:transparent!important;animation:premiumMetal 7s ease-in-out infinite}
-.title-founder{background-image:linear-gradient(110deg,#b28a43,#fff0c3,#c59a4a,#fff3c8)}
-.intro-portal{background:radial-gradient(ellipse at center,#7055a466,transparent 65%),#10121b!important;box-shadow:inset 0 0 36px #a4adf544;animation:premiumHalo 4s ease-in-out infinite}
-@media(prefers-reduced-motion:reduce){.frame-chromeface:after,.frame-prism:after,.frame-celestial:after,.bg-marble,.bg-aurora,.bg-contactsheet,.name-chrome,.title-founder,.title-ogmogger,.intro-portal{animation:none!important}}
-
-/* September 16: photo-led graphite interface. Cosmetic-specific styles retain priority. */
-:root{--bg:#101113;--card:#191b1f;--card2:#202328;--line:#34373e;--text:#f0f1ed;--muted:#a3a6ac;--accent:#d3eda0;--accent2:#e6f4cd}
-body{background:#101113}body:before{display:none}
-.app{max-width:580px;padding:22px 16px calc(108px + env(safe-area-inset-bottom))}
-.top{padding:3px 2px 15px;margin:0;border-bottom:1px solid #303237}
-.top>.kicker,.top>div>.kicker{display:none}
-.logo{font-size:27px;letter-spacing:-1.1px;line-height:1;font-weight:900}.logo span{color:#c4c9cf}
-.scorePill{background:none;border:0;border-left:1px solid #40434a;border-radius:0;padding:4px 0 4px 14px;font-size:12px;color:#bfc4ca}
-.card,.walletCard{border:1px solid #2e3137;background:#191c20;border-radius:16px;padding:19px;margin-top:16px;box-shadow:none}
-.sectionHead{gap:12px;margin-bottom:4px}.sectionHead h2{font-size:19px;font-weight:700;letter-spacing:-.5px}.sectionHead>span{font-size:10px;letter-spacing:.04em}
-.muted{font-size:12px;line-height:1.55}.kicker{font-size:10px;letter-spacing:.12em}.timer{font-variant-numeric:tabular-nums;color:#b3b8c0}
-#homeProfileCard{background:linear-gradient(120deg,#23272d,#181b20);border:0;padding:20px}
-#homeProfileCard .profileTop{gap:17px;align-items:center}
-#homeProfileCard .avatar{width:92px;height:112px;border-radius:12px;font-size:32px;border:0}
-#homeProfileCard .name{font-size:23px;letter-spacing:-.7px}
-.user{font-size:11px}.rankRow{gap:8px;flex-wrap:wrap}.rank{border-radius:6px;padding:6px 9px;font-size:11px}
-.miniStats{gap:0;margin-top:20px;border-top:1px solid #373c44;padding-top:15px}
-.stat{background:none;border:0;border-right:1px solid #373c44;border-radius:0;padding:2px 5px}.stat:last-child{border-right:0}.stat b{font-size:18px;font-variant-numeric:tabular-nums;font-weight:650}.stat small{font-size:8px;letter-spacing:.025em;color:#a5adb7}
-.goalCard{position:relative;background:linear-gradient(120deg,#232a23,#181d1b)!important;border:1px solid #414b3b}
-.goalRank{font-size:38px;letter-spacing:-1.5px}.goalNeed{font-size:11px;color:#bdc7b5}
-.goalCopy{font-size:12px;color:#aab4a3}.progress{height:4px;background:#30362e}.progress i{background:#d3eda0}
-.primary,.primary.pink{background:#d3eda0;color:#182015;border-radius:10px;min-height:48px;font-size:13px;font-weight:750;letter-spacing:.02em;box-shadow:none}
-.secondary{background:#252930;border-color:#3a404a;border-radius:10px;min-height:44px;font-size:12px}
-.battleNow{animation:none}.battleNow:after{display:none}
-.battleCard{background:#121519;border:1px solid #32373e;border-radius:13px;padding:13px;margin-top:16px}
-.battleFaces{grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr);gap:5px;align-items:start;margin-top:14px}
-.facePhoto{height:clamp(172px,49vw,248px);min-height:0;max-height:none;border-radius:9px}
-.face b{font-size:14px;margin-top:11px}.face small{display:block;font-size:10px;line-height:1.5;margin-top:3px}.vs{align-self:center;color:#adb5c0;font-size:11px;letter-spacing:-.3px}
-.voteBar{gap:10px;margin-top:14px}.vote{min-height:45px;background:#252b32;border-color:#424b56;border-radius:9px;font-size:12px}.vote.selected{color:#e2f6be;background:#303e24;border-color:#a8cb77}
-.v8-own-battle{border-color:#9bad7c!important;box-shadow:none;transform:none}.v8-own-battle:before{font-size:10px;letter-spacing:.1em;color:#d3eda0}
-.matchBox{background:linear-gradient(140deg,#293126,#171c1a);border-color:#424e39;padding:22px}
-#rankedBtn,#quickBtn{min-height:102px!important;font-size:16px;letter-spacing:.04em;text-align:left;padding:18px}
-#quickBtn{background:#2d343c;color:#f0f2ef;border:1px solid #56606c}
-#rankedBtn span,#quickBtn span{display:inline-block;margin-top:9px;font-size:11px!important;letter-spacing:0}
-.nav{width:min(580px,100%);background:#171a1ff5;border-top:1px solid #444b54;gap:3px;padding:10px 10px calc(10px + env(safe-area-inset-bottom));backdrop-filter:blur(18px)}
-.nav button{border-radius:10px;min-height:49px;color:#a5abb4;font-size:18px;transform:none!important}
-.nav button.active{background:#2c3526;color:#e2f3c9;box-shadow:inset 0 1px #526144}.nav small{font-size:10px;margin-top:5px}
-.inventory{gap:12px}.item{background:#1d2228;border:1px solid #383f48;border-radius:13px;padding:12px;min-width:0}.item b{font-size:13px;line-height:1.3;display:block;margin:7px 0;overflow-wrap:anywhere}
-.itemPreview{height:158px;border-radius:9px;background:radial-gradient(ellipse at 50% 0,#323a46,#10151b 80%);overflow:hidden}
-.item .rarity{margin-top:12px;font-size:9px;letter-spacing:.1em}.shopDescription{font-size:11px;line-height:1.45;min-height:36px}
-.item .secondary{font-size:11px;min-height:42px}.sourceTag{font-size:8px;color:#a5adb7;line-height:1.5}
-.shopFilters{gap:7px;padding:9px 0}.shopFilters button{border-radius:20px;font-size:11px;padding:10px 14px}.shopFilters button.active{background:#d3eda0;color:#182015;border-color:#d3eda0}
-.starsSection{border-top:1px solid #9d8453;padding-top:23px}.starsSection>h3{font-size:20px;letter-spacing:-.3px;color:#edd8ad}.premiumItem{border-color:#806b49!important}
-.upgradeCard{background:#1e252b;border:1px solid #3c4650;border-radius:12px}.upgradeCard b{font-size:12px}.upgradeCard small{color:#b1bbc5;font-size:11px}
-#profileHero{background:#1a1f25;border:1px solid #3c444e}#profileHero #bigAvatar{height:360px!important}#profileHero h2{font-size:29px!important}
-.walletCard{background:#19212a}.walletNet{font-size:10px;color:#b7c6d7}
-button:focus-visible{outline:2px solid #e3f4c4;outline-offset:3px}
-@media(max-width:370px){.app{padding-left:10px;padding-right:10px}.card{padding:14px}.inventory{gap:8px}.item{padding:9px}.itemPreview{height:130px}#homeProfileCard .avatar{width:74px;height:92px}#homeProfileCard .name{font-size:20px}.nav small{font-size:9px}#rankedBtn,#quickBtn{padding:13px}}
-@media(prefers-reduced-motion:reduce){.card,.primary,.secondary,.nav button{transition:none}}
-
-/* Editorial live home, reversible frontend-only release. */
-:root{--accent:#dadbd0;--accent2:#f0f0e9}
-body{background:#0e0e10}
-#homeView.active{display:flex;flex-direction:column}
-#homeProfileCard{order:0;background:#17181b;border:0;border-radius:0;padding:14px 0;margin:0 0 10px}
-#homeProfileCard .avatar{width:48px;height:58px;border-radius:3px}
-#homeProfileCard .name{font-size:18px}
-#homeProfileCard .miniStats{display:none}
-#homeProfileCard .profileTop{gap:13px}
-#homeProfileCard .rankRow{margin-top:7px}
-#homeProfileCard .rankProgress{display:none}
-#homeView .homeBattleStage{order:1;background:transparent;border:0;padding:0;margin:8px 0}
-#homeView .goalCard{order:2;background:transparent!important;border:0;border-top:1px solid #414145;border-radius:0;margin-top:14px;padding:16px 0}
-#homeView>.card:not(#homeProfileCard):not(.homeBattleStage):not(.goalCard){order:3}
-.logo{font-family:Georgia,serif;font-weight:400;font-size:29px;letter-spacing:-1.6px}.logo span{color:#bcbec2}
-.homeBattleStage .sectionHead h2{font-family:Georgia,serif;font-style:italic;font-weight:400;font-size:33px}
-#homeFeed .battleCard{border:0;background:transparent;padding:0;margin-top:14px;border-radius:0}
-#homeFeed .battleFaces{grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr);gap:3px}
-#homeFeed .facePhoto{height:clamp(205px,57vw,290px);border-radius:2px}
-#homeFeed .face b{font-family:Georgia,serif;font-size:19px;font-weight:400}
-#homeFeed .vs{font-family:Georgia,serif;font-style:italic;font-size:12px}
-#homeFeed .vote{border-radius:2px;background:transparent;border-color:#77787c;min-height:46px}
-#homeFeed .vote.selected{background:#deded5;color:#101012}
-#homeFeed .v8-own-battle:before{color:#deded5}
-#homeView .goalRank{font-family:Georgia,serif;font-weight:400;font-size:27px}
-#homeView .goalCopy{display:none}
-#homeView .battleNow{border-radius:2px;background:#deded5;color:#131315;margin-top:13px}
-#homeView .goalCard .kicker{font-size:9px}
-.primary.pink{background:#deded5;color:#131315}
-.nav button.active{background:#292a2d;color:#f1f1e9;box-shadow:inset 0 1px #777}
-.progress i{background:#dadbd0}
-@keyframes editorialPair{from{opacity:.35;transform:translateY(6px)}to{opacity:1;transform:none}}
-#homeFeed .facePhoto{animation:editorialPair .28s ease-out}
-@media(prefers-reduced-motion:reduce){#homeFeed .facePhoto{animation:none}}
-
-/* Unified graphite/cobalt, compact mobile battle composition. */
-:root{--accent:#6689ff;--accent2:#cbd7ff;--line:#303a4c;--muted:#a4adbd}
-html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#0c1018}
-.logo,#homeFeed .face b,#homeFeed .vs,#homeView .goalRank,.homeBattleStage .sectionHead h2{font-family:inherit;font-style:normal}
-.logo{font-weight:850;font-size:24px;letter-spacing:-.8px}.logo span{color:#a5b5d4}
-.top{padding-bottom:12px}.app{padding-top:16px}
-#homeProfileCard{padding:10px 0;margin-bottom:4px;background:transparent}
-#homeProfileCard .avatar{width:40px;height:44px}
-#homeProfileCard .name{font-size:16px;letter-spacing:-.3px}
-#homeProfileCard .user,#homeProfileCard .progress{display:none}
-#homeProfileCard .rankRow{margin-top:4px}
-#homeProfileCard .rank{padding:3px 7px;font-size:10px}
-.homeBattleStage .sectionHead h2{font-size:18px;font-weight:650;letter-spacing:-.4px}
-#homeFeed .battleCard{background:linear-gradient(160deg,#171e2c,#111722);border:1px solid #334058;border-radius:14px;padding:11px}
-#homeFeed .facePhoto{height:clamp(140px,28dvh,240px);border-radius:8px;animation:none}
-#homeFeed .face b{font-size:13px;margin-top:7px;font-weight:650}
-#homeFeed .face small{font-size:10px}
-#homeFeed .battleFaces{margin-top:8px}
-#homeFeed .voteBar{margin-top:9px}
-#homeFeed .vote{border-radius:8px;min-height:40px;background:#222e44;border-color:#475c80}
-#homeFeed .vote.selected{background:#4765b8;color:white}
-#homeView .goalCard{padding:10px 0;margin-top:6px}
-#homeView .goalCard .kicker,#homeView .goalCard .goalTop,#homeView .goalCard>.progress{display:none}
-#homeView .battleNow,.primary.pink{background:#577bea;color:#fff;border-radius:10px}
-#homeView .battleNow{margin-top:4px}
-.nav button.active{background:#233351;color:#cfddff;box-shadow:inset 0 1px #7894ce}
-.progress i{background:#6d91ff}
-.matchBox{background:linear-gradient(135deg,#1c2941,#121b2a);border-color:#3c5278;padding:16px}
-.matchBox>h2{font-size:21px!important}.matchBox>p{margin:7px 0}
-#rankedBtn,#quickBtn{min-height:78px!important;padding:13px;font-size:14px}#rankedBtn{background:#577bea;color:white}#quickBtn{background:#202d43;border-color:#4a628a}
-#dailyWheel{position:fixed;inset:0;z-index:125;background:#030712cf;display:flex;align-items:center;justify-content:center;padding:16px}
-#dailyWheel[hidden]{display:none}
-.spinSheet{width:min(420px,100%);max-height:90dvh;overflow:auto;background:#141d2b;border:1px solid #415572;border-radius:20px;padding:20px}
-.spinStage{position:relative;width:250px;height:250px;margin:20px auto}
-#spinDisc{position:absolute;inset:0;border-radius:50%;background:conic-gradient(#2d466d 0deg 60deg,#172a47 60deg 120deg,#385580 120deg 180deg,#192f50 180deg 240deg,#344261 240deg 300deg,#4b628d 300deg 360deg);border:5px solid #7690b5;box-shadow:0 0 0 6px #0b1422}
-#spinDisc span{position:absolute;left:50%;top:50%;width:76px;margin-left:-38px;margin-top:-8px;text-align:center;transform:rotate(var(--a)) translateY(-83px);font-size:12px;color:#fff;font-weight:700}
-.spinCenter{position:absolute;inset:96px;border-radius:50%;display:grid;place-items:center;background:#111d30;border:1px solid #7189af;font-size:22px;font-weight:800}
-.spinPointer{position:absolute;z-index:2;top:-9px;left:calc(50% - 10px);width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:22px solid #e1ebff}
-#spinResult{min-height:48px;text-align:center;font-size:15px;line-height:1.5;padding:10px 0}
-.spinOdds{margin-top:16px;color:#b6c5db;font-size:11px;line-height:1.6}.spinOdds summary{cursor:pointer;font-size:12px}
-@media(max-height:650px){#homeFeed .facePhoto{height:140px}.app{padding-top:10px}.spinStage{transform:scale(.85);margin:0 auto}}
-
-/* Studio edition: shared geometry, type scale and intentional visual hierarchy. */
-:root{--bg:#090c12;--card:#141a24;--line:#2b3649;--text:#f2f4f8;--muted:#a0adc0;--accent:#8caaff;--accent2:#d5e2ff}
-body{background:radial-gradient(ellipse at 95% 0,#1c315533,transparent 45%),#090c12}
-.app{padding:17px 15px calc(94px + env(safe-area-inset-bottom));max-width:540px}
-.top{border:0;padding:4px 1px 15px;align-items:center}.logo{font-size:23px;font-weight:850;letter-spacing:-1.2px}.logo span{font-size:11px;font-weight:500;letter-spacing:2px;display:block;margin-top:3px;color:#8798b3}.scorePill{font-size:11px;border:1px solid #303e55;border-radius:30px;background:#172133;padding:9px 12px}
-#homeProfileCard{border:1px solid #2c394e;border-radius:14px;background:linear-gradient(120deg,#202d41,#111a28);padding:12px 14px;margin:0 0 21px}
-#homeProfileCard .avatar{width:40px;height:46px;border-radius:7px}
-#homeProfileCard .profileTop{gap:12px}
-#homeProfileCard .profileInfo{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:5px}
-#homeProfileCard .name{font-size:16px;max-width:55%}
-#homeProfileCard .rankRow{margin:0;gap:7px}#homeProfileCard .rank{border:0;background:#33476b;color:#e3ecff;border-radius:5px}#homeProfileCard .timer{font-size:10px}
-#homeProfileCard #homeTitle:empty{display:none}#homeProfileCard .profileInfo>.user{display:none}
-.homeBattleStage .arenaHead{margin:0 0 12px;align-items:center}
-.homeBattleStage .arenaHead h2{font-family:inherit;font-size:29px;font-weight:750;letter-spacing:-1px;line-height:1.1}
-.headingDot{color:#8caaff}.arenaHead>span{font-size:10px;letter-spacing:0}
-#homeFeed .battleCard,.battleCard{background:#121923;border:1px solid #2f3d52;border-radius:16px;padding:10px;margin-top:10px;box-shadow:0 10px 25px #0002}
-#homeFeed .battleFaces,.battleFaces{position:relative;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:start;margin-top:9px}
-#homeFeed .vs,.battleFaces>.vs{position:absolute;z-index:3;left:50%;top:40%;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;background:#111b2a;border:3px solid #151f2d;width:32px;height:32px;font-size:10px;font-weight:800;letter-spacing:-.6px;color:#d9e5fc}
-#homeFeed .facePhoto,.facePhoto{height:clamp(145px,27dvh,230px);min-height:0;max-height:none;border-radius:9px}
-#homeFeed .face b,.face b{font-size:13px;font-weight:650;margin-top:9px;text-align:left;padding:0 4px}
-.face small{text-align:left;padding:0 4px;color:#9baac1;font-size:10px}
-.battleSplit{height:3px;background:#465269;border-radius:4px;overflow:hidden;margin:12px 3px 6px}.battleSplit i{display:block;height:100%;background:#8fabf4;transition:width .3s ease}
-.tally{font-size:9px;padding:0 3px;color:#9baac1}
-#homeFeed .voteBar,.voteBar{gap:8px;margin-top:9px}
-#homeFeed .vote,.vote{background:#23334e;border:1px solid #405a83;border-radius:8px;min-height:41px;color:#dce8ff;font-size:11px;font-weight:650}
-#homeFeed .vote.selected,.vote.selected{background:#92aff4;color:#111c31;border-color:#b0c6fc}
-.homeModeBar{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
-.homeModeBar button{display:flex;align-items:center;gap:9px;background:linear-gradient(140deg,#223149,#172133);border:1px solid #3d5274;border-radius:11px;color:#eaf0fb;text-align:left;padding:13px 11px;min-width:0}
-.homeModeBar b{font-size:12px}.homeModeBar small{display:block;font-size:9px;color:#a6b5cb;margin-top:4px}
-.modeGlyph{font-size:23px;color:#9eb9f8}.modeArrow{margin-left:auto;color:#a4b8d8}
-#homeView .goalCard{display:none}
-.card:has(.wheelLaunch){background:transparent;border:0;padding:0;margin-top:15px;order:2!important}
-.wheelCardTitle{display:none}.card:has(.wheelLaunch)>.sectionHead{display:none}
-.wheelLaunch{display:flex;width:100%;align-items:center;gap:15px;padding:17px;border:1px solid #485477;border-radius:14px;color:#f0f2fa;background:radial-gradient(ellipse at 0 0,#46517d55,transparent 60%),#1b2033;text-align:left;overflow:hidden}
-.wheelLaunch b{font-size:14px;font-weight:650}.wheelLaunch small{display:block;margin-top:6px;color:#b2b9d2;font-size:10px}.launchArrow{margin-left:auto;font-size:23px;color:#c1c8f5}
-.miniWheel{display:block;flex:0 0 48px;height:48px;border:3px solid #b6c3e8;border-radius:50%;background:conic-gradient(#859bca 0deg 60deg,#30446b 60deg 120deg,#7c90b6 120deg 180deg,#263a60 180deg 240deg,#8299c6 240deg 300deg,#3c517b 300deg);position:relative;transform:rotate(-15deg);box-shadow:0 0 0 4px #ffffff0b}.miniWheel:after{content:'';position:absolute;inset:15px;border-radius:50%;background:#d1dafa}
-.nav{width:min(540px,100%);background:#101722f5;border-color:#33415a;padding-top:9px}
-.nav button{color:#90a0b9;font-size:10px;min-height:46px;border-radius:9px}.nav svg{display:block;margin:0 auto 5px;width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5}.nav small{margin-top:0;font-size:9px}
-.nav button.active{background:#233650;color:#dce9ff;box-shadow:inset 0 1px #5a77a3}
-.matchBox{border:1px solid #3b5279;border-radius:16px;background:radial-gradient(ellipse at 100% 0,#5978a62b,transparent 60%),#151f2e}
-#rankedBtn{background:linear-gradient(135deg,#afc5f5,#769ce7);color:#132138}
-#quickBtn{background:#26354b;color:#d9e6fa;border-color:#476084}
-.sectionHead h2{font-size:18px;letter-spacing:-.5px}
-.itemPreview{border-radius:9px;background:radial-gradient(ellipse at 50% 0,#33415b,#111925 80%);height:145px}
-.item{background:#162030;border-color:#34445e}
-.starsSection{border-top-color:#7b6c55}.premiumItem{background:linear-gradient(140deg,#332c24,#1c1e29)!important}
-.spinSheet{background:radial-gradient(ellipse at 50% 30%,#263758,#111a2a 70%);border-color:#52678a;border-radius:24px;padding:24px}
-.spinSheet .sectionHead h2{font-size:23px;letter-spacing:-.8px}
-.spinStage{margin:30px auto;filter:drop-shadow(0 16px 16px #0005)}
-#spinDisc{border:7px solid #b0bfd9;box-shadow:0 0 0 2px #3d5274,0 0 0 10px #17263e,0 0 0 11px #586f94;background:conic-gradient(#314d78 0 60deg,#142944 60deg 120deg,#4a6590 120deg 180deg,#203b63 180deg 240deg,#344e77 240deg 300deg,#6681ad 300deg 360deg)}
-#spinDisc span{font-weight:650;font-size:12px;text-shadow:0 1px 3px #0007}
-.spinCenter{inset:91px;background:linear-gradient(145deg,#d5dfed,#7185a6);border:5px solid #20314d;box-shadow:0 0 0 1px #a2b7d6;display:flex;flex-direction:column;justify-content:center;color:#15263e}
-.spinCenter b{font-size:22px;line-height:1}.spinCenter small{font-size:7px;letter-spacing:1.5px;margin-top:4px}
-.spinPointer{top:-17px;border-top-color:#e1ebfa;filter:drop-shadow(0 2px 3px #000a)}
-#spinRun{background:linear-gradient(130deg,#b8cef6,#7fa5ef);color:#132440;font-size:12px;font-weight:750}
-#spinResult{font-weight:600;color:#dbe8ff}.spinOdds{border-top:1px solid #3b4d68;padding-top:15px}
-@media(max-width:365px){.app{padding-left:10px;padding-right:10px}.homeModeBar button{padding:11px 8px}.modeGlyph{font-size:18px}#homeProfileCard .profileInfo{display:block}#homeProfileCard .name{max-width:none}#homeProfileCard .rankRow{margin-top:4px}}
-@media(prefers-reduced-motion:reduce){.battleSplit i{transition:none}}
-
-/* Readable prize wheel, responsive to the Telegram window width. */
-#dailyWheel{padding:12px}
-.spinSheet{width:min(500px,100%);padding:22px;max-height:calc(100dvh - 24px)}
-.spinStage{width:min(340px,calc(100vw - 92px));height:auto;aspect-ratio:1;margin:28px auto 20px;container-type:inline-size;transform:none}
-#spinDisc span{width:90px;margin-left:-45px;margin-top:-22px;transform:rotate(var(--a)) translateY(-31cqw) rotate(calc(-1 * var(--a)));text-shadow:0 1px 3px #0008;line-height:1.1}
-#spinDisc span b{display:block;font-size:clamp(19px,7cqw,25px);font-weight:800}
-#spinDisc span small{display:block;font-size:clamp(10px,3.5cqw,12px);margin-top:4px;font-weight:550}
-.spinCenter{inset:38%;border-width:4px}
-.spinCenter b{font-size:27px}.spinCenter small{font-size:8px;letter-spacing:1px}
-#spinResult{min-height:42px;padding:6px 0 10px}
-.moggPrizeNote{font-size:12px;color:#c7d4e8;line-height:1.5;padding:12px;background:#101c2e;border:1px solid #3a4e6d;border-radius:9px;margin:14px 0 0}
-.spinOdds{font-size:12px;margin-top:12px}.spinOdds summary{font-size:13px;font-weight:650}
-@supports not (container-type:inline-size){#spinDisc span{transform:rotate(var(--a)) translateY(-90px) rotate(calc(-1 * var(--a)))}}
-
-/* Wheel v2: fit the sheet, counter-rotate labels, keep the action visible. */
-#dailyWheel{padding:10px;background:#04070cea;backdrop-filter:blur(12px)}
-#dailyWheel .spinSheet{width:min(460px,100%);min-width:0;padding:20px;max-height:calc(100dvh - 20px);overflow-x:hidden;overflow-y:auto;background:radial-gradient(ellipse at 50% 28%,#202d40,#0d131d 70%);border:1px solid #3e4b60;border-radius:22px;box-shadow:0 24px 80px #0009}
-#dailyWheel .sectionHead{align-items:center}
-#dailyWheel .sectionHead h2{font-size:22px;letter-spacing:-.6px}
-.spinEyebrow{font-size:9px;letter-spacing:2px;color:#aebdd1;margin-bottom:5px}
-#dailyWheel .spinStage{width:calc(100% - 24px);max-width:360px;height:auto;aspect-ratio:1;margin:28px auto 20px;container-type:inline-size;transform:none}
-#dailyWheel #spinDisc{border:2px solid #acb7c7;box-shadow:0 0 0 5px #131b27,0 0 0 6px #67758a,0 0 0 10px #0b111b;background:conic-gradient(#24364e 0deg 29.6deg,#8594a3 29.6deg 30deg,#1c2a3d 30deg 59.6deg,#8594a3 59.6deg 60deg,#30435b 60deg 89.6deg,#8594a3 89.6deg 90deg,#20334c 90deg 119.6deg,#8594a3 119.6deg 120deg,#36587b 120deg 149.6deg,#8594a3 149.6deg 150deg,#68523a 150deg 179.6deg,#8594a3 179.6deg 180deg,#214c53 180deg 209.6deg,#8594a3 209.6deg 210deg,#2e6268 210deg 239.6deg,#8594a3 239.6deg 240deg,#304668 240deg 269.6deg,#8594a3 269.6deg 270deg,#58485e 270deg 299.6deg,#8594a3 299.6deg 300deg,#3f4863 300deg 329.6deg,#8594a3 329.6deg 330deg,#625046 330deg 359.6deg,#8594a3 359.6deg 360deg)}
-#dailyWheel #spinDisc .spinLabel{width:18%;margin:0;transform:translate(-50%,-50%);line-height:1.05;font-weight:600}
-#dailyWheel #spinDisc .spinLabel b{font-size:clamp(14px,5.8cqw,21px);font-weight:800;letter-spacing:-.6px}
-#dailyWheel #spinDisc .spinLabel small{font-size:clamp(7px,2.6cqw,10px);margin-top:3px;letter-spacing:0}
-#dailyWheel .spinCenter{inset:38%;border:2px solid #8d9fb8;background:radial-gradient(circle at 35% 25%,#e0e7ef,#8a9cb5 70%,#52627a);box-shadow:0 0 0 6px #0d172b;color:#102036}
-#dailyWheel .spinPointer{top:-13px;left:calc(50% - 8px);border-left-width:8px;border-right-width:8px;border-top:19px solid #f6e5c8}
-#dailyWheel #spinResult{font-size:15px;min-height:46px;overflow-wrap:anywhere}
-#dailyWheel #spinRun{min-height:48px;border-radius:12px;background:linear-gradient(110deg,#d5e0ef,#9cb6df);color:#15243a;font-size:12px}
-#dailyWheel #spinRun:disabled{opacity:.6}
-.spinAction{position:sticky;bottom:-20px;margin:0 -4px;padding:9px 4px 16px;background:linear-gradient(#0d131df2,#0d131d);z-index:3}
-.spinCaption{text-align:center;font-size:11px;color:#99abc2;margin:9px 0 0}
-.spinOddsGrid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin-top:12px}
-.spinOddsGrid>div{display:flex;justify-content:space-between;gap:6px;padding:8px 0;border-bottom:1px solid #ffffff12;font-size:11px}
-.spinOddsGrid b{color:#e1eaf7;white-space:nowrap}
-#dailyWheel .spinOdds p{font-size:11px;color:#9eacc0}
-#dailyWheel .moggPrizeNote{font-size:11px;border:0;padding:0;background:none;color:#99abc2}
-@media(max-width:340px){#dailyWheel .spinSheet{padding:15px}.spinOddsGrid{grid-template-columns:1fr}.spinAction{bottom:-15px}#dailyWheel .sectionHead h2{font-size:20px}}
-
-
-/* Midnight electric — colour and motion, with gameplay untouched. */
-:root{--accent:#8d9bff;--accent2:#dae1ff;--muted:#a6b3cd}
-body{background:radial-gradient(ellipse at 0 0,#443aa32b,transparent 48%),radial-gradient(ellipse at 100% 18%,#167bce24,transparent 42%),#080d18;background-attachment:fixed}
-.logo{color:#f4f6ff;text-shadow:0 2px 22px #6281ff35}
-.logo span{color:#99aaff}
-.scorePill{background:linear-gradient(120deg,#23294c,#151e36);border-color:#505b8b;color:#edf0ff}
-#homeProfileCard:not([class*="bg-"]){background:linear-gradient(115deg,#242d53,#142038 72%);border-color:#455384}
-#homeProfileCard .rank{background:#394c8b;color:#edf2ff}
-.homeBattleStage{border-top-color:#5262a5}
-.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#5369e8,#7356dc);color:#fff;border-color:#8a91f5;box-shadow:0 5px 22px #5366e82b}
-.homeModeBar #homeQuick,#quickBtn{background:linear-gradient(120deg,#122d40,#17334b);color:#e1f8ff;border-color:#38748c}
-#homeRanked .modeGlyph,#homeRanked .modeArrow{color:#e1dcff}
-#homeQuick .modeGlyph,#homeQuick .modeArrow{color:#79e4ed}
-.homeModeBar small{color:#d0dafa}
-#homeFeed .vote,.vote{background:#1b2945;border-color:#465e98;color:#e9efff}
-#homeFeed .vote.selected,.vote.selected{background:#8b9fff;border-color:#b2bfff;color:#101834}
-.battleSplit i:first-child{background:#8398ff}.battleSplit i:last-child{background:#57c8d8}
-.progress i{background:linear-gradient(90deg,#657dff,#a286ff);box-shadow:0 0 12px #7d82ff35}
-.wheelLaunch{position:relative;isolation:isolate;background:radial-gradient(ellipse at 10% 0,#8059df42,transparent 65%),linear-gradient(110deg,#2b234d,#171e38);border-color:#7865b3;box-shadow:0 8px 28px #070a1740}
-.wheelLaunch>span{position:relative;z-index:1}
-.wheelLaunch::before{content:"";position:absolute;inset:-80% -40%;background:linear-gradient(110deg,transparent 42%,#c3b4ff18 49%,transparent 56%);transform:translateX(-65%);pointer-events:none;animation:moggSheen 9s ease-in-out infinite}
-.wheelLaunch small{color:#c6bddf}.launchArrow{color:#d8c5ff}
-.miniWheel{background:conic-gradient(#a18afa 0 60deg,#4257ba 60deg 120deg,#67ccdf 120deg 180deg,#4a5caa 180deg 240deg,#9d84df 240deg 300deg,#38447d 300deg);border-color:#c7b9ff;animation:moggWheelTease 9s ease-in-out infinite}
-.nav{background:#101628f2;border-top-color:#414976;box-shadow:0 -10px 32px #05091655}
-.nav button.active{color:#f0edff;background:linear-gradient(145deg,#383064,#222d4c);box-shadow:inset 0 1px #9689d2}
-.nav button.active svg{filter:drop-shadow(0 0 5px #b49aff70)}
-.shopFilters button.active{background:#30284d;border-color:#8671bb;color:#e5dcff}
-.farmHero{background:radial-gradient(ellipse at top right,#635aca2b,transparent 65%),#111b2c;border-color:#465579}
-.studioLight:not(.locked){box-shadow:0 0 34px #d9bcff50;background:#eee2ff}
-.studioMonitor:not(.locked){background:linear-gradient(145deg,#88d8ef,#7163c4)}
-#dailyWheel .spinSheet{background:radial-gradient(ellipse at 50% 22%,#30244c,#101727 65%);border-color:#655787}
-#dailyWheel #spinRun{background:linear-gradient(110deg,#b4baff,#99d8ee);color:#142039}
-#dailyWheel .spinCenter{background:radial-gradient(circle at 35% 25%,#eee7ff,#b2addf 65%,#7185b5)}
-#dailyWheel .spinPointer{border-top-color:#e6d7ff}
-.primary,.secondary,.vote,.homeModeBar button,.wheelLaunch,.nav button{transition:transform .18s ease,border-color .18s ease,background-color .18s ease}
-button:not(:disabled):active{transform:scale(.975)}
-button:focus-visible,summary:focus-visible{outline:2px solid #a9bbff;outline-offset:4px}
-.view.active{animation:moggViewEnter .32s ease-out both}
-#dailyWheel:not([hidden]) .spinSheet{animation:moggSheetEnter .28s ease-out both}
-@media(hover:hover) and (pointer:fine){
- .homeModeBar button:not(:disabled):hover,.wheelLaunch:not(:disabled):hover{transform:translateY(-2px);border-color:#baa9ff}
- .vote:not(:disabled):hover,.secondary:not(:disabled):hover{border-color:#9aa9ee}
-}
-@keyframes moggViewEnter{from{opacity:.45;translate:0 7px}to{opacity:1;translate:0 0}}
-@keyframes moggSheetEnter{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
-@keyframes moggSheen{0%,55%{transform:translateX(-65%)}85%,100%{transform:translateX(65%)}}
-@keyframes moggWheelTease{0%,55%{transform:rotate(-15deg)}85%,100%{transform:rotate(45deg)}}
-@media(prefers-reduced-motion:reduce){
- .view.active,#dailyWheel:not([hidden]) .spinSheet,.wheelLaunch::before,.miniWheel{animation:none}
- .primary,.secondary,.vote,.homeModeBar button,.wheelLaunch,.nav button{transition:none}
-}
-
-
-/* Nocturne: darker surfaces; retain electric accents and motion. */
-:root{--bg:#07080c;--card:#11131b;--line:#2a2e3c;--accent:#929dea;--accent2:#d7dcf8}
-body{background:radial-gradient(ellipse at 0 0,#30345416,transparent 48%),#07080c}
-.logo{text-shadow:none}.logo span{color:#a3acc7}
-.scorePill{background:#141720;border-color:#363b4c}
-#homeProfileCard:not([class*="bg-"]){background:linear-gradient(120deg,#191d2a,#10131b);border-color:#343a4d}
-#homeProfileCard .rank{background:#2a314a;color:#e2e7fc}
-.homeBattleStage{border-top-color:#353b50}
-.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#354ba2,#4b3985);border-color:#6f76b4;box-shadow:0 4px 18px #3b45a51a}
-.homeModeBar #homeQuick,#quickBtn{background:linear-gradient(115deg,#14212a,#151d29);border-color:#385260}
-#homeQuick .modeGlyph,#homeQuick .modeArrow{color:#90c9d3}
-#homeFeed .vote,.vote{background:#171e2c;border-color:#384663}
-.wheelLaunch{background:radial-gradient(ellipse at 0 0,#63518920,transparent 65%),#14151f;border-color:#514763;box-shadow:none}
-.wheelLaunch::before{opacity:.55}
-.miniWheel{filter:saturate(.65);border-color:#a9a6c5}
-.nav{background:#0d1019f5;border-top-color:#303446;box-shadow:0 -8px 28px #0004}
-.nav button.active{background:linear-gradient(135deg,#28263d,#1b2232);box-shadow:inset 0 1px #686889}
-.nav button.active svg{filter:none}
-.farmHero{background:radial-gradient(ellipse at top right,#4b42721c,transparent 60%),#11151e;border-color:#333b4c}
-#dailyWheel .spinSheet{background:radial-gradient(ellipse at 50% 24%,#222335,#0c1019 70%);border-color:#47495e}
-#dailyWheel .spinCenter{background:radial-gradient(circle at 35% 25%,#d9dbea,#9a9fb9 65%,#64718f)}
-#dailyWheel #spinRun{background:linear-gradient(110deg,#a7b1e7,#93b7cb)}
-
-
-/* Night arena: concentrated light, distinct dock, motion on interaction. */
-body{background:radial-gradient(ellipse at 50% -12%,#5844a32b,transparent 44%),#07090e}
-.top{padding-bottom:18px;border-bottom:1px solid #ffffff0a}
-.logo{font-weight:900;letter-spacing:-1px}.logo span{color:#a7a6bf;letter-spacing:2.8px}
-#homeProfileCard:not([class*="bg-"]){background:linear-gradient(110deg,#171a27,#10131c);border:1px solid #343749;box-shadow:inset 3px 0 #a29aff}
-.homeModeBar #homeRanked,#rankedBtn{background:linear-gradient(115deg,#7260dd,#5441ac);border-color:#b7a2ff;color:#fff;box-shadow:0 5px 24px #7758e82b,inset 0 1px #e7d8ff40}
-.homeModeBar #homeQuick,#quickBtn{background:#131c27;border-color:#426375;color:#effcff}
-#homeQuick .modeGlyph{color:#99e8ed}
-.homeModeBar button{border-radius:13px}
-.homeModeBar .modeGlyph{transition:transform .25s ease;filter:drop-shadow(0 0 8px #ae99ff35)}
-.wheelLaunch{background:radial-gradient(ellipse at 0 50%,#63518d25,transparent 65%),#15151f;border-color:#625675}
-.wheelLaunch .launchArrow{transition:transform .25s ease}
-.wheelLaunch:active .launchArrow{transform:translate(3px,-3px)}
-#homeFeed .vote.selected,.vote.selected{background:#b7abf3;color:#151225;border-color:#dfd1ff}
-.progress i{background:linear-gradient(90deg,#7178cd,#b9a5f5);box-shadow:none}
-.nav{--dock-index:0;bottom:calc(10px + env(safe-area-inset-bottom));width:min(520px,calc(100% - 20px));padding:8px;gap:0;border:1px solid #49465f;border-radius:21px;background:linear-gradient(135deg,#1b1a28ed,#101720f5);box-shadow:0 12px 40px #0009,inset 0 1px #ffffff0b;backdrop-filter:blur(20px)}
-.nav:has(button[data-view="battle"].active){--dock-index:1}
-.nav:has(button[data-view="tap"].active){--dock-index:2}
-.nav:has(button[data-view="rewards"].active){--dock-index:3}
-.nav:has(button[data-view="profile"].active){--dock-index:4}
-.nav::before{content:"";position:absolute;left:8px;top:8px;bottom:8px;width:calc((100% - 16px)/5);border-radius:14px;background:radial-gradient(ellipse at 50% 0,#a399f43d,transparent 80%),#29283b;box-shadow:inset 0 1px #c7b8ff70;transform:translateX(calc(var(--dock-index)*100%));transition:transform .35s cubic-bezier(.22,.8,.25,1);pointer-events:none}
-.nav button{position:relative;z-index:1;min-height:52px;border-radius:14px;padding:7px 0 5px;color:#a5a9bd;overflow:visible;isolation:isolate;-webkit-tap-highlight-color:transparent}
-.nav button.active{background:transparent;color:#f1eaff;box-shadow:none;transform:none}
-.nav button svg{width:21px;height:21px;stroke-width:1.7;transition:transform .25s ease,filter .25s ease;color:inherit}
-.nav button.active svg{transform:translateY(-2px);filter:drop-shadow(0 0 6px #b59bff80)}
-.nav button small{font-size:9px;transition:color .2s;letter-spacing:.1px}
-.nav button.active::before{content:"";position:absolute;bottom:2px;left:calc(50% - 7px);width:14px;height:2px;border-radius:2px;background:#c5afff;box-shadow:0 0 8px #ac87ff60}
-.nav button:active{transform:scale(.94)}
-.navPulse{position:absolute;left:50%;top:35%;width:38px;height:38px;margin:-19px;border:1px solid #d1bdff;border-radius:50%;pointer-events:none;z-index:-1;animation:moggNavPulse .5s ease-out forwards}
-@keyframes moggNavPulse{from{transform:scale(.5);opacity:.65}to{transform:scale(1.65);opacity:0}}
-@media(hover:hover) and (pointer:fine){
- .nav button:hover{color:#f0eaff}
- .nav button:hover svg{transform:translateY(-4px) scale(1.12);filter:drop-shadow(0 0 7px #b19afc80)}
- .homeModeBar button:hover .modeGlyph{transform:rotate(-7deg) scale(1.12)}
- .wheelLaunch:hover .launchArrow{transform:translate(3px,-3px)}
-}
-@supports not selector(:has(*)){
- .nav::before{display:none}.nav button.active{background:#29283b}
-}
-@media(prefers-reduced-motion:reduce){
- .nav::before,.nav button svg,.nav button small,.homeModeBar .modeGlyph,.wheelLaunch .launchArrow{transition:none}
- .navPulse{display:none}
-}
-
-
-html{color-scheme:dark;scrollbar-color:#454257 #0b0e16;scrollbar-width:thin}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:#0b0e16}::-webkit-scrollbar-thumb{background:#454257;border-radius:8px}
-.supportCard summary{cursor:pointer;font-weight:650;padding:8px 0}.supportCard p{font-size:13px;line-height:1.6;overflow-wrap:anywhere}.supportCard a{color:#bdb0ff;overflow-wrap:anywhere}.supportCard details{border-top:1px solid #ffffff14;padding:6px 0}.supportCard a:focus-visible,.supportCard summary:focus-visible{outline:2px solid #bdb0ff;outline-offset:3px}
-
-.supportFooter{text-align:center;margin:16px 0 4px}
-#supportOpen{display:inline-block;width:auto;min-height:36px;padding:8px 12px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#9395a5;font:inherit;font-size:12px;font-weight:400;letter-spacing:0;transform:none}
-#supportOpen:hover{color:#ddd8ee}
-#supportDialog{position:fixed;inset:0;margin:auto;width:calc(100% - 40px);max-width:360px;max-height:70dvh;box-sizing:border-box;padding:18px;border:1px solid #363441;border-radius:18px;background:#15151c;color:#eee;overflow-y:auto;box-shadow:0 20px 60px #0009}
-#supportDialog:not([open]){display:none}
-#supportDialog::backdrop{background:#0009}
-.supportHeading{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.supportHeading h2{font-size:17px;margin:0}
-#supportClose{width:36px;height:36px;min-height:36px;padding:0;border:0;background:transparent;color:#aaa;font-size:25px;box-shadow:none}
-</style>
-
-<style id="ui-clarity-september">
-/* Shared interface hierarchy; cosmetic display styles retain their own fonts. */
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font-family:inherit}
-.muted,.timer,.kicker,.reward small,.missionText small,.upgradeCard small,.wheelLaunch small,.homeModeBar small,.walletHelp{font-family:inherit;letter-spacing:0;line-height:1.5}
-.muted,.reward small,.missionText small,.upgradeCard small,.walletHelp{font-size:14px;font-weight:400;color:#acafc3}
-.kicker{font-size:11px;font-weight:650;letter-spacing:.07em}
-.sectionHead h2{font-size:21px;letter-spacing:-.45px}
-.card{margin-bottom:16px}
-button.primary,button.secondary,a.secondary,.vote{min-height:48px;font-size:14px;font-weight:600;letter-spacing:0;text-transform:none;border-radius:14px;cursor:pointer;transition:background .16s,border-color .16s,transform .16s,box-shadow .16s}
-button.secondary,a.secondary{background:#222332;border:1px solid #44455d;color:#f2f0ff}
-a.secondary{display:flex;align-items:center;justify-content:center;text-decoration:none;padding:12px;box-sizing:border-box}
-button.primary,#claimChannelRequest{background:linear-gradient(135deg,#8b6cf0,#654acb);color:white;border:1px solid #a28aef;box-shadow:0 4px 16px #503ca32b}
-button:focus-visible,a.secondary:focus-visible{outline:2px solid #c5b6ff;outline-offset:3px}
-button:disabled{opacity:.48;cursor:default;box-shadow:none}
-button:not(:disabled):active,a.secondary:active{transform:scale(.975)}
-@media(hover:hover){button.secondary:not(:disabled):hover,a.secondary:hover,.vote:not(:disabled):hover{background:#34304c;border-color:#9c86df}button.primary:not(:disabled):hover,#claimChannelRequest:not(:disabled):hover{filter:brightness(1.12)}}
-#homeView .homeBattleStage .arenaHead h2{font-size:24px;letter-spacing:-.6px}
-.arenaHead>span{display:none}
-#homeView .homeBonuses{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
-.homeBonuses .sectionHead{display:none}
-.sponsor{margin:0 0 12px;padding:18px;background:#181622;border:1px solid #40364f;border-radius:20px}
-.channelRewardHead{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.channelRewardHead b{font-size:17px}.channelRewardHead span{font-size:14px;color:#c4afff;font-weight:650;white-space:nowrap}
-.sponsor>p{margin:7px 0 14px}.sponsor .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-#channelRewardStatus{font-size:13px;margin:10px 0 0;line-height:1.4}
-.wheelLaunch{margin:0!important;min-height:92px;border-radius:20px;padding:18px;background:linear-gradient(115deg,#272037,#191824);border:1px solid #51436b}
-.wheelLaunch b{font-size:17px;font-weight:650}.wheelLaunch small{font-size:13px;color:#bcb4ce;margin-top:4px}
-.dailyRun{padding:16px 18px!important;background:#15161e}
-.dailyRun>summary{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:16px;font-weight:600;list-style:none}
-.dailyRun>summary::-webkit-details-marker{display:none}.dailyRun>summary span{font-size:12px;color:#bbb0d3}
-.dailyRun[open]>.runTop{margin-top:18px}.dailyRun[open]>summary span{font-size:0}.dailyRun[open]>summary span:after{content:"Свернуть";font-size:12px}
-.dailyRun .runTop .kicker{display:none}.missionFoot{font-size:12px}.missionText b{font-size:14px;letter-spacing:0}
-#rankedBtn,#quickBtn{min-height:96px!important;font-size:17px;padding:16px 10px!important}
-#rankedBtn span,#quickBtn span{display:block;font-size:12px;font-weight:400;margin-top:5px;line-height:1.35}
-#quickBtn{background:#232532;border:1px solid #4a4c63;color:#f0edff;box-shadow:none}
-.voteBar .vote{background:#272636;border:1px solid #625579;color:#f1ebff;font-size:14px!important;min-height:48px!important}
-.face small,#homeFeed .face small{font-size:12px}.face b,#homeFeed .face b{font-size:15px}
-#battleFeed>.battleCard[aria-live]{padding:16px;background:#171820;border-color:#343544}
-#battleFeed>.battleCard[aria-live]>.row b{font-size:16px}
-#battleFeed>.battleCard[aria-live] p{margin:8px 0}
-#battleFeed>.battleCard[aria-live] small{display:block;font-size:13px;line-height:1.45}
-#rankedQueuePanel{padding:12px 0 0}#cancelRankedQueue{font-size:13px;background:transparent;color:#bfb7d4;min-height:40px;border:1px solid #4a405b;border-radius:10px;padding:8px 12px}
-.nav button small{font-family:inherit;font-size:11px;letter-spacing:0}.nav button{min-height:52px}
-@media(prefers-reduced-motion:reduce){button,a.secondary{transition:none!important;transform:none!important}}
-@media(max-width:360px){#rankedBtn,#quickBtn{font-size:15px}.sponsor{padding:14px}.channelRewardHead b{font-size:16px}.nav button small{font-size:10px}}
-</style>
-<style id="mogg-lab-clarity">
-.friendsBattle{background:linear-gradient(125deg,#262038,#15151f);border:1px solid #5e4b7c;padding:18px;border-radius:20px}
-.friendsHeading{display:flex;align-items:center;gap:14px}.friendsMark{display:grid;place-items:center;width:48px;height:48px;flex:none;background:#8670d720;border:1px solid #8973bc;border-radius:14px;font-size:21px;font-weight:800;color:#c8b4ff}
-.friendsHeading h2{font-size:20px;margin:0}.friendsHeading p{font-size:14px;color:#bfb8cc;margin:5px 0 0}
-.groupInvite{display:flex;justify-content:space-between;align-items:center;min-height:50px;box-sizing:border-box;margin-top:16px;padding:14px 16px;border:1px solid #a18adf;background:linear-gradient(120deg,#8563dc,#6146b1);border-radius:14px;color:white;text-decoration:none;font-size:15px;font-weight:650}
-.friendsHint{font-size:12px;color:#b9b1ca;line-height:1.5;margin:10px 0 0}
-.gameBasics{margin:0 0 20px;border-bottom:1px solid #343040;padding:4px 2px 14px;color:#bdb4cf;font-size:13px}.gameBasics summary,.guideRules summary{cursor:pointer;line-height:1.5}.gameBasics dl{margin:14px 0 0}.gameBasics dt{color:#f1eafa;font-size:14px;font-weight:650;margin-top:12px}.gameBasics dd{margin:4px 0;color:#b5b1c3;line-height:1.55}
-.guideRules{margin-top:16px}.guideRules p{font-size:13px;line-height:1.6}
-.labIntro{padding:8px 3px 20px}.labIntro>span{font-size:11px;letter-spacing:.12em;color:#b5a0e1}.labIntro h1{font-size:32px;letter-spacing:-1px;margin:7px 0}.labIntro p{font-size:14px;line-height:1.5;color:#bbb5c9;margin:8px 0 14px}
-.labShopLink{width:auto;padding:10px 16px}
-#tapView .studioRoom{background:linear-gradient(150deg,#302341,#151820 65%)}#tapView .studioFloor{background:repeating-linear-gradient(90deg,transparent 0 23px,#ab89d322 24px 25px),repeating-linear-gradient(0deg,#171820 0 23px,#ab89d322 24px 25px)}
-#tapView .studioBackdrop{background:linear-gradient(#a98ace,#3e344f);box-shadow:0 0 24px #a084cd25}#tapView .studioTag{font-size:11px;color:#d5c1f3}
-#tapView .tapCircle{border-color:#9f7cd8;box-shadow:0 0 36px #8055b92b,inset 0 0 30px #8865b521}
-#tapView .upgradeCard{border:1px solid #40344f;background:#191620;border-radius:16px;padding:15px}#tapView .upgradeCard b{font-size:12px;letter-spacing:.04em}#tapView .upgradeCard small{display:block;min-height:42px;margin:8px 0;font-size:13px}
-#tapView .farmHero>.kicker,#tapView #farmNext{display:none}#tapView #farmHint{font-size:13px;line-height:1.5}
-.groupInvite:focus-visible{outline:2px solid #e0c9ff;outline-offset:4px}@media(hover:hover){.groupInvite:hover{filter:brightness(1.1)}}
-@media(max-width:360px){.groupInvite{font-size:14px}.friendsHeading h2{font-size:18px}}
-</style>
-<style id="arena-four-tabs">
-.nav{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important}
-.nav::before{width:calc((100% - 16px)/4)}
-.nav:has(button[data-view="home"].active){--dock-index:0}.nav:has(button[data-view="tap"].active){--dock-index:1}.nav:has(button[data-view="rewards"].active){--dock-index:2}.nav:has(button[data-view="profile"].active){--dock-index:3}
-#homeView.active{display:flex;flex-direction:column}
-#homeView>#homeProfileCard{order:0}
-#homeView>.matchBox{order:1!important}
-#homeView>#arenaOwnCard{order:2!important}
-#homeView>.homeBattleStage{order:3!important}
-#homeView>.friendsBattle{order:4!important}
-#homeView>#arenaBonuses{order:5!important}
-#homeView>[hidden],#arenaHistory[hidden]{display:none!important}
-#arenaBonuses>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;list-style:none;min-height:44px}
-#arenaBonuses>summary::-webkit-details-marker{display:none}
-#arenaBonuses>summary span{font-size:17px;font-weight:650}
-#arenaBonuses>summary small{font-size:12px;color:#b8b0ca;line-height:1.4}
-#arenaBonuses[open]>summary{margin-bottom:16px}
-#arenaBonuses .homeBonuses{margin-bottom:12px}
-#arenaBonuses .dailyRun{margin-bottom:0}
-#arenaHistory summary{font-size:16px;font-weight:600;cursor:pointer;padding:6px 0}
-#arenaLastResult{margin-top:14px}
-#profileRankRewards .chest{padding:16px}
-#homeView .matchBox{padding:18px}
-#homeView .matchBox .matchIcon{display:none}
-#homeView .matchBox>h2{font-size:20px!important}
-#homeView .matchBox>p{display:none}
-#homeView .homeBattleStage{margin-top:4px}
-#homeView .homeBattleStage .arenaHead h2{font-size:21px}
-#homeView #rankedBtn,#homeView #quickBtn{min-height:76px!important}
-</style></head>
-<body>
-<div id="toast" class="toast"></div>
-<div id="connectionNotice" role="status" hidden style="max-width:512px;margin:12px auto;padding:12px 16px;background:#181923;border:1px solid #49415d;border-radius:12px">
-  <span id="connectionText"></span>
-  <button id="connectionRetry" class="secondary" style="margin-top:8px">Повторить</button>
-  <a id="connectionTelegram" href="https://t.me/MoggBattleGameBot?startapp" hidden style="display:none;color:#c9bcff">Открыть в Telegram</a>
-</div>
-
-<div id="onboard" class="onboard">
-  <div class="sheet">
-    <div class="kicker">ДОБРО ПОЖАЛОВАТЬ</div>
-    <h2 style="margin:5px 0 0;font-size:20px">Создай профиль</h2>
-    <p class="muted">Сначала выбери пол и загрузи фото для баттлов. Рейтинг начинается с 0.</p>
-
-    <div id="genderStep">
-      <div class="genderGrid">
-        <button class="gender" data-g="male">Мужской<br><small class="muted">MTN · CHAD · GIGACHAD</small></button>
-        <button class="gender f" data-g="female">Женский<br><small class="muted">MTB · STACY · TRUE STACY</small></button>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#101211" />
+    <meta
+      name="description"
+      content="Два фото. Один выбор. Минутные дуэли с друзьями, голосование и свой стиль в Telegram."
+    />
+    <meta property="og:title" content="MOGG BATTLE — кто заберёт этот батл?" />
+    <meta
+      property="og:description"
+      content="Вызови друга. Дай беседе выбрать победителя."
+    />
+    <meta
+      property="og:image"
+      content="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/social-cover.png"
+    />
+    <title>MOGG BATTLE · Арена</title>
+    <link rel="icon" href="brand.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="cosmetics.css?v=arena2" />
+    <link rel="stylesheet" href="style.css?v=arena2" />
+    <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+    <script src="app.js?v=arena2" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">К игре</a>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <main id="main" class="app">
+      <header class="topbar">
+        <a class="wordmark" href="#arena" aria-label="MOGG BATTLE, арена"
+          >MOGG<span class="brand-square">↗</span></a
+        ><button
+          id="profileShortcut"
+          class="account-chip"
+          aria-label="Открыть профиль"
+        >
+          <span id="miniAvatar" class="mini-avatar">M</span
+          ><span id="miniPoints">— P</span>
+        </button>
+      </header>
+      <div id="connection" class="notice" role="status" hidden>
+        <span id="connectionText"></span
+        ><button id="retry" class="text-button">Повторить</button>
       </div>
-    </div>
-
-    <div id="photoStep" style="display:none">
-      <div id="preview" class="preview"><img id="previewImg" alt=""></div>
-      <label class="fileLabel">
-        <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp">
-        Нажми, чтобы выбрать фото<br><span style="font-size:8px">JPEG / PNG / WEBP · до 5 MB</span>
-      </label>
-      <button id="uploadBtn" class="primary pink" style="margin-top:10px" disabled>СОХРАНИТЬ ФОТО</button>
-    </div>
-  </div>
-</div>
-
-
-<div id="rankModal" class="rankModal">
-  <div class="rankSheet">
-    <div class="sectionHead">
-      <div><div class="kicker">РАНГИ</div><h2 style="margin-top:4px">Твой путь</h2></div>
-      <button id="closeRankModal" class="modalClose" type="button">ЗАКРЫТЬ</button>
-    </div>
-    <div class="rankCurrent">
-      <small>ТВОЙ РАНГ</small>
-      <b id="modalRank">SUB3</b>
-      <small><span id="modalScore">0</span> рейтинга · до следующего ранга <span id="modalNeed">700</span></small>
-      <div class="progress"><i id="modalRankProgress"></i></div>
-    </div>
-    <div id="rankLadder" class="ladder"></div>
-  </div>
-</div>
-
-<main class="app">
-  <header class="top">
-    <div><div class="kicker">LOOKSMAXING COMPETITION</div><div class="logo">MOGG <span>BATTLE</span></div></div>
-    <div class="scorePill"><b id="score">0</b> Рейтинг</div>
-  </header>
-
-  <section id="homeView" class="view active">
-    <div class="card" id="homeProfileCard">
-      <div class="profileTop">
-        <div class="avatar" id="avatar">?</div>
-        <div class="profileInfo">
-          <div class="name" id="name">Loading...</div>
-          <div class="user" id="username">@telegram</div><div id="homeTitle"></div>
-          <div class="rankRow"><button id="rank" class="rank rankBtn" type="button">SUB3</button><span class="timer"><b id="homeScore">0</b> рейтинга</span></div>
-          <div class="progress"><i id="rankProgress"></i></div>
+      <div id="demoBanner" class="demo-banner" hidden>
+        <span>Демо · настоящие бои и награды доступны в Telegram</span
+        ><a class="text-button" href="https://t.me/MoggBattleGameBot?startapp"
+          >Играть ↗</a
+        >
+      </div>
+      <section id="arenaView" class="view active" aria-label="Арена">
+        <div class="arena-title">
+          <div>
+            <span class="eyebrow">MOGG BATTLE / АРЕНА</span>
+            <h1>Два фото.<br /><em>Один выбор.</em></h1>
+          </div>
+          <span class="arena-symbol" aria-hidden="true"
+            >VS<span>01 / 02</span></span
+          >
         </div>
-      </div>
-      <div class="miniStats">
-        <div class="stat"><b id="seasonPeak">0</b><small>SEASON PEAK</small></div>
-        <div class="stat"><b id="allPeak">0</b><small>ALL-TIME</small></div>
-        <div class="stat"><b id="battleCount">0</b><small>Бои</small></div>
-        <div class="stat"><b id="pointsBalance">0</b><small>POINTS</small></div>
-      </div>
-      <div class="statusPunch"><b id="statusPunchText">BUILD YOUR STATUS</b><span id="statusPunchNext">RANK UP →</span></div>
-    </div>
-
-
-    <div class="card goalCard">
-      <div class="kicker">СЛЕДУЮЩИЙ РАНГ</div>
-      <div class="goalTop"><div class="goalRank" id="nextRankName">SUB5</div><div class="goalNeed" id="nextRankNeed">700 до следующего ранга</div></div>
-      <div class="progress"><i id="nextRankProgress"></i></div>
-      <div class="goalCopy" id="goalCopy">Побеждай в рейтинговых боях, чтобы поднять ранг.</div>
-
-      <div class="firstLoop"><div class="loopStep" id="loopPhoto"><b>1 · PHOTO</b>Set profile</div><div class="loopStep" id="loopBattle"><b>2 · BATTLE</b>Fight</div><div class="loopStep" id="loopRank"><b>3 · RANK</b>Ascend</div></div>
-    </div>
-
-<div class="card friendsBattle">
-<div class="friendsHeading"><span class="friendsMark" aria-hidden="true">VS</span><div><h2>Батл с друзьями</h2><p>Кто победит в вашей беседе?</p></div></div>
-<a class="primary groupInvite" href="https://t.me/MoggBattleGameBot?startgroup=true" target="_blank" rel="noopener">Добавить бота в беседу <span aria-hidden="true">↗</span></a>
-<p class="friendsHint">Добавь бота → ответь другу командой <b>/battle</b>.</p>
-</div>
-    <details class="gameBasics"><summary>Рейтинг, Points и MOGG — в чём разница?</summary><dl><dt>Рейтинг</dt><dd>Побеждай в рейтинговых боях, поднимай ранг и открывай награды.</dd><dt>Points</dt><dd>Получай в LAB, за голоса и ежедневные бонусы. Трать на улучшения и косметику.</dd><dt>MOGG</dt><dd>Отдельный токен в TON. Выплаты за игру и обмен Points пока не запущены. Батлы сейчас дают рейтинг, а не токены.</dd></dl></details>
-    <div class="card homeBattleStage">
-      <div class="sectionHead arenaHead"><h2>Выбери победителя</h2><span><span class="liveDot">●</span> Голосование</span></div>
-      <div class="feedTabs">
-        <button class="tab active" data-feed="all">LIVE</button>
-        <button class="tab" data-feed="promotion">PROMOTION</button>
-        <button class="tab" data-feed="high">HIGH ELO</button>
-      </div>
-      <div id="homeFeed"></div>
-    </div>
-
-    <div class="card homeBonuses">
-      <div class="sectionHead"><h2 class="wheelCardTitle">Бонусы</h2></div>
-      <div class="sponsor">
-        <div class="channelRewardHead"><b>Наш канал</b><span>+150 Points</span></div>
-        <p class="muted">Награда за заявку · один раз</p>
-        <div class="row"><a id="openChannel" class="secondary" href="https://t.me/+QZ86AoSdXBJlMDIy" target="_blank" rel="noopener">Подать заявку</a>
-        <button id="claimChannelRequest" class="secondary">Забрать</button></div>
-        <p id="channelRewardStatus" class="muted"></p>
-      </div>
-      <button id="appDailyBtn" class="wheelLaunch"><span class="miniWheel" aria-hidden="true"></span><span><b>Ежедневный спин</b><small>Бесплатно каждый день</small></span><span class="launchArrow">↗</span></button>
-    </div>
-    <details class="card dailyRun"><summary>Задания на сегодня <span>Открыть</span></summary>
-      <div class="runTop">
-        <div><div class="kicker">ЗАДАНИЯ НА СЕГОДНЯ</div><div class="runScore" id="dailyDone">0 / 4</div></div>
-        <div style="text-align:right"><div class="runLabel">STREAK</div><div class="streak" id="dailyStreak">🔥 1 DAY</div></div>
-      </div>
-      <div id="dailyMissions" class="missionList"></div>
-      <div class="missionFoot"><span>Прогресс за день сохраняется на этом устройстве.</span><span id="dailyReset">Обновление · —</span></div>
-    </details>
-
-  </section>
-
-  <section id="battleView" class="view">
-    <div class="card matchBox">
-      <div class="matchIcon">⚔</div>
-      <h2 style="font-size:18px;margin:0 0 6px">Начать бой</h2>
-      <p class="muted">Выбери режим боя.</p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px">
-        <button id="rankedBtn" class="primary pink" style="min-height:92px">Рейтинговый<br><span>Поднимай ранг</span></button>
-        <button id="quickBtn" class="primary" style="min-height:92px">Быстрый<br><span>Без изменения рейтинга</span></button>
-      </div>
-      <div id="matchStatus" class="muted" style="margin-top:10px"></div><div id="rankedQueuePanel" hidden><p id="rankedQueueText" class="muted"></p><button id="cancelRankedQueue" type="button">Отменить заявку</button></div>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Твои бои</h2><span id="feedCount">0 BATTLES</span></div>
-      <div id="battleFeed"></div>
-    </div>
-  </section>
-
-  <section id="tapView" class="view"><div class="labIntro"><span>ПОЛУЧАЙ POINTS</span><h1>MOGG LAB</h1><p>Нажимай. Улучшай модули. Собирай больше Points.</p><button class="labShopLink secondary" type="button">Потратить в магазине ↗</button></div>
-    <div class="card">
-      <div class="row"><span class="kicker">Энергия</span><span class="timer"><b id="energy">100</b>/<span id="maxEnergy">100</span></span></div>
-      <div class="tapZone">
-        <button id="tapBtn" class="tapCircle"><img src="mogg-token.png" alt="MOGG"></button>
-        <div class="tapText">ТАПАЙ</div>
-        <div class="muted">Нажимай — получай Points</div>
-      </div>
-      <div class="progress energyPulse"><i id="energyProgress"></i></div>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Игровые Points</h2><span><b id="tapPoints">0</b> PTS</span></div>
-      <p class="muted">Points можно тратить на улучшения и косметику.</p>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Модули LAB</h2></div>
-      <div class="farmHero"><div class="kicker">ТВОЯ ЛАБОРАТОРИЯ</div><div id="studioLabel" class="studioLabel"></div><div id="farmStage" class="farmStage"></div><p id="studioGoal" class="muted"></p><div class="farmStats"><div><b id="farmRate">0</b><small>POINTS / ЧАС</small></div><div><b id="farmBalance">0</b><small>ТВОИ POINTS</small></div></div><p id="farmHint" class="muted"></p><div class="progress"><i id="farmProgress"></i></div><p id="farmNext" class="muted"></p></div>
-      <div class="v7grid" id="upgradeGrid">
-        <div class="upgradeCard"><b>СКАНЕР</b><small id="effect-tap"></small><button class="secondary upg" data-kind="tap">Улучшить</button></div>
-        <div class="upgradeCard"><b>АККУМУЛЯТОР</b><small id="effect-energy"></small><button class="secondary upg" data-kind="energy">Улучшить</button></div>
-        <div class="upgradeCard"><b>ЗАРЯДНЫЙ МОДУЛЬ</b><small id="effect-recovery"></small><button class="secondary upg" data-kind="recovery">Улучшить</button></div>
-        <div class="upgradeCard"><b>ГЕНЕРАТОР POINTS</b><small id="effect-idle"></small><button class="secondary upg" data-kind="idle">Улучшить</button></div>
-      </div>
-      <button id="prestigeBtn" class="primary" style="margin-top:10px">ЗАБРАТЬ БОНУС</button><div id="prestigeHint" class="muted" style="margin-top:6px;text-align:center"></div>
-      
-    </div>
-    <div class="card crewBox">
-      <h2 style="margin:4px 0 8px">Команда</h2><div id="crewContent"></div>
-    </div>
-  </section>
-
-  <section id="rewardsView" class="view">
-    <div class="card">
-      <div class="sectionHead"><h2>Награда за ранг</h2></div>
-      <div class="chest">
-        <div class="chestIcon">◇</div>
-        <b id="dropTitle">Первый drop после SUB5</b>
-        <p class="muted" id="dropText">Поднимай ранг и открывай новые предметы.</p>
-        <div class="dropMeta"><span id="dropAvailable">0 AVAILABLE</span><span id="dropTier">RANK LOCKED</span></div>
-        <div id="dropRates" class="dropRates"></div>
-        <button id="dropBtn" class="secondary" style="margin-top:10px">Открыть награду</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Магазин</h2><span><b id="shopPoints">0</b> PTS</span></div>
-      <p class="muted">Покупки за Points или ⭐ Stars.</p>
-      <div id="shopFilters" class="shopFilters"></div>
-      <div id="shop"></div>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Мои предметы</h2><span id="inventoryCount">0 ITEMS</span></div>
-      <div id="inventory" class="inventory"></div>
-    </div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Пригласить друзей</h2><span>INVITE</span></div>
-      <p class="muted">Приглашай друзей. Награда начисляется после того, как приглашённый выберет пол и загрузит фото.</p>
-      <div class="refbox">Открой бота и используй команду <b>/ref</b> — он выдаст персональную ссылку.</div>
-    </div>
-  </section>
-
-  <section id="profileView" class="view">
-<button id="guideBtn" class="secondary" style="margin-bottom:12px">? КАК ИГРАТЬ</button>
-    <div class="card" id="profileHero" style="text-align:center">
-      <div class="avatar" id="bigAvatar" style="width:92px;height:92px;margin:auto;font-size:32px">?</div>
-      <h2 id="bigName" style="font-size:19px;margin:10px 0 2px">Player</h2>
-      <div class="user" id="bigUsername">@telegram</div><div id="profileTitle"></div>
-      <div class="rankRow" style="justify-content:center"><button id="bigRank" class="rank rankBtn" type="button">SUB3</button><span><b id="bigScore">0</b> рейтинга</span></div>
-    </div>
-
-    <div class="card photoReviewCard" hidden style="display:none"><div class="kicker">PHOTO REVIEW · BETA</div><h2>Разбор фото</h2><p class="muted">Свет, ракурс и кадрирование — советы по фото.</p><button id="reviewOpen" class="secondary">РАЗОБРАТЬ ФОТО</button><div id="reviewPanel" hidden><p id="reviewStatus" class="muted" role="status" aria-live="polite"></p><label class="reviewConsent"><input id="reviewConsent" type="checkbox"><span>Это моё фото. Согласен отправить текущее фото профиля в OpenAI для разбора. Советы ИИ могут ошибаться. Результат не влияет на Score.</span></label><p class="muted">До 3 попыток в сутки. При ошибке сервиса попытка также учитывается.</p><button id="reviewRun" class="primary pink" disabled>ПОЛУЧИТЬ РАЗБОР</button><div id="reviewResult" aria-live="polite"></div></div></div>
-
-    <div class="card">
-      <div class="sectionHead"><h2>Профиль</h2></div>
-      <div class="reward"><div><b>Фото</b><small>Используется и в Mini App, и в баттлах</small></div><span id="photoState" class="rewardValue">✓</span></div>
-      <div class="reward"><div><b>Пол</b><small>Для подбора соперников и рангов</small></div><span id="genderState" class="rewardValue">—</span></div>
-      <div class="reward"><div><b>Приглашённые друзья</b><small>Активированные приглашения</small></div><span id="refCount" class="rewardValue">0</span></div>
-      <div class="profileActions">
-        <button id="changePhotoBtn" class="secondary">СМЕНИТЬ ФОТО</button>
-        <button id="shareProfileBtn" class="secondary shareBtn">ПОДЕЛИТЬСЯ</button>
-      </div>
-    </div>
-
-    <div class="walletCard">
-      <div class="walletTop">
-        <div class="walletMeta">
-          <b>Кошелёк MOGG</b>
-          <div id="walletAddress" class="walletAddress">Не подключён</div>
+        <div class="arena-actions">
+          <button id="friendBtn" class="primary">
+            Вызвать друга <span>↗</span></button
+          ><button id="quickBtn" class="secondary">
+            Случайный бой <span>⚡</span>
+          </button>
         </div>
-        <div id="ton-connect"></div>
+        <p class="arena-note">Дуэль длится минуту. Победителя выбирают люди.</p>
+        <div id="inviteBanner" hidden></div>
+        <div id="ownBattles"></div>
+        <div class="section-heading">
+          <h2>Выбери победителя</h2>
+          <span id="feedLabel" class="pill">+2 Points за голос</span>
+        </div>
+        <div class="feed-filters" role="group" aria-label="Фильтр боёв">
+          <button class="selected" data-feed="all">Все</button
+          ><button data-feed="human">Игроки</button
+          ><button data-feed="practice">Тренировка</button>
+        </div>
+        <div id="battleFeed" aria-live="polite">
+          <div class="skeleton-pair"><i></i><i></i></div>
+        </div>
+        <div id="welcomeCard" class="welcome-card" hidden></div>
+        <a
+          id="groupLink"
+          class="group-card"
+          href="https://t.me/MoggBattleGameBot?startgroup=true"
+          ><span class="group-icon" aria-hidden="true">↗</span>
+          <div>
+            <b>Вся беседа — твоя арена</b>
+            <p>Добавь бота: /battle — дуэль, /top — топ недели.</p>
+          </div>
+          <span aria-hidden="true">↗</span></a
+        >
+        <details class="ranked-details">
+          <summary>Рейтинговый режим <span>↗</span></summary>
+          <p>
+            Рейтинг меняется по голосам игроков. Нужно 5 оценок, затем ещё 10
+            минут. Если за сутки оценок не хватило, рейтинг сохраняется.
+          </p>
+          <button id="rankedBtn" class="secondary">
+            Найти рейтинговый бой
+          </button>
+          <div id="rankedQueue"></div>
+        </details>
+        <div id="matchStatus" role="status" class="status-line"></div>
+      </section>
+      <section id="tasksView" class="view" aria-label="Задания">
+        <div class="page-title">
+          <span class="eyebrow">КАЖДЫЙ ДЕНЬ / НОВЫЙ ШАГ</span>
+          <h1>Твой прогресс<span class="lime">.</span></h1>
+          <p>Собирай Points. Открывай свой стиль.</p>
+        </div>
+        <div class="daily-summary">
+          <div>
+            <span class="eyebrow">СЕРИЯ ДНЕЙ</span
+            ><b id="streak">01<span>день</span></b>
+          </div>
+          <div>
+            <span class="eyebrow">ТВОЙ БАЛАНС</span
+            ><b id="taskPoints">0<span>Points</span></b>
+          </div>
+        </div>
+        <div id="missions"></div>
+        <p class="muted reset-note">
+          Новый день — в 03:00 МСК. Прогресс связан с аккаунтом.
+        </p>
+        <button id="dailyBtn" class="daily-card">
+          <span class="daily-orbit" aria-hidden="true">✳</span>
+          <div>
+            <span class="eyebrow">ОДИН БЕСПЛАТНЫЙ СПИН</span
+            ><b>Что принесёт сегодня?</b>
+            <p>Points, энергия или новый предмет</p>
+          </div>
+          <span>↗</span>
+        </button>
+        <details id="lab" class="lab-panel">
+          <summary>
+            <div><span class="eyebrow">ДОПОЛНИТЕЛЬНО</span><b>MOGG LAB</b></div>
+            <span>⚡</span>
+          </summary>
+          <div class="lab-content">
+            <p>
+              Нажимай, чтобы получать Points. Улучшения увеличивают запас
+              энергии и доход.
+            </p>
+            <div class="energy-row">
+              <span>Энергия</span><b id="energy">—</b>
+            </div>
+            <div class="progress"><i id="energyProgress"></i></div>
+            <button id="tapBtn" class="tap-button" aria-label="Получить Points">
+              <span>✳</span><b>ТАПАЙ</b>
+            </button>
+            <div id="tapHint" class="muted">До 8 нажатий в секунду</div>
+            <div id="upgrades" class="upgrade-grid"></div>
+            <button id="labDaily" class="secondary">Забрать бонус LAB</button>
+          </div>
+        </details>
+      </section>
+      <section id="styleView" class="view" aria-label="Магазин и коллекция">
+        <div class="page-title">
+          <span class="eyebrow">ТВОЙ СТИЛЬ / ТВОИ ПРАВИЛА</span>
+          <h1>Будь заметнее<span class="lime">.</span></h1>
+          <p>Оформление видно в профиле и карточках боя.</p>
+        </div>
+        <div class="store-tabs" role="group" aria-label="Магазин или коллекция">
+          <button data-store="shop" class="selected">Магазин</button
+          ><button data-store="owned">
+            Моя коллекция <span id="ownedCount">0</span>
+          </button>
+        </div>
+        <div id="shopPanel">
+          <div class="section-heading">
+            <h2>Полный образ</h2>
+            <span class="pill">3 предмета в наборе</span>
+          </div>
+          <div id="sets"></div>
+          <div class="section-heading">
+            <h2>Собери по-своему</h2>
+            <span id="shopPoints" class="muted">0 Points</span>
+          </div>
+          <div
+            class="shop-filters"
+            role="group"
+            aria-label="Категория предметов"
+          >
+            <button data-kind="all" class="selected">Всё</button
+            ><button data-kind="frame">Рамки</button
+            ><button data-kind="profile_bg">Фоны</button
+            ><button data-kind="title">Титулы</button
+            ><button data-kind="other">Эффекты</button>
+          </div>
+          <div id="shop" class="item-grid"></div>
+          <p class="store-note">
+            Оформление меняет стиль. Рейтинг определяется голосами.
+          </p>
+        </div>
+        <div id="ownedPanel" hidden>
+          <div id="inventory" class="item-grid"></div>
+        </div>
+      </section>
+      <section id="profileView" class="view" aria-label="Профиль">
+        <div class="page-title">
+          <span class="eyebrow">ТВОЯ FACE CARD</span>
+          <h1>Твой профиль<span class="lime">.</span></h1>
+        </div>
+        <div id="profileHero" class="profile-hero"></div>
+        <div class="profile-actions">
+          <button id="changePhoto" class="secondary">Фото и профиль</button
+          ><button id="shareProfile" class="primary">Поделиться ↗</button>
+        </div>
+        <div id="profileStats" class="stats-grid"></div>
+        <div id="lastBattle"></div>
+        <div class="section-heading">
+          <h2>Лига и награды</h2>
+          <button id="rankGuide" class="text-button">Все ранги ↗</button>
+        </div>
+        <div id="rankReward" class="panel"></div>
+        <div class="invite-card">
+          <span class="eyebrow">ВМЕСТЕ ИНТЕРЕСНЕЕ</span>
+          <h2>Позови свою команду</h2>
+          <p>
+            Персональная ссылка. 100 Points за друга после создания его профиля.
+          </p>
+          <button id="shareInvite" class="secondary">
+            Пригласить друзей ↗
+          </button>
+          <p id="refCount" class="muted"></p>
+        </div>
+        <div class="profile-links">
+          <button id="guideBtn">Как играть <span>↗</span></button
+          ><button id="supportBtn">Помощь и обращения <span>↗</span></button
+          ><a href="rules.html" target="_blank" rel="noopener"
+            >Правила и данные <span>↗</span></a
+          >
+        </div>
+      </section>
+      <footer class="footer">MOGG BATTLE <span>MAKE YOUR MOVE.</span></footer>
+    </main>
+    <nav class="dock" aria-label="Разделы">
+      <button data-view="arena" class="selected" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="m4 4 16 16M20 4 4 20M3 8l5-5M16 21l5-5M3 16l5 5M16 3l5 5"
+          /></svg
+        ><span>Арена</span></button
+      ><button data-view="tasks">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h3" /></svg
+        ><span>Задания</span></button
+      ><button data-view="style">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m12 3 9 9-9 9-9-9zM8 12h8M12 8v8" /></svg
+        ><span>Стиль</span></button
+      ><button data-view="profile">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21v-2a8 8 0 0 1 16 0v2" /></svg
+        ><span>Профиль</span>
+      </button>
+    </nav>
+    <dialog id="modal">
+      <div class="modal-top">
+        <span id="modalLabel" class="eyebrow">MOGG BATTLE</span
+        ><button id="modalClose" class="close-button" aria-label="Закрыть">
+          ×
+        </button>
       </div>
-      <div class="walletBalance"><span id="chainMogg">—</span><small>MOGG</small></div>
-      <div class="walletNet">Токены в сети TON</div><div id="walletHelp" class="walletHelp">MOGG — токен проекта. Выплаты за игру и обмен Points пока не запущены.</div>
-    </div>
-
-    <div class="supportFooter"><button id="supportOpen" type="button" aria-haspopup="dialog">Помощь и связь</button></div>
-  </section>
-</main>
-<dialog id="supportDialog" class="supportCard" aria-labelledby="supportTitle"><div class="supportHeading"><h2 id="supportTitle">Помощь и связь</h2><button id="supportClose" type="button" aria-label="Закрыть">×</button></div>
-      <p>MOGG BATTLE — игра бренда Mogg Labs.</p>
-      <p class="muted">Владелец: Смирнов Роман Артурович<br>Поддержка: <a href="mailto:mogglabs@gmail.com">mogglabs@gmail.com</a></p>
-<details><summary>Отправить обращение в игре</summary>
-<form id="supportForm">
-<label for="supportCategory">Тема</label>
-<select id="supportCategory" style="width:100%;margin:8px 0"><option value="report">Жалоба на фото или игрока</option><option value="payment">Покупка или возврат</option><option value="delete_photo">Удаление моего фото</option><option value="delete_account">Удаление моего аккаунта</option><option value="other">Другой вопрос</option></select>
-<label for="supportMessage">Что произошло?</label><textarea id="supportMessage" minlength="5" maxlength="1500" required rows="4" style="width:100%;box-sizing:border-box;margin:8px 0" placeholder="Опиши вопрос. Для жалобы укажи имя игрока и время боя."></textarea>
-<p class="muted">Запрос привязан к твоему аккаунту. Удаление и возвраты выполняются после ручного разбора. Не отправляй пароли и ключи кошелька.</p>
-<button id="supportSubmit" type="submit" class="primary">Отправить</button><p id="supportFeedback" role="status" aria-live="polite"></p>
-</form><button id="supportHistory" type="button">Мои обращения</button><div id="supportHistoryList" aria-live="polite"></div></details>
-      <details><summary>Покупки и возвраты</summary><p>Напиши название предмета, дату покупки и приложи квитанцию Telegram. Обращения разбираются вручную; отправка письма не означает автоматический возврат.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20payment">Написать по оплате</a></details>
-      <details><summary>Пожаловаться на фото или игрока</summary><p>Укажи имя игрока, время боя и причину жалобы. При необходимости приложи скриншот.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20report">Отправить жалобу</a></details>
-      <details><summary>Удаление фото и аккаунта</summary><p>Удалить текущее фото из профиля и хранилища. Аккаунт и очки сохранятся. Старые загрузки, сообщения Telegram и чужие копии сюда не входят — для них отправь обращение.</p><button id="deleteOwnPhoto" type="button">Удалить текущее фото</button><p id="deletePhotoStatus" role="status"></p><p>Напиши свой Telegram @username и что нужно удалить: фото или аккаунт. Если username нет, укажи Telegram ID из ответа бота на /deleteaccount в личном чате. Поддержка уточнит принадлежность аккаунта. Запрос обрабатывается вручную; открытие письма ничего не удаляет.</p><a href="mailto:mogglabs@gmail.com?subject=MOGG%20BATTLE%20deletion">Запросить удаление</a></details>
-      <p class="muted">Не отправляй пароли, seed-фразы или приватные ключи. Если почтовое приложение не открывается, напиши на адрес выше вручную.</p></dialog>
-<div id="dailyWheel" hidden role="dialog" aria-modal="true" aria-labelledby="spinTitle"><div class="spinSheet">
-<div class="sectionHead"><div><div class="spinEyebrow">MOGG DAILY</div><h2 id="spinTitle">Твой ежедневный приз</h2></div><button id="spinClose" class="modalClose" aria-label="Закрыть колесо">✕</button></div>
-<p class="spinCaption">Один бесплатный спин · каждый день</p>
-<div class="spinStage" aria-hidden="true"><div class="spinPointer"></div><div id="spinDisc"><span class="spinLabel" style="left:59.83512371389579%;top:13.294818601015407%"><b>50</b><small>Points</small></span><span class="spinLabel" style="left:76.8700576850888%;top:23.129942314911194%"><b>75</b><small>Points</small></span><span class="spinLabel" style="left:86.70518139898459%;top:40.16487628610421%"><b>100</b><small>Points</small></span><span class="spinLabel" style="left:86.70518139898459%;top:59.83512371389579%"><b>150</b><small>Points</small></span><span class="spinLabel" style="left:76.87005768508881%;top:76.8700576850888%"><b>200</b><small>Points</small></span><span class="spinLabel" style="left:59.8351237138958%;top:86.70518139898459%"><b>400</b><small>Points</small></span><span class="spinLabel" style="left:40.164876286104224%;top:86.70518139898459%"><b>20</b><small>энергии</small></span><span class="spinLabel" style="left:23.129942314911197%;top:76.87005768508881%"><b>50</b><small>энергии</small></span><span class="spinLabel" style="left:13.294818601015407%;top:59.83512371389578%"><b>100</b><small>P + 20 ⚡</small></span><span class="spinLabel" style="left:13.294818601015407%;top:40.164876286104196%"><b>▣</b><small>рамка</small></span><span class="spinLabel" style="left:23.129942314911187%;top:23.1299423149112%"><b>▧</b><small>фон</small></span><span class="spinLabel" style="left:40.16487628610422%;top:13.294818601015407%"><b>Aa</b><small>титул</small></span></div><div class="spinCenter"><b>↻</b><small>DAILY</small></div></div>
-<div id="spinResult" role="status" aria-live="polite"></div>
-<div class="spinAction"><button id="spinRun" class="primary">КРУТИТЬ БЕСПЛАТНО</button><p class="spinCaption">Следующий спин — в 03:00 МСК · 00:00 UTC</p></div>
-<details class="spinOdds"><summary>Все 12 призов и шансы</summary><div class="spinOddsGrid"><div><span>50 Points</span><b>18%</b></div><div><span>75 Points</span><b>15%</b></div><div><span>100 Points</span><b>15%</b></div><div><span>150 Points</span><b>10%</b></div><div><span>200 Points</span><b>8%</b></div><div><span>400 Points</span><b>3%</b></div><div><span>20 энергии</span><b>10%</b></div><div><span>50 энергии</span><b>6%</b></div><div><span>100 Points + 20 энергии</span><b>5%</b></div><div><span>Рамка</span><b>4%</b></div><div><span>Фон профиля</span><b>3%</b></div><div><span>Титул</span><b>3%</b></div></div>
-<p>Рамка: FOCUS или FACE CARD. Фон: CONTACT GRID. Титул: MOGGER, PRETTYBOY, NATURAL или FACE CARD. Выбирается случайный ещё не открытый предмет соответствующего вида из магазина за Points ценой до 1 600. Предметы за Stars и лимитированные коллекции не выпадают.</p>
-<p>Если все подходящие предметы этого вида уже есть — 150 Points. Излишек энергии при полном запасе — Points в соотношении 1:1. Размер сектора не означает его вероятность.</p></details>
-<p class="moggPrizeNote">Points — игровые очки. MOGG-токены пока не разыгрываются: выплаты не подключены.</p>
-</div></div>
-
-
-
-<div id="caseModal" class="caseModal">
-  <div id="caseSheet" class="caseSheet">
-    <div class="caseTitle">ASCENSION DROP · VERIFIED RANK REWARD</div>
-    <div class="caseWindow"><div id="caseReel" class="caseReel"></div></div>
-    <div id="caseReveal" class="caseReveal"><div id="caseRarity" class="rarity"></div><h2 id="caseName">UNLOCKED</h2><div id="caseKind" class="muted"></div></div>
-    <button id="caseClose" class="primary pink caseClose">ADD TO COLLECTION</button>
-  </div>
-</div>
-
-<div id="introOverlay" class="introOverlay"><div class="introCore"><div class="introKicker">MOGG ANALYSIS</div><div id="introTitle" class="introTitle">SCANNING</div><div id="introSub" class="introSub">MATCH FOUND · CALIBRATING FACES</div><div class="introDots"><i></i><i></i><i></i></div></div></div>
-
-<div id="resultFlash" class="resultFlash"><div class="resultInner"><div class="resultKicker">MOGG BATTLE</div><div id="resultHeadline" class="resultHeadline">SCORE UPDATED</div><div id="resultScore" class="resultScore">+0</div><div id="resultRank" class="resultRank">SCORE UPDATED</div><div class="resultActions"><button id="resultClose" class="secondary">CONTINUE</button><button id="resultShare" class="secondary shareBtn">↗ SHARE</button></div></div></div>
-
-
-<div id="guideModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
- <div class="rankSheet guideSheet"><div class="row"><span class="kicker">MOGG BATTLE · БЫСТРЫЙ СТАРТ</span><button id="guideClose" class="modalClose" aria-label="Закрыть обучение">Закрыть</button></div>
- <div id="guideProgress" class="guideProgress" aria-label="Прогресс обучения"></div>
- <div id="guideBody" aria-live="polite"></div>
- <div class="row guideControls"><button id="guideBack" class="secondary">Назад</button><button id="guideNext" class="primary pink">Далее</button></div>
- <button id="guideFarm" class="secondary" style="margin-top:9px;display:none">Открыть LAB</button>
- </div>
-</div>
-
-<nav class="nav">
-  <button class="active" data-view="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></svg><small>Арена</small></button>
-  <button data-view="tap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v14H3ZM7 7l2-4h6l2 4"/><circle cx="12" cy="14" r="4"/></svg><small>LAB</small></button>
-  <button data-view="rewards"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l1 13H3ZM8 8V6a4 4 0 0 1 8 0v2"/></svg><small>Магазин</small></button>
-  <button data-view="profile"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="4"/><path d="M4 22v-3a8 8 0 0 1 16 0v3"/></svg><small>Профиль</small></button>
-</nav>
-
-<div id="tryModal" class="rankModal" role="dialog" aria-modal="true" aria-labelledby="tryTitle"><div class="rankSheet shopSheet"><div class="row"><h2 id="tryTitle">Примерка</h2><button id="tryClose" class="modalClose">Закрыть</button></div><div id="tryPreview"></div><p id="tryDescription" class="muted"></p><p class="muted">Примерка бесплатна. Покупка — отдельной кнопкой в магазине.</p></div></div>
-<script>
-// Preserve existing IDs and event handlers while grouping related actions.
-(function arrangeArena(){
- const home=document.getElementById('homeView'),battle=document.getElementById('battleView'),profile=document.getElementById('profileView');
- const stage=home.querySelector('.homeBattleStage'),match=battle.querySelector('.matchBox');
- const ownCard=document.getElementById('battleFeed').closest('.card');
- ownCard.id='arenaOwnCard';ownCard.querySelector('h2').textContent='Твои бои';
- home.insertBefore(match,stage);home.insertBefore(ownCard,stage);
- const bonuses=document.createElement('details');bonuses.id='arenaBonuses';bonuses.className='card arenaBonuses';
- const summary=document.createElement('summary');summary.innerHTML='<span>Бонусы</span><small>Колесо · задания · канал</small>';bonuses.append(summary);
- bonuses.append(home.querySelector('.homeBonuses'),home.querySelector('.dailyRun'));home.append(bonuses);
- const basics=home.querySelector('.gameBasics');profile.insertBefore(basics,profile.querySelector('.walletCard'));
- const drop=document.getElementById('dropBtn').closest('.card');drop.id='profileRankRewards';profile.insertBefore(drop,profile.querySelector('.walletCard'));
- const ref=document.querySelector('#rewardsView .refbox').closest('.card');profile.insertBefore(ref,profile.querySelector('.walletCard'));
- const history=document.createElement('details');history.id='arenaHistory';history.className='card';history.innerHTML='<summary>Последний бой</summary><div id="arenaLastResult"></div>';profile.insertBefore(history,profile.querySelector('.walletCard'));
- battle.hidden=true;
-})();
-
-const API="https://zjznmcydpngceiblqtwj.supabase.co/functions/v1/player-api";
-const tg=window.Telegram?.WebApp;
-if(tg){tg.ready();tg.expand();}
-
-const TONCONNECT_MANIFEST="https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/tonconnect-manifest.json";
-const MOGG_JETTON_MASTER="EQD4-rV0gBrtGdPA6rr1Zuq54RjwvUFEoUXCGbGz2a-mCiJE";
-const TONCENTER_MAINNET="https://toncenter.com/api/v3";
-const MOGG_CHAIN="-239";
-const MOGG_WALLET_HELP="MOGG — токен проекта. Выплаты за игру и обмен Points пока не запущены.";
-let tonConnectUi=null;
-let chainBalanceRequest=0;
-
-function shortAddress(a){
-  if(!a)return "Не подключён";
-  return a.length>16 ? a.slice(0,8)+"…"+a.slice(-6) : a;
-}
-
-async function loadChainMogg(owner,chain){
-  const requestId=++chainBalanceRequest;
-  const out=$("chainMogg"),help=$("walletHelp");
-  out.textContent="—";
-  help.textContent=MOGG_WALLET_HELP;
-  if(!owner)return;
-  if(String(chain)!==MOGG_CHAIN){
-    help.textContent="Подключён тестовый кошелёк или сеть не определена. Переключи кошелёк на TON Mainnet и подключи его заново.";
-    return;
-  }
-  out.textContent="...";
-  try{
-    const url=TONCENTER_MAINNET+"/jetton/wallets?owner_address="+encodeURIComponent(owner)
-      +"&jetton_address="+encodeURIComponent(MOGG_JETTON_MASTER)+"&limit=1";
-    const r=await fetch(url);
-    if(!r.ok)throw new Error("balance_fetch_failed");
-    const d=await r.json();
-    if(!Array.isArray(d.jetton_wallets))throw new Error("invalid_balance_response");
-    const w=d.jetton_wallets[0];
-    const nano=w ? BigInt(w.balance) : 0n;
-    const whole=nano/1000000000n;
-    const frac=(nano%1000000000n).toString().padStart(9,"0").slice(0,4).replace(/0+$/,"");
-    if(requestId!==chainBalanceRequest)return;
-    out.textContent=frac ? whole.toString()+"."+frac : whole.toString();
-  }catch(e){
-    if(requestId!==chainBalanceRequest)return;
-    console.error(e);
-    out.textContent="—";
-    help.textContent="Не удалось загрузить баланс MOGG. Попробуй переподключить кошелёк чуть позже.";
-  }
-}
-
-function updateMoggWallet(account){
-  const address=account?.address||"";
-  $("walletAddress").textContent=shortAddress(address);
-  $("walletAddress").title=address;
-  return loadChainMogg(address,account?.chain);
-}
-
-function initTonConnect(){
-  try{
-    if(!window.TON_CONNECT_UI?.TonConnectUI)return;
-    tonConnectUi=new TON_CONNECT_UI.TonConnectUI({
-      manifestUrl:TONCONNECT_MANIFEST,
-      buttonRootId:"ton-connect",
-      restoreConnection:true,
-      uiPreferences:{theme:"DARK"}
-    });
-    tonConnectUi.onStatusChange(wallet=>updateMoggWallet(wallet?.account));
-    updateMoggWallet(tonConnectUi.account);
-  }catch(e){console.error("TON Connect:",e)}
-}
-
-
-let state={player:null,feed:[],inventory:[],shop:[],sponsors:[],drops:null,crew:null,gender:null,photoFile:null,shopFilter:"all"};
-const $=id=>document.getElementById(id);
-const toast=m=>{const e=$("toast");e.textContent=m;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1500)};
-const DAY_KEY=()=>new Date().toISOString().slice(0,10);
-function loadDaily(){
-  const key="mogg_daily_"+DAY_KEY();
-  try{
-    const raw=JSON.parse(localStorage.getItem(key)||"{}");
-    return {taps:Number(raw.taps||0),votes:Number(raw.votes||0),quick:Number(raw.quick||0),scoreGain:Number(raw.scoreGain||0)};
-  }catch{return {taps:0,votes:0,quick:0,scoreGain:0}}
-}
-function saveDaily(d){try{localStorage.setItem("mogg_daily_"+DAY_KEY(),JSON.stringify(d))}catch{}}
-let daily=loadDaily();
-function bumpDaily(kind,amount=1){daily[kind]=Math.max(0,Number(daily[kind]||0)+Number(amount||0));saveDaily(daily);renderDaily()}
-function nextMidnightLabel(){
-  const n=new Date();const m=new Date(n);m.setHours(24,0,0,0);
-  const mins=Math.max(0,Math.ceil((m-n)/60000)),h=Math.floor(mins/60),mm=mins%60;
-  return `${h}H ${String(mm).padStart(2,"0")}M`;
-}
-function renderDaily(){
-  const missions=[
-    {icon:"⚡",name:"Сделай 50 тапов",sub:"В разделе «LAB»",key:"taps",goal:50},
-    {icon:"◉",name:"Оцени 3 боя",sub:"Выбирай победителей",key:"votes",goal:3},
-    {icon:"⚔",name:"Начни 2 быстрых боя",sub:"На Арене",key:"quick",goal:2},
-    {icon:"▲",name:"Подними рейтинг на 20",sub:"В рейтинговых боях",key:"scoreGain",goal:20},
-  ];
-  const done=missions.filter(m=>Number(daily[m.key]||0)>=m.goal).length;
-  $("dailyDone").textContent=done+" / "+missions.length;
-  $("dailyMissions").innerHTML=missions.map(m=>{
-    const v=Math.min(m.goal,Number(daily[m.key]||0)),ok=v>=m.goal;
-    return `<div class="missionRow ${ok?"done":""}"><div class="missionIcon">${ok?"✓":m.icon}</div><div class="missionText"><b>${m.name}</b><small>${m.sub}</small></div><div class="missionProgress">${v} / ${m.goal}</div></div>`;
-  }).join("");
-  $("dailyReset").textContent="Обновление · "+nextMidnightLabel();
-  const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
-  const ykey="mogg_daily_"+yesterday.toISOString().slice(0,10);
-  let streak=1;try{const y=JSON.parse(localStorage.getItem(ykey)||"{}");if(Object.values(y).some(v=>Number(v)>0))streak=2}catch{}
-  $("dailyStreak").textContent="🔥 "+streak+" DAY"+(streak===1?"":"S");
-}
-
-
-const maleRanks=["SUB3","SUB5","LLTN","LTN","HLTN","LMTN","MTN","HMTN","LHTN","HTN","HHTN","CHAD","GIGACHAD"];
-const femaleRanks=["SUB3","SUB5","LLTB","LTB","HLTB","LMTB","MTB","HMTB","LHTB","HTB","HHTB","STACY","TRUE STACY"];
-const cuts=[0,700,900,1100,1300,1500,1700,1900,2100,2350,2600,2900,3300];
-
-function rankIndex(score){let i=0;cuts.forEach((x,n)=>{if(score>=x)i=n});return i}
-function ranksFor(g){return g==="female"?["SUB3","SUB5","LLTB","LTB","HLTB","LMTB","MTB","HMTB","LHTB","HTB","HHTB","STACY","TRUE STACY"]:["SUB3","SUB5","LLTN","LTN","HLTN","LMTN","MTN","HMTN","LHTN","HTN","HHTN","CHAD","GIGACHAD"]}
-function rankFor(score,g){return (g==="female"?femaleRanks:maleRanks)[rankIndex(score)]}
-function nextCut(score){const i=rankIndex(score);return cuts[Math.min(i+1,cuts.length-1)]||3300}
-function initials(name){return (name||"?").trim().charAt(0).toUpperCase()||"?"}
-
-async function call(action,extra={}){
-  if(!tg?.initData)throw new Error("open_in_telegram");
-  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
-  try{
-    const r=await fetch(API,{
-      method:"POST",signal:controller.signal,
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({initData:tg.initData,action,...extra})
-    });
-    let d;try{d=await r.json();}catch{throw new Error("invalid_response");}
-    if(!r.ok||d.error){const e=new Error(d.error||"request_failed");e.data=d;throw e}
-    return d;
-  }catch(e){if(e.name==="AbortError")throw new Error("request_timeout");throw e;}
-  finally{clearTimeout(timer);}
-}
-let bootReady=false,bootBusy=false,refreshBusy=false;
-function showConnectionError(e){
-  const auth=["open_in_telegram","invalid_auth"].includes(e?.message);
-  $("connectionNotice").hidden=false;
-  $("connectionText").textContent=auth?"Открой игру заново через Telegram.":"Не удалось обновить данные. Проверь интернет и повтори.";
-  $("connectionRetry").hidden=auth;
-  $("connectionTelegram").hidden=!auth;
-  $("connectionTelegram").style.display=auth?"inline-block":"none";
-}
-$("connectionRetry").onclick=()=>bootReady?refresh():init();
-
-function avatarInto(el,p){
-  if(p?.profile_photo_url)el.innerHTML=`<img src="${p.profile_photo_url}" alt="">`;
-  else el.textContent=initials(p?.first_name||p?.username);
-}
-
-
-function visualKey(c){return String(c?.visual_key||c?.code||"").replace(/^(frame_|bg_|title_|intro_|victory_|score_|name_|react_)/,"").replace(/_/g,"")}
-function frameClass(c){return c?`cosmeticFrame frame-${visualKey(c)}`:""}
-function bgClass(c){return c?`bg-${visualKey(c)}`:""}
-function nameClass(c){return c?`name-${visualKey(c)}`:""}
-function scoreClass(c){return c?`score-${visualKey(c)}`:""}
-function clearCosmeticClasses(el,prefix){[...el.classList].filter(x=>x.startsWith(prefix)).forEach(x=>el.classList.remove(x))}
-function htmlText(value){return String(value??'').replace(/[&<>"']/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));}
-function cosmeticDescription(c){
-  const premium={prism:'Переливающийся контур.',chromeface:'Хромовая рамка с движущимся бликом.',celestial:'Мягкое свечение золотого контура.',marble:'Мрамор с медленно движущимся светом.',aurora:'Плавное движение цветного света.',contactsheet:'Контактный лист с проходящим бликом.',chrome:'Металлический перелив имени.',founder:'Титул с золотым переливом.',ogmogger:'Титул с хромовым переливом.',portal:'Световое вступление в бой.'};
-  if(Number(c.price_stars)>0&&premium[visualKey(c)])return premium[visualKey(c)];
-  return ({frame:'Рамка для фото.',profile_bg:'Фон профиля и карточки боя.',name_style:'Оформление имени.',title:'Подпись под именем.',score_style:'Стиль рейтинга.',battle_intro:'Надпись перед началом боя.',victory_card:'Карточка победы.',reaction:'Визуальная реакция.'})[c.kind]||'Косметический предмет.';
-}
-function showTryOn(id){
-  const c=state.shop.find(x=>x.id===id);if(!c)return;
-  $('tryTitle').textContent=c.name;
-  $('tryDescription').textContent=cosmeticDescription(c);
-  $('tryPreview').innerHTML=`<div class="tryCard">${previewHtml(c)}</div>`;
-  $('tryModal').classList.add('show');
-}
-$('tryClose').onclick=()=>$('tryModal').classList.remove('show');
-$('tryModal').onclick=e=>{if(e.target===$('tryModal'))$('tryModal').classList.remove('show')};
-function previewHtml(c){
-  const k=visualKey(c),kind=c.kind||"";
-  const avatar=`<div class="previewAvatar">${state.player?.profile_photo_url?`<img src="${htmlText(state.player.profile_photo_url)}" alt="Твоё фото" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">`:''}</div>`;
-  if(kind==="frame")return `<div class="cosmeticFrame frame-${k}" style="border-radius:50%;display:inline-block">${avatar}</div>`;
-  if(kind==="profile_bg")return `<div class="bg-${k}" style="padding:16px;width:100%;display:grid;place-items:center;border-radius:10px">${avatar}</div>`;
-  if(kind==="title")return `<div class="previewTitle cosmeticTitle title-${k}">${htmlText(c.name)}</div>`;
-  if(kind==="score_style")return `<div class="previewTitle score-${k}">3 300 Score</div>`;
-  if(kind==="name_style")return `<div class="previewTitle name-${k}">${htmlText(state.player?.first_name||"YOUR NAME")}</div>`;
-  if(kind==="battle_intro")return `<div class="previewTitle intro-${k}">⚔ ${htmlText(c.name)}</div>`;
-  if(kind==="victory_card")return `<div class="previewTitle">WIN · ${c.name}</div>`;
-  if(kind==="reaction")return `<div class="previewTitle">${htmlText(c.name)}</div>`;
-  return `<div class="previewTitle">${c.name}</div>`;
-}
-function equippedIdForKind(kind){
-  const p=state.player||{};return ({frame:p.equipped_frame,profile_bg:p.equipped_background,title:p.equipped_title,battle_intro:p.equipped_battle_intro,victory_card:p.equipped_victory_card,score_style:p.equipped_score_style,name_style:p.equipped_name_style,reaction:p.equipped_reaction})[kind]||null;
-}
-function kindLabel(k){return ({frame:"РАМКА",profile_bg:"ФОН",title:"ТИТУЛ",battle_intro:"ВСТУПЛЕНИЕ",victory_card:"КАРТОЧКА ПОБЕДЫ",score_style:"СТИЛЬ РЕЙТИНГА",name_style:"СТИЛЬ ИМЕНИ",reaction:"РЕАКЦИЯ"})[k]||k}
-
-function renderPlayer(){
-  const p=state.player;if(!p)return;
-  const score=Number(p.mogg_score||0), name=p.first_name||p.username||"Player", rank=rankFor(score,p.gender), st=p.style||{};
-  $("score").textContent=score.toLocaleString();$("homeScore").textContent=score.toLocaleString();$("bigScore").textContent=score.toLocaleString();
-  $("name").textContent=name;$("bigName").textContent=name;
-  $("name").className="name"+(st.name_style?" "+nameClass(st.name_style):"");$("bigName").className=st.name_style?nameClass(st.name_style):"";
-  $("homeScore").className=st.score_style?scoreClass(st.score_style):"";$("bigScore").className=st.score_style?scoreClass(st.score_style):"";
-  $("username").textContent=p.username?"@"+p.username:"";$("bigUsername").textContent=p.username?"@"+p.username:"";
-  $("rank").textContent=rank;$("bigRank").textContent=rank;
-  $("rank").classList.toggle("f",p.gender==="female");$("bigRank").classList.toggle("f",p.gender==="female");
-  avatarInto($("avatar"),p);avatarInto($("bigAvatar"),p);
-  [$("avatar"),$("bigAvatar")].forEach(el=>{clearCosmeticClasses(el,"frame-");el.classList.add("avatar");el.classList.toggle("cosmeticFrame",!!st.frame);if(st.frame)el.classList.add("frame-"+visualKey(st.frame));});
-  [$("homeProfileCard"),$("profileHero")].forEach(el=>{clearCosmeticClasses(el,"bg-");if(st.profile_bg)el.classList.add("bg-"+visualKey(st.profile_bg));});
-  const titleHtml=st.title?`<span class="cosmeticTitle title-${visualKey(st.title)}">${st.title.name}</span>`:"";$("homeTitle").innerHTML=titleHtml;$("profileTitle").innerHTML=titleHtml;
-  $("seasonPeak").textContent=Number(p.season_peak||0).toLocaleString();$("allPeak").textContent=Number(p.all_time_peak||0).toLocaleString();$("battleCount").textContent=p.battles_played||0;
-  const pts=Number(p.mogg_points||0);$("pointsBalance").textContent=pts.toLocaleString();$("tapPoints").textContent=pts.toLocaleString();$("shopPoints").textContent=pts.toLocaleString();
-  $("energy").textContent=p.energy??100;$("maxEnergy").textContent=p.max_energy??100;$("energyProgress").style.width=Math.max(0,Math.min(100,(Number(p.energy||0)/Number(p.max_energy||100))*100))+"%";
-  const n=nextCut(score), base=cuts[rankIndex(score)]||0;const pct=n===base?100:Math.max(0,Math.min(100,(score-base)/(n-base)*100));$("rankProgress").style.width=pct+"%";
-  $("genderState").textContent=p.gender==="female"?"FEMALE":"MALE";$("photoState").textContent=p.profile_photo_url?"✓":"MISSING";$("refCount").textContent=p.referral_count||0;
-  const idx=rankIndex(score), nextIdx=Math.min(idx+1,cuts.length-1), atMax=idx>=cuts.length-1;
-  $("nextRankName").textContent=atMax?rank:ranksFor(p.gender)[nextIdx];
-  $("nextRankNeed").textContent=atMax?"MAX RANK":Math.max(0,cuts[nextIdx]-score).toLocaleString()+" до следующего ранга";
-  $("nextRankProgress").style.width=pct+"%";
-  $("loopPhoto").classList.toggle("done",!!p.profile_photo_url);$("loopBattle").classList.toggle("done",Number(p.battles_played||0)>0);$("loopRank").classList.toggle("done",score>=700);
-  const statusNext=atMax?"ELITE STATUS":ranksFor(p.gender)[nextIdx];
-  $("statusPunchText").textContent=rank+" · "+score.toLocaleString()+" рейтинга";
-  $("statusPunchNext").textContent=atMax?"MAX RANK":statusNext+" →";
-  renderDaily();
-}
-
-function nameOf(p){return p?.first_name||p?.username||"Player"}
-function isOwnLiveBattle(b){
-  const me=state.player?.id;
-  return !!me && (b.player_a===me || b.player_b===me) && b.status==="active" && new Date(b.ends_at).getTime()>Date.now();
-}
-function battleTime(seconds){return seconds>=3600?Math.ceil(seconds/3600)+" ч":seconds>=60?Math.ceil(seconds/60)+" мин":seconds+" с"}
-function npcPractice(b){return !!(b.a?.is_npc||b.b?.is_npc)}
-function lastBattleHtml(){
-  const b=state.lastBattle;if(!b)return "";
-  const practice=npcPractice(b),mine=b.player_a===state.player?.id;
-  const delta=mine?b.score_delta_a:b.score_delta_b;
-  const title=b.result_reason==="insufficient_votes"?"Бой без результата":b.result_reason==="delivery_failed"?"Бой не начался":b.winner_id?(b.winner_id===state.player?.id?"Победа":"Поражение"):"Ничья";
-  const simulated=b.result_source==="simulation";
-  return `<div class="battleCard" style="margin-bottom:14px" aria-live="polite"><div class="row"><b>${title}</b><b>${delta>0?"+":""}${Number(delta||0)} Score</b></div><p class="muted">${htmlText(nameOf(b.a))} / ${htmlText(nameOf(b.b))}</p><small class="muted">${simulated?"Результат симуляции NPC — не оценка внешности":b.result_reason==="insufficient_votes"?"Мало голосов. Рейтинг не изменился. Можно снова искать бой.":b.result_reason==="pair_limit"?"Повторная пара за сутки · без изменения Score":Number(b.votes_a)+Number(b.votes_b)===0?"Рейтинг сохранён":"По голосам игроков"}</small></div>`;
-}
-
-function battleHtml(b){
-  const a=b.a||{}, bb=b.b||{}, sa=a.style||{}, sb=bb.style||{};
-  const sec=Math.ceil(Math.max(0,new Date(b.ends_at).getTime()-Date.now())/1000);
-  const face=(p,st)=>`<div class="face ${st.profile_bg?bgClass(st.profile_bg):""}"><div class="facePhoto ${st.frame?frameClass(st.frame):""}">${p.profile_photo_url?`<img src="${p.profile_photo_url}" alt="">`:initials(nameOf(p))}</div><b class="${st.name_style?nameClass(st.name_style):""}">${nameOf(p)}</b>${st.title?`<span class="cosmeticTitle">${st.title.name}</span>`:""}<small>${rankFor(Number(p.mogg_score||0),p.gender)} · <span class="${st.score_style?scoreClass(st.score_style):""}">${p.mogg_score||0}</span></small></div>`;
-  return `<div class="battleCard${isOwnLiveBattle(b)?" v8-own-battle":""}" data-battle="${b.id}"><div class="row"><span class="timer">${b.mode==="quick"?"QUICK":b.mode==="group"?"GROUP":b.is_promotion?"PROMOTION":"RANKED / LIVE"}</span><span class="timer battleTimer" data-ends="${b.ends_at}">${battleTime(sec)}</span></div><div class="battleFaces">${face(a,sa)}<div class="vs">VS</div>${face(bb,sb)}</div>${isOwnLiveBattle(b)?`<div class="ownBattleHint">${b.mode==="quick"?"Твой Quick · без изменения рейтинга":b.quorum_at?"Оценки собраны · идёт финальное голосование":"Твой Ranked ждёт оценки · максимум сутки"}</div>`:`<div class="voteBar"><button class="vote" data-side="a" data-id="${b.id}">ЗА ${htmlText(nameOf(a))}</button><button class="vote" data-side="b" data-id="${b.id}">ЗА ${htmlText(nameOf(bb))}</button></div><button class="skipBattle" data-id="${b.id}" style="display:block;margin:8px auto 0;background:none;border:0;color:var(--muted);font-size:12px">Пропустить</button>`}</div>`;
-}
-
-const sessionVotedBattles=new Set();
-const sessionSkippedBattles=new Set();
-let votePending=false;
-function renderFeed(){
-  const own=state.feed.find(isOwnLiveBattle);
-
-  const valid=state.feed.filter(b=>b.status==="active" && new Date(b.ends_at).getTime()>Date.now() && (isOwnLiveBattle(b)||(!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id)))).sort((a,b)=>Number(isOwnLiveBattle(b))-Number(isOwnLiveBattle(a)) || Number(npcPractice(a))-Number(npcPractice(b)));
-  $("feedCount").textContent=valid.length+" в ленте";
-  const choices=valid.filter(b=>!isOwnLiveBattle(b)&&!sessionVotedBattles.has(b.id)&&!sessionSkippedBattles.has(b.id));
-  $("homeFeed").innerHTML=choices.length?choices.slice(0,1).map(battleHtml).join(""):`<div class="emptyAction"><b>Пока нет новых пар</b><p class="muted">Новые пары появятся здесь. Пока можно вызвать друга в беседе.</p><button class="secondary revisitBattles">Посмотреть пропущенные</button></div>`;
-  const ownBattles=valid.filter(isOwnLiveBattle);
-  $("battleFeed").innerHTML=ownBattles.map(battleHtml).join("");
-  $("arenaOwnCard").hidden=!ownBattles.length;
-  $("feedCount").textContent=ownBattles.length?ownBattles.length+" активных":"";
-  document.querySelectorAll('.skipBattle').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.add(btn.dataset.id);renderFeed();});
-  document.querySelectorAll('.revisitBattles').forEach(btn=>btn.onclick=()=>{sessionSkippedBattles.clear();renderFeed();});
-  const result=lastBattleHtml();
-  $("arenaLastResult").innerHTML=result; $("arenaHistory").hidden=!result;
-  document.querySelectorAll(".vote").forEach(btn=>btn.addEventListener("click",()=>vote(btn.dataset.id,btn.dataset.side,btn)));document.querySelectorAll(".emptyBattleBtn").forEach(btn=>btn.onclick=()=>openView("battle"));
-}
-
-function renderDropInfo(){
-  const d=state.drops||{}, rates=d.rates||{};const av=d.available_tiers||[];
-  const labels={1:"SUB5",3:(state.player?.gender==="female"?"LTB":"LTN"),6:(state.player?.gender==="female"?"MTB":"MTN"),9:(state.player?.gender==="female"?"HTB":"HTN"),11:(state.player?.gender==="female"?"STACY":"CHAD"),12:(state.player?.gender==="female"?"TRUE STACY":"GIGACHAD")};
-  const dropScore={1:700,3:1100,6:1700,9:2350,11:2900,12:3300}; const milestones=d.milestones||[1,3,6,9,11,12]; const future=milestones.find(t=>t>Number(d.current_tier||0)); const score=Number(state.player?.mogg_score||0);
-  $("dropAvailable").textContent=av.length+" доступно";$("dropTier").textContent=d.next_tier?(labels[d.next_tier]||"DROP"):(future?"NEXT · "+labels[future]:"ALL CLAIMED");
-  $("dropBtn").disabled=!d.next_tier;$("dropBtn").textContent=d.next_tier?`Забрать награду ${labels[d.next_tier]||""}`:(future?`Доступно с ${labels[future]}`:"Все награды получены");
-  $("dropTitle").textContent=d.next_tier?`Ascension Drop · ${labels[d.next_tier]}`:(future?`Следующий Ascension Drop · ${labels[future]} · ${Math.max(0,(dropScore[future]||0)-score).toLocaleString()} до следующего ранга`:"Все награды за ранги получены");
-  $("dropRates").innerHTML=Object.entries(rates).filter(([k,v])=>Number(v)>0).map(([k,v])=>`<div class="rateChip"><b>${v}%</b><small>${k}</small></div>`).join("");
-}
-function renderShopFilters(){
-  const fs=[["all","ALL"],["frame","FRAMES"],["profile_bg","BACKGROUNDS"],["title","TITLES"],["effects","EFFECTS"],["exclusive","EXCLUSIVE"]];
-  $("shopFilters").innerHTML=fs.map(([k,n])=>`<button class="${state.shopFilter===k?"active":""}" data-filter="${k}">${n}</button>`).join("");
-  $("shopFilters").querySelectorAll("button").forEach(b=>b.onclick=()=>{state.shopFilter=b.dataset.filter;renderShop()});
-}
-let upgradeBusy=false;
-function farmStats(p){
-  const level=Math.max(0,Number(p.idle_level||0));
-  return {level,rate:level*6,cap:level*72,cost:Math.floor(250*Math.pow(1.72,level))};
-}
-function renderFarm(p){
-  const f=farmStats(p),points=Number(p.mogg_points||0);
-  $("farmRate").textContent=f.rate.toLocaleString();
-  $("farmBalance").textContent=points.toLocaleString();
-  const total=Math.max(0,Number(p.tap_power||1)-1)+Number(p.energy_level||0)+Number(p.recovery_level||0)+f.level;
-  const stage=total>=12?3:total>=6?2:total>=2?1:0;
-  const names=['Базовая лаборатория','Новый модуль','Продвинутая лаборатория','Полный комплект'];
-  $('studioLabel').textContent=names[stage];
-  $('studioGoal').textContent=stage===3?'Все облики открыты.':`До нового облика: ${[2,6,12][stage]-total} улучшений.`;
-  $('farmStage').setAttribute('role','img');
-  $('farmStage').setAttribute('aria-label',`${names[stage]}. Камера, фон, свет и рабочее место. Уровень генератора ${f.level}.`);
-  $("farmStage").innerHTML=`<div class="studioRoom stage-${stage}"><span class="studioTag">${String(stage+1).padStart(2,'0')} / 04</span><div class="studioFloor"></div><div class="studioBackdrop"></div><div class="studioLight ${total<2?'locked':''}"></div><div class="studioCamera"></div><div class="studioDesk"></div><div class="studioMonitor ${f.level===0?'locked':''}"></div><div class="studioBattery ${Number(p.energy_level||0)===0?'locked':''}"></div><div class="studioCharging ${Number(p.recovery_level||0)===0?'locked':''}">↯</div></div>`;
-  $("farmHint").textContent=f.level?`Генератор Points LV ${f.level} · +${f.level} Points каждые 10 минут. Офлайн: до ${f.cap} Points за 12 часов.`:'Генератор Points — 250 Points.';
-  $("farmProgress").style.width=Math.min(100,points/f.cost*100)+'%';
-  $("farmNext").textContent=points>=f.cost?'Хватает на следующий уровень генератора →':`До следующего уровня генератора: ${Math.max(0,f.cost-points).toLocaleString()} Points`;
-  $("effect-tap").textContent=`${Number(p.tap_power||1)} → ${Number(p.tap_power||1)+1} Points за нажатие`;
-  $("effect-energy").textContent=`Запас энергии: ${Number(p.max_energy||100)} → ${Number(p.max_energy||100)+10}`;
-  const rec=Number(p.recovery_level||0),secs=l=>Math.max(60,Math.round(180/(1+l*.1)));
-  $("effect-recovery").textContent=`1 энергия за ${secs(rec)} → ${secs(rec+1)} сек.`;
-  $("effect-idle").textContent=`${f.rate} → ${f.rate+6} Points / час · офлайн до 12 ч`;
-}
-function renderV7(){
-  const ph=$("prestigeHint"),pb=$("prestigeBtn");if(ph&&pb&&state.player){const p=state.player;const bonus=Math.min(20,2+Number(p.tap_power||1)+Number(p.energy_level||0)+Number(p.recovery_level||0)+Number(p.idle_level||0)*2);ph.textContent="Ежедневный бонус · +"+bonus+" Points";pb.disabled=false}
-  const p=state.player||{};renderFarm(p);
-  document.querySelectorAll('.upg').forEach(b=>{const k=b.dataset.kind;const lvl=k==='tap'?Math.max(0,Number(p.tap_power||1)-1):Number(p[k+'_level']||0);const cost=Math.floor(250*Math.pow(1.72,lvl));b.textContent=`Улучшить · ${cost.toLocaleString()} Points`;b.disabled=upgradeBusy||Number(p.mogg_points||0)<cost;});
-  const c=state.crew,box=$("crewContent");if(!box)return;
-  if(c)box.innerHTML=`<b class="crewTag">[${htmlText(c.tag)}] ${htmlText(c.name)}</b><p class="muted">Уровень ${c.level} · В копилке ${Number(c.treasury||0).toLocaleString()} Points</p><button id="crewDonate" class="secondary">Внести 500 Points</button>`;
-  else box.innerHTML=`<p class="muted">Создать команду — 5 000 Points.</p><input id="crewName" class="v7input" maxlength="24" placeholder="Название команды"><input id="crewTag" class="v7input" maxlength="5" placeholder="Короткий тег"><button id="createCrew" class="secondary">Создать · 5 000 Points</button>`;
-  $("createCrew")?.addEventListener("click",async()=>{try{await call("create_crew",{name:$("crewName").value,tag:$("crewTag").value});await refresh();toast("CREW CREATED")}catch(e){toast(String(e.message))}});
-  $("crewDonate")?.addEventListener("click",async()=>{try{await call("crew_contribute",{amount:500});await refresh();toast("+500 CREW")}catch(e){toast(String(e.message))}});
-}
-function renderShop(){
-  renderShopFilters();
-  const owned=new Set(state.inventory.map(x=>x.cosmetics?.id).filter(Boolean));
-  let items=(state.shop||[]).filter(c=>!["reaction","victory_card"].includes(c.kind)&&(c.is_purchasable||c.drop_enabled||Number(c.price_stars)>0||["top1","top10"].includes(c.collection)));
-  if(state.shopFilter==="effects")items=items.filter(c=>["battle_intro","victory_card","score_style","name_style","reaction"].includes(c.kind));
-  else if(state.shopFilter==="exclusive")items=items.filter(c=>c.price_stars>0||["top1","top10"].includes(c.collection)||c.limited_total);
-  else if(state.shopFilter!=="all")items=items.filter(c=>c.kind===state.shopFilter);
-  items=[...items].sort((a,b)=>Number(a.price_stars||a.price_points||0)-Number(b.price_stars||b.price_points||0));
-  const renderItem=c=>{
-    const isOwned=owned.has(c.id),stars=Number(c.price_stars||0),points=Number(c.price_points||0),exclusive=["top1","top10"].includes(c.collection);
-    let action="";
-    if(isOwned)action=`<div class="ownedTag">Есть ✓</div>`;
-    else if(stars>0)action=`<button class="secondary starBuy" data-id="${c.id}"><span class="priceStars">⭐ ${stars}</span></button>`;
-    else if(points>0&&c.is_purchasable)action=`<button class="secondary buy" data-id="${c.id}">Купить · ${points.toLocaleString()} Points</button>`;
-    else if(exclusive)action=`<div class="exclusiveTag">${c.collection==="top1"?"TOP 1 ONLY":"TOP 10 ONLY"}</div>`;
-    else action=`<div class="exclusiveTag">RANK / EVENT DROP</div>`;
-    return `<div class="item ${stars>0?"premiumItem":""}"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">${String(c.collection||"core").toUpperCase()}${c.limited_total?" · "+c.limited_total+" TOTAL":""}</div><div class="shopDescription">${cosmeticDescription(c)}</div><button class="secondary tryOn" data-id="${c.id}">ПРИМЕРИТЬ</button>${action}</div>`;
-  };
-  const pointsItems=items.filter(c=>!Number(c.price_stars)&&c.is_purchasable&&Number(c.price_points)>0);
-  const rewardItems=items.filter(c=>!Number(c.price_stars)&&!(c.is_purchasable&&Number(c.price_points)>0));
-  const starItems=items.filter(c=>Number(c.price_stars)>0);
-  const section=(title,list,cls='')=>list.length?`<section class="shopSection ${cls}"><h3>${title}</h3><div class="inventory">${list.map(renderItem).join('')}</div></section>`:'';
-  $("shop").innerHTML=section('За Points',pointsItems)+section('Награды',rewardItems)+section('За Stars',starItems,'starsSection')||'<p class="muted">В этой категории пока нет предметов.</p>';
-  document.querySelectorAll(".tryOn").forEach(b=>b.onclick=()=>showTryOn(b.dataset.id));
-  document.querySelectorAll(".buy").forEach(b=>b.onclick=()=>buyCosmetic(b.dataset.id));document.querySelectorAll(".starBuy").forEach(b=>b.onclick=()=>buyWithStars(b.dataset.id));
-}
-function renderInventory(){
-  $("inventoryCount").textContent=state.inventory.length+" ITEMS";
-  $("inventory").innerHTML=state.inventory.length?state.inventory.map(x=>{const c=x.cosmetics||{};const eq=equippedIdForKind(c.kind)===c.id;return `<div class="item"><div class="itemPreview">${previewHtml(c)}</div><div class="rarity ${c.rarity}">${String(c.rarity||"item").toUpperCase()}</div><b>${c.name||"Cosmetic"}</b><div class="muted">${kindLabel(c.kind)}</div><div class="sourceTag">SOURCE · ${String(x.source||"drop").toUpperCase()}</div><button class="secondary equip ${eq?"isEquipped":""}" ${["reaction","victory_card"].includes(c.kind)?"disabled":""} data-id="${c.id}">${["reaction","victory_card"].includes(c.kind)?"В разработке":eq?"СНЯТЬ":"НАДЕТЬ"}</button></div>`}).join(""):`<p class="muted">Пока пусто. Первый Ascension Drop откроется после SUB5.</p>`;
-  document.querySelectorAll(".equip").forEach(b=>b.onclick=()=>equip(b.dataset.id));
-}
-
-function openRankModal(){
-  const p=state.player;if(!p)return;
-  const score=Number(p.mogg_score||0);
-  const idx=rankIndex(score);
-  const ranks=p.gender==="female"?femaleRanks:maleRanks;
-  const current=ranks[idx];
-  const next=idx<cuts.length-1?cuts[idx+1]:null;
-  const base=cuts[idx]||0;
-  const pct=next===null?100:Math.max(0,Math.min(100,(score-base)/(next-base)*100));
-
-  $("modalRank").textContent=current;
-  $("modalScore").textContent=score.toLocaleString();
-  $("modalNeed").textContent=next===null?"MAX":Math.max(0,next-score).toLocaleString();
-  $("modalRankProgress").style.width=pct+"%";
-
-  $("rankLadder").innerHTML=ranks.map((r,i)=>{
-    const low=cuts[i];
-    const high=i<cuts.length-1?cuts[i+1]-1:"∞";
-    return `<div class="ladderRow ${i===idx?"current":""}">
-      <div class="dot"></div>
-      <div><b>${r}</b><br><span>${low.toLocaleString()}${high==="∞"?"+":" – "+Number(high).toLocaleString()} рейтинга</span></div>
-      <span>${i===idx?"YOU":i<idx?"✓":""}</span>
-    </div>`;
-  }).join("");
-
-  $("rankModal").classList.add("show");
-}
-
-async function init(){
-  if(bootBusy)return;bootBusy=true;
-  try{
-    const d=await call("me");
-    state.player=d.player;state.feed=d.feed||[];state.rankedQueue=d.ranked_queue||null;renderRankedQueue();state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.sponsors=d.sponsors||[];state.drops=d.drops||null;state.crew=d.crew||null;
-    renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
-
-    const start=tg?.initDataUnsafe?.start_param||"";
-    if(start.startsWith("ref_")){
-      const id=Number(start.slice(4));if(id)await call("apply_ref",{ref_telegram_id:id});
-    }
-
-    if(!state.player.gender || !state.player.profile_photo_url){
-      $("onboard").classList.add("show");
-      if(state.player.gender){state.gender=state.player.gender;$("genderStep").style.display="none";$("photoStep").style.display="block"}
-    }
-    bootReady=true;$("connectionNotice").hidden=true;
-  }catch(e){console.error(e);showConnectionError(e)}
-  finally{bootBusy=false;}
-}
-
-document.querySelectorAll(".gender").forEach(b=>b.addEventListener("click",async()=>{
-  try{
-    state.gender=b.dataset.g;
-    const d=await call("set_gender",{gender:state.gender});
-    state.player=d.player;renderPlayer();
-    $("genderStep").style.display="none";$("photoStep").style.display="block";
-  }catch(e){toast("Не удалось сохранить")}
-}));
-
-$("photoInput").addEventListener("change",()=>{
-  const f=$("photoInput").files?.[0];state.photoFile=f||null;
-  $("uploadBtn").disabled=!f;
-  if(f){$("preview").style.display="block";$("previewImg").src=URL.createObjectURL(f)}
-});
-
-async function uploadPhoto(){
-  const f=state.photoFile;if(!f)return;
-  if(f.size>5*1024*1024)return toast("Фото больше 5 MB");
-  $("uploadBtn").disabled=true;$("uploadBtn").textContent="UPLOADING...";
-  const reader=new FileReader();
-  reader.onload=async()=>{
-    try{
-      const base64=String(reader.result).split(",")[1];
-      const d=await call("upload_photo",{mime:f.type,base64});
-      state.player=d.player;renderPlayer();
-      $("onboard").classList.remove("show");
-      $("uploadBtn").textContent="СОХРАНИТЬ ФОТО";
-      toast("Профиль готов ✓");
-    }catch(e){toast("Ошибка загрузки");$("uploadBtn").disabled=false;$("uploadBtn").textContent="СОХРАНИТЬ ФОТО"}
-  };
-  reader.readAsDataURL(f);
-}
-$("uploadBtn").addEventListener("click",uploadPhoto);
-$("changePhotoBtn").addEventListener("click",()=>{state.photoFile=null;$("photoStep").style.display="block";$("genderStep").style.display="none";$("onboard").classList.add("show")});
-
-$("tapBtn").addEventListener("click",async(e)=>{
-  const btn=$("tapBtn");btn.classList.remove("tapHit");void btn.offsetWidth;btn.classList.add("tapHit");
-  try{const before=Number(state.player?.mogg_points||0);const d=await call("tap");state.player=d.player;bumpDaily("taps",1);renderPlayer();const gain=Math.max(1,Number(d.player?.mogg_points||0)-before);const r=btn.getBoundingClientRect(),f=document.createElement("div");f.className="tapFloat";f.textContent="+"+gain+" P";f.style.left=(r.left+r.width/2-18)+"px";f.style.top=(r.top+r.height/2-8)+"px";document.body.appendChild(f);setTimeout(()=>f.remove(),750);tg?.HapticFeedback?.impactOccurred("light")}
-  catch(e){toast(String(e.message).includes("no_energy")?"Нет энергии":"Ошибка")}
-});
-
-$("openChannel").addEventListener("click",(e)=>{if(tg?.openTelegramLink){e.preventDefault();tg.openTelegramLink("https://t.me/+QZ86AoSdXBJlMDIy");}});
-
-
-let wheelBusy=false,wheelAngle=0,wheelOpener=null,wheelScroll="";
-function prizeText(p){
- if(p.cosmetic_name)return "Твой приз: "+p.cosmetic_name;
- const reward=[p.points?("+"+p.points+" Points"):"",p.energy?("+"+p.energy+" энергии"):""].filter(Boolean).join(" · ");
- return reward+(p.fallback?" · все предметы этого вида уже открыты":p.energy_overflow?" · включая компенсацию энергии":"");
-}
-function wheelTarget(slot){return (360-(slot*30+15))%360;}
-function positionWheel(p,animate){
- if(Number(p?.version)!==2 || !Number.isInteger(Number(p.slot)) || Number(p.slot)<0 || Number(p.slot)>11)return false;
- const target=wheelTarget(Number(p.slot));
- wheelAngle=animate?wheelAngle+1440+((target-wheelAngle%360+360)%360):target;
- const transition=animate?"transform 2.6s cubic-bezier(.16,.7,.2,1)":"none";
- $("spinDisc").style.transition=transition;
- $("spinDisc").style.transform="rotate("+wheelAngle+"deg)";
- $("spinDisc").querySelectorAll(".spinLabel").forEach(el=>{
-   el.style.transition=transition;
-   el.style.transform="translate(-50%,-50%) rotate("+(-wheelAngle)+"deg)";
- });
- return true;
-}
-function closeWheel(){
- if(wheelBusy)return;
- $("dailyWheel").hidden=true;document.body.style.overflow=wheelScroll;wheelOpener?.focus();
-}
-$("appDailyBtn").onclick=async()=>{
- if(!$("dailyWheel").hidden)return;
- wheelOpener=document.activeElement;wheelScroll=document.body.style.overflow;document.body.style.overflow="hidden";
- $("dailyWheel").hidden=false;$("spinClose").focus();$("spinResult").textContent="Проверяем доступность…";$("spinRun").disabled=true;
- $("spinRun").textContent="КРУТИТЬ БЕСПЛАТНО";
- try{
-  const d=await call("daily_spin_status");$("spinRun").disabled=d.claimed;
-  $("spinRun").textContent=d.claimed?"НА СЕГОДНЯ ПОЛУЧЕНО":"КРУТИТЬ БЕСПЛАТНО";
-  $("spinResult").textContent=d.claimed?(d.prize?prizeText(d.prize):"Бонус сегодня уже получен"):"От 50 до 400 Points, энергия или косметика";
-  if(d.claimed && d.prize)positionWheel(d.prize,false);
- }catch(e){$("spinResult").textContent="Не удалось проверить. Закрой и открой колесо ещё раз.";}
-};
-$("spinClose").onclick=closeWheel;
-$("dailyWheel").addEventListener("keydown",e=>{
- if(e.key==="Escape"){e.preventDefault();closeWheel();}
- if(e.key==="Tab"){
-  const all=[...$("dailyWheel").querySelectorAll("button:not(:disabled),summary")];
-  const first=all[0],last=all[all.length-1];
-  if(e.shiftKey && document.activeElement===first){e.preventDefault();last?.focus();}
-  else if(!e.shiftKey && document.activeElement===last){e.preventDefault();first?.focus();}
- }
-});
-$("spinRun").onclick=async()=>{
- if(wheelBusy || $("spinRun").disabled)return;
- wheelBusy=true;$("spinRun").disabled=true;$("spinClose").disabled=true;$("spinResult").textContent="Получаем результат…";
- let awarded=false;
- try{
-  const d=await call("daily_spin_v2"),p=d.prize;
-  if(!p)throw new Error("missing_prize");
-  awarded=true;
-  const animate=!d.replayed && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(positionWheel(p,animate) && animate)await new Promise(r=>setTimeout(r,2700));
-  $("spinResult").textContent=prizeText(p)+(d.replayed?" · получено сегодня":"");
-  $("spinRun").textContent="НА СЕГОДНЯ ПОЛУЧЕНО";
-  try{await refresh();}catch(e){$("spinResult").textContent+=" · баланс обновится при следующем входе";}
- }catch(e){
-  const claimed=String(e.message).includes("already_claimed");
-  $("spinResult").textContent=claimed?"Бонус сегодня уже получен. Новый спин — в 03:00 МСК.":"Не удалось получить результат. Повтори — двойного начисления не будет.";
-  $("spinRun").disabled=awarded||claimed;
-  $("spinRun").textContent=claimed?"НА СЕГОДНЯ ПОЛУЧЕНО":"ПОВТОРИТЬ";
- }finally{wheelBusy=false;$("spinClose").disabled=false;$("spinClose").focus();}
-};
-
-
-function showBattleIntro(mode){
-  const style=state.player?.style?.battle_intro;
-  $("introTitle").textContent=style?.name|| (mode==="ranked"?"RANKED LOCK":"QUICK SCAN");
-  $("introSub").textContent=mode==="ranked"?"MATCH FOUND · SCORE ON THE LINE":"MATCH FOUND · ZERO SCORE RISK";
-  $("introOverlay").className="introOverlay show"+(style?" intro-"+visualKey(style):"");
-  tg?.HapticFeedback?.impactOccurred("medium");
-  return new Promise(resolve=>setTimeout(()=>{$("introOverlay").classList.remove("show");resolve()},1150));
-}
-
-let matchSearchTimer=null,matchSearchUntil=0;
-async function startMatchmaking(mode,retry=false){
-  clearTimeout(matchSearchTimer);
-  if(!retry)matchSearchUntil=Date.now()+120000;
-  const ranked=$("rankedBtn"),quick=$("quickBtn");
-  if(ranked.disabled||quick.disabled)return;
-  const active=state.feed.find(b=>isOwnLiveBattle(b)&&(b.mode==="quick")===(mode==="quick"));
-  if(active){
-    const label=active.mode==='quick'?'QUICK':active.mode==='group'?'GROUP':'RANKED';
-    $("matchStatus").textContent=`У тебя уже идёт ${label}. Новый бой доступен после завершения.`;
-    toast(`Сначала заверши текущий ${label}`);
-    openView('battle');renderFeed();return;
-  }
-  ranked.disabled=true;quick.disabled=true;
-  $("matchStatus").textContent=mode==="ranked"?"Ищем рейтингового соперника...":"Ищем быстрый баттл...";
-  try{
-    const d=await call("open_matchmaking",{mode});
-    if(d.votes_required){$("matchStatus").textContent="Оцени ещё "+d.votes_required+" чужих боя перед Ranked. Quick доступен сразу.";openView("home");toast("Сначала оцени чужие бои: осталось "+d.votes_required);return;}
-    const actualMode=d.battle?.mode||d.mode||mode;
-    if(d.existing){
-      const label=actualMode==='quick'?'QUICK':actualMode==='group'?'GROUP':'RANKED';
-      $("matchStatus").textContent=`У тебя уже идёт ${label}. Дождись завершения, чтобы начать новый бой.`;
-      toast(`Уже идёт ${label} — открываю текущий бой`);
-      if(d.battle){state.feed=[d.battle,...state.feed.filter(b=>b.id!==d.battle.id)];renderFeed();}
-      openView("battle");
-      return;
-    }
-    if(d.matched){
-      if(actualMode==='quick')bumpDaily('quick',1);
-      $("matchStatus").textContent=actualMode!=="quick"?"RANKED найден. Баттл запущен!":"QUICK найден. Баттл запущен!";
-      toast(npcPractice(d.battle||{})?"Бой найден":actualMode!=="quick"?"RANKED MATCH ⚔":"QUICK MATCH ⚡");
-      if(d.battle){state.feed=[d.battle,...state.feed.filter(b=>b.id!==d.battle.id)];renderFeed();}
-      if(!npcPractice(d.battle||{}))await showBattleIntro(actualMode);
-      openView("battle");
-      await refresh();
-    }else{
-      $("matchStatus").textContent=mode==="ranked"?"Ты в Ranked очереди. Ждём соперника.":"Ты в Quick очереди. Ждём соперника.";
-      if(!retry)toast("Поиск запущен");
-      if(mode==="ranked"){state.rankedQueue=d.request;renderRankedQueue();$("matchStatus").textContent="Заявка принята";}
-      else if(Date.now()<matchSearchUntil)matchSearchTimer=setTimeout(()=>startMatchmaking(mode,true),3000);
-      else $("matchStatus").textContent="Пока нет соперника. Попробуй Quick или повтори поиск позже.";
-    }
-  }catch(e){
-    $("matchStatus").textContent="";
-    if(e.message==="photo_required"||e.message==="onboarding_required")toast("Сначала загрузи фото и заверши профиль");
-    else if(e.message==="votes_required"){toast("Оцени 3 чужих боя перед следующим Ranked");openView("home");}
-    else { console.error("matchmaking",e); toast("Ошибка поиска: "+String(e.message||"unknown")); }
-  }finally{ranked.disabled=false;quick.disabled=false}
-}
-$("rankedBtn").addEventListener("click",()=>startMatchmaking("ranked"));
-document.querySelectorAll('.upg').forEach(b=>b.addEventListener('click',async()=>{
-  if(upgradeBusy)return;upgradeBusy=true;renderV7();
-  try{const d=await call('buy_upgrade',{kind:b.dataset.kind});state.player=d.player;renderPlayer();renderV7();toast('Улучшение построено');}
-  catch(e){toast(e.message==='not_enough_points'?'Не хватает Points': 'Не удалось улучшить: '+String(e.message));}
-  finally{upgradeBusy=false;renderV7();}
-}));
-$("prestigeBtn")?.addEventListener("click",async()=>{try{const d=await call("claim_prestige");state.player=d.player;renderPlayer();renderV7();toast("Бонус Points получен")}catch(e){if(e.message==="already_claimed")toast("Prestige уже получен сегодня");else if(e.message==="prestige_score_cap")toast("Дальше рейтинг растёт в боях.");else toast(String(e.message))}});
-$("quickBtn").addEventListener("click",()=>startMatchmaking("quick"));
-
-async function vote(id,side,btn){
-  if(votePending)return;
-  votePending=true;
-  btn.disabled=true;
-  try{
-    const d=await call("vote",{battle_id:id,side});
-    document.querySelectorAll(`[data-id="${id}"]`).forEach(x=>x.disabled=true);
-    btn.classList.add("selected");sessionVotedBattles.add(id);bumpDaily("votes",1);toast("Голос принят ✓");await new Promise(resolve=>setTimeout(resolve,650));await refresh();
-  }catch(e){
-    if(e.message==="already_voted"){sessionVotedBattles.add(id);toast("Ты уже голосовал");renderFeed();}
-    else if(e.message==="fighters_cannot_vote")toast("Участники не голосуют за себя");
-    else toast("Баттл закрыт");
-  }finally{votePending=false;if(btn.isConnected)btn.disabled=false;}
-}
-
-async function buyCosmetic(id){
-  try{
-    const d=await call("buy_cosmetic",{cosmetic_id:id});
-    state.player=d.player;renderPlayer();toast("Предмет куплен ✓");await refresh();
-  }catch(e){
-    if(String(e.message).includes("not_enough_points"))toast("Недостаточно Points");
-    else if(String(e.message).includes("already_owned"))toast("Уже в коллекции");
-    else toast("Не удалось купить");
-  }
-}
-
-async function equip(id){
-  try{const d=await call("equip",{cosmetic_id:id});toast(d.equipped?"Оформление применено ✓":"Оформление снято");await refresh()}
-  catch(e){console.error(e);toast("Не удалось применить: "+String(e.message||"error"))}
-}
-async function buyWithStars(id){
-  try{
-    if(!tg?.openInvoice)return toast("Покупка за Stars доступна внутри Telegram");
-    const d=await call("create_star_invoice",{cosmetic_id:id});
-    tg.openInvoice(d.invoice_url,async status=>{if(status==="paid"){toast("Оплата прошла ⭐");setTimeout(refresh,1000)}else if(status==="failed")toast("Платёж не прошёл")});
-  }catch(e){if(e.message==="already_owned")toast("Уже в коллекции");else if(e.message==="sold_out")toast("Предмет распродан");else toast("Не удалось открыть Stars оплату")}
-}
-
-function animateDrop(result){
-  const pool=(state.shop||[]).filter(c=>c.drop_enabled&&!['stars','top1','top10'].includes(c.collection));const reel=[];
-  for(let i=0;i<34;i++)reel.push(pool[Math.floor(Math.random()*pool.length)]||result);reel[29]=result;
-  $("caseReel").innerHTML=reel.map(c=>`<div class="caseItem"><div class="rarity ${c.rarity}">${String(c.rarity).toUpperCase()}</div><b>${c.name}</b><small>${kindLabel(c.kind)}</small></div>`).join("");
-  $("caseReveal").classList.remove("show");$("caseClose").classList.remove("show");$("caseSheet").className="caseSheet";$("caseModal").classList.add("show");
-  const itemW=100,target=29*itemW;$("caseReel").style.transition="none";$("caseReel").style.transform="translateX(0px)";
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{$("caseReel").style.transition="transform 4.6s cubic-bezier(.08,.68,.09,1)";$("caseReel").style.transform=`translateX(-${target}px)`;}));
-  setTimeout(()=>{tg?.HapticFeedback?.notificationOccurred("success");$("caseRarity").className="rarity "+result.rarity;$("caseRarity").textContent=String(result.rarity).toUpperCase();$("caseName").textContent=result.name;$("caseKind").textContent=kindLabel(result.kind)+" · permanently added to Inventory";$("caseReveal").classList.add("show");$("caseClose").classList.add("show");$("caseSheet").classList.add(result.rarity);},4750);
-}
-$("caseClose").onclick=()=>{$("caseModal").classList.remove("show");refresh()};
-$("dropBtn").addEventListener("click",async()=>{
-  $("dropBtn").disabled=true;
-  try{const d=await call("open_drop");const c=d.drop?.cosmetics;if(!c)throw new Error("drop_missing");if(d.replayed){toast("Эта награда уже получена");await refresh();$("dropBtn").disabled=false;}else if(Number(d.compensation)>0){toast("Предмет уже есть · +"+Number(d.compensation)+" Points");await refresh();$("dropBtn").disabled=false;}else animateDrop(c)}
-  catch(e){if(e.message==="no_drop_available")toast("Первый drop после SUB5");else if(e.message==="all_rank_drops_claimed")toast("Все доступные drops уже получены");else toast("Drop error: "+String(e.message||"unknown"));$("dropBtn").disabled=false}
-});
-
-
-let lastKnownScore=null;
-let lastResultShare="";
-function maybeShowScoreResult(newScore,gender){
-  if(lastKnownScore===null){lastKnownScore=newScore;return}
-  const oldScore=lastKnownScore,diff=newScore-oldScore;
-  if(diff!==0){
-    const oldRank=rankFor(oldScore,gender),newRank=rankFor(newScore,gender),rankUp=oldRank!==newRank&&diff>0;
-    if(diff>0)bumpDaily("scoreGain",diff);
-    $("resultHeadline").textContent=rankUp?"RANK UP":"SCORE UPDATED";
-    $("resultScore").textContent=(diff>0?"+":"")+diff;
-    $("resultScore").style.color=diff>0?"var(--good)":"var(--bad)";
-    $("resultRank").textContent=rankUp?oldRank+" → "+newRank:newRank+" · "+newScore.toLocaleString()+" Score";
-    $("resultScore").classList.toggle("rankUpBurst",rankUp);
-    lastResultShare=`${rankUp?"RANK UP · "+newRank:"MOGG BATTLE · "+(diff>0?"+":"")+diff+" SCORE"}\n${newScore.toLocaleString()} Score`;
-    $("resultFlash").classList.add("show");
-    tg?.HapticFeedback?.notificationOccurred(diff>0?"success":"warning");
-  }
-  lastKnownScore=newScore;
-}
-$("resultClose").onclick=()=>$("resultFlash").classList.remove("show");
-
-async function refresh(){
-  if(!bootReady||refreshBusy)return;refreshBusy=true;
-  try{
-    const d=await call("me");state.player=d.player;maybeShowScoreResult(Number(d.player?.mogg_score||0),d.player?.gender);state.feed=d.feed||[];state.rankedQueue=d.ranked_queue||null;renderRankedQueue();state.lastBattle=d.last_battle||null;state.inventory=d.inventory||[];state.shop=d.shop||[];state.drops=d.drops||null;state.crew=d.crew||null;renderPlayer();renderFeed();renderDropInfo();renderShop();renderInventory();renderV7();
-    $("connectionNotice").hidden=true;
-  }catch(e){showConnectionError(e)}
-  finally{refreshBusy=false;}
-}
-
-
-function shareTelegram(text){
-  const inviter=String(state.player?.telegram_id||tg?.initDataUnsafe?.user?.id||"");
-  const url=/^[1-9]\d*$/.test(inviter)
-    ? "https://t.me/MoggBattleGameBot?startapp=ref_"+inviter
-    : "https://t.me/MoggBattleGameBot?startapp";
-  const share="https://t.me/share/url?url="+encodeURIComponent(url)+"&text="+encodeURIComponent(text);
-  if(tg?.openTelegramLink)tg.openTelegramLink(share);else window.open(share,"_blank");
-}
-function profileShareText(){
-  const p=state.player||{},score=Number(p.mogg_score||0),rank=rankFor(score,p.gender);
-  return `${p.first_name||p.username||"Player"} · ${rank}\n${score.toLocaleString()} Score\nСможешь могнуть меня? 😈`;
-}
-
-function openView(view){if(view==="battle")view="home";document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===view));document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));$(view+"View")?.classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
-document.querySelectorAll(".nav button").forEach(btn=>btn.addEventListener("click",()=>openView(btn.dataset.view)));
-
-// Dock feedback is decorative only; navigation continues through openView.
-document.querySelectorAll(".nav button").forEach(btn=>{
- btn.addEventListener("click",()=>{
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
-  btn.querySelector(".navPulse")?.remove();
-  const pulse=document.createElement("span");
-  pulse.className="navPulse";pulse.setAttribute("aria-hidden","true");
-  btn.appendChild(pulse);setTimeout(()=>pulse.remove(),550);
-  const icon=btn.querySelector("svg");
-  if(icon?.animate)icon.animate([
-   {transform:"translateY(0) scale(1)"},
-   {transform:"translateY(-5px) scale(1.16)",offset:.45},
-   {transform:"translateY(-2px) scale(1)"}
-  ],{duration:360,easing:"ease-out"});
- });
-});
-
-
-$("shareProfileBtn").onclick=()=>shareTelegram(profileShareText());
-$("resultShare").onclick=()=>shareTelegram(lastResultShare||profileShareText());
-
-
-$("rank").addEventListener("click",openRankModal);
-$("bigRank").addEventListener("click",openRankModal);
-$("closeRankModal").addEventListener("click",()=>$("rankModal").classList.remove("show"));
-$("rankModal").addEventListener("click",(e)=>{if(e.target===$("rankModal"))$("rankModal").classList.remove("show")});
-
-const guideSteps=[
-{tag:'01 · БАТЛЫ',title:'Выбирай победителей. Участвуй сам.',lead:'На главной голосуй за чужие фото. На Арене запускай свой матч.',detail:'<b>Быстрый</b> — без изменения рейтинга.<br><b>Рейтинговый</b> — победы поднимают ранг. После заявки можно выйти: поиск продолжится.<details class="guideRules"><summary>Правила боя и рейтинга</summary><p><b>Quick</b> — результат не меняет Score.<br><b>Ranked</b> — победа повышает Score, поражение может его снизить.<br>Свои бои — на Арене. Выбери режим боя.<br><br>В игре есть NPC-соперники; голосуют только игроки. Правила рейтинга одинаковы для всех соперников. При равном рейтинге — +24 победителю и −24 проигравшему, диапазон изменения 8–40; Score не опускается ниже нуля. Одна и та же пара меняет рейтинг только один раз за сутки UTC.<br><br>Ranked ждёт минимум 5 оценок, затем ещё 10 минут. Максимальная длительность — 24 часа. Если оценок не хватило, рейтинг сохраняется и можно снова искать бой. Ничья не меняет Score.<br><br>Первый рейтинговый бой доступен сразу; перед следующим оцени 3 чужих боя. Если доступных пар нет, ограничение снимается. Пропуск оценкой не считается.</p></details>'},
-{tag:'02 · POINTS',title:'LAB — твои игровые ресурсы.',lead:'Нажимай в LAB, голосуй и забирай ежедневные бонусы, чтобы получать Points.',detail:'Улучшения LAB дают больше Points за нажатие, энергии или пассивного дохода. Генератор учитывает до 12 часов офлайн.<br><br>Трать Points на модули и косметику. Они не повышают рейтинг и не являются токенами.'},
-{tag:'03 · MOGG И ДРУЗЬЯ',title:'Играй с друзьями в беседе.',lead:'Добавь бота и ответь на сообщение друга командой /battle. Друг принимает вызов — остальные выбирают победителя.',detail:'<b>Что с MOGG?</b><br>Токен проекта существует в TON. Выплаты за игру и обмен Points пока не запущены. Подключение кошелька само по себе токены не начисляет.'}
-];
-let guideIndex=0,guideReturnFocus=null;
-function renderGuide(){
- const s=guideSteps[guideIndex];
- $('guideProgress').innerHTML=guideSteps.map((_,i)=>`<i class="${i<=guideIndex?'active':''}"></i>`).join('');
- $('guideProgress').setAttribute('aria-label',`Шаг ${guideIndex+1} из ${guideSteps.length}`);
- $('guideBody').innerHTML=`<div class="guideStep">${s.tag}</div><h2 id="guideTitle">${s.title}</h2><p class="guideLead">${s.lead}</p><div class="guideDetail">${s.detail}</div>`;
- $('guideBack').disabled=guideIndex===0;
- $('guideNext').textContent=guideIndex===guideSteps.length-1?'Перейти к боям':'Далее';
- $('guideFarm').style.display=guideIndex===guideSteps.length-1?'block':'none';
-}
-function closeGuide(){ $('guideModal').classList.remove('show');guideReturnFocus?.focus(); }
-$('guideBtn').onclick=()=>{guideReturnFocus=document.activeElement;guideIndex=0;renderGuide();$('guideModal').classList.add('show');$('guideClose').focus()};
-$('guideClose').onclick=closeGuide;
-$('guideBack').onclick=()=>{if(guideIndex>0){guideIndex--;renderGuide()}};
-$('guideNext').onclick=()=>{if(guideIndex<guideSteps.length-1){guideIndex++;renderGuide()}else{closeGuide();openView('battle')}};
-$('guideFarm').onclick=()=>{closeGuide();openView('tap')};
-$('guideModal').onclick=e=>{if(e.target===$('guideModal'))closeGuide()};
-$('guideModal').addEventListener('keydown',e=>{
- if(e.key==='Escape'){e.preventDefault();closeGuide()}
- if(e.key==='Tab'){
-  const buttons=[$('guideClose'),$('guideBack'),$('guideNext'),$('guideFarm')].filter(b=>!b.disabled&&b.style.display!=='none');
-  const first=buttons[0],last=buttons[buttons.length-1];
-  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
-  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
- }
-});
-
-let reviewAvailable=false,reviewBusy=false;
-function updateReviewButton(){ $('reviewRun').disabled=!reviewAvailable||reviewBusy||!$('reviewConsent').checked; }
-$('reviewConsent').onchange=updateReviewButton;
-$('reviewOpen').onclick=async()=>{
- $('reviewPanel').hidden=false;$('reviewStatus').textContent='Проверяем доступность…';
- try{const d=await call('photo_review_status');reviewAvailable=!!d.available;$('reviewStatus').textContent=reviewAvailable?'Готово. Для анализа используется текущее фото профиля.':'ИИ-разбор ещё не подключён. Скоро здесь появится анализ твоего снимка.';}
- catch{reviewAvailable=false;$('reviewStatus').textContent='Не удалось проверить сервис. Попробуй позже.';}
- updateReviewButton();
-};
-function renderPhotoReview(r){
- $('reviewResult').innerHTML=`<p class="guideLead">${htmlText(r.summary)}</p>`+(r.usable?(r.criteria.map(c=>`<div class="reviewMetric"><b>${htmlText(c.label)} · ${Number(c.score)}/5</b><p>${htmlText(c.note)}</p></div>`).join('')+`<h3>Попробуй в следующем фото</h3><ol class="reviewTips">${r.tips.map(t=>`<li>${htmlText(t)}</li>`).join('')}</ol>`):'');
-}
-$('reviewRun').onclick=async()=>{
- if(reviewBusy||!reviewAvailable||!$('reviewConsent').checked)return;
- reviewBusy=true;updateReviewButton();$('reviewResult').textContent='';$('reviewStatus').textContent='Анализируем снимок…';
- const originalPhoto=state.player?.profile_photo_url;
- try{const d=await call('photo_review',{consent:true});if(originalPhoto!==state.player?.profile_photo_url){$('reviewStatus').textContent='Фото изменилось. Запусти разбор нового снимка.';return;}renderPhotoReview(d.review);$('reviewStatus').textContent='Разбор готов. Это рекомендации по фото, не оценка красоты.';}
- catch(e){const messages={review_daily_limit:'Лимит анализов на сегодня исчерпан. Попробуй завтра.',review_unavailable:'ИИ-разбор пока недоступен.',photo_required:'Сначала добавь фото профиля.',review_photo_unsupported:'Загрузи фото заново через профиль.',review_service_error:'Сервис не завершил анализ. Попробуй позже.'};$('reviewStatus').textContent=messages[e.message]||'Не удалось получить разбор. Попробуй позже.';}
- finally{reviewBusy=false;$('reviewConsent').checked=false;updateReviewButton();}
-};
-
-setInterval(()=>{
- document.querySelectorAll('.battleTimer').forEach(el=>{const left=Math.max(0,Math.ceil((new Date(el.dataset.ends).getTime()-Date.now())/1000));el.textContent=left?battleTime(left):'Подводим итог…';});
-},1000);
-setInterval(refresh,15000);
-initTonConnect();
-init();
-</script>
-<script>
-(()=>{
-const open=document.getElementById("supportOpen"),dialog=document.getElementById("supportDialog"),close=document.getElementById("supportClose");
-open.addEventListener("click",()=>{if(!dialog.open)dialog.showModal();});
-close.addEventListener("click",()=>dialog.close());
-dialog.addEventListener("click",e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close();}});
-dialog.addEventListener("close",()=>open.focus());
-})();
-
-let supportRequestKey=null;
-document.getElementById("supportForm").addEventListener("input",()=>{supportRequestKey=null});
-document.getElementById("supportForm").addEventListener("submit",async e=>{
- e.preventDefault();const button=document.getElementById("supportSubmit"),feedback=document.getElementById("supportFeedback");
- if(button.disabled)return;
- const message=document.getElementById("supportMessage").value.trim(),category=document.getElementById("supportCategory").value;
- if(message.length<5){feedback.textContent="Добавь описание: минимум 5 символов.";return;}
- supportRequestKey=supportRequestKey||crypto.randomUUID();button.disabled=true;
- const fields=[document.getElementById("supportMessage"),document.getElementById("supportCategory")];fields.forEach(x=>x.disabled=true);
- feedback.textContent="Отправляем…";
- try{const d=await call("support_submit",{request_key:supportRequestKey,category,message});
- feedback.textContent="Обращение №"+d.request.id.slice(0,8)+" принято. Статус — в «Мои обращения».";
- document.getElementById("supportMessage").value="";supportRequestKey=null;
- }catch(err){feedback.textContent=String(err.message||err).includes("support_daily_limit")?"До 5 обращений за 24 часа. Срочный вопрос: mogglabs@gmail.com.":"Не удалось подтвердить отправку. Нажми ещё раз — повтор не создаст дубль.";}
- finally{button.disabled=false;fields.forEach(x=>x.disabled=false);}
-});
-document.getElementById("supportHistory").addEventListener("click",async()=>{
- const box=document.getElementById("supportHistoryList");box.textContent="Загружаем…";
- try{const d=await call("support_list");box.replaceChildren();
- if(!d.requests.length){box.textContent="Пока нет обращений.";return;}
- const labels={open:"Принято",in_progress:"В работе",resolved:"Закрыто"};
- for(const r of d.requests){const p=document.createElement("p");p.textContent="№"+r.id.slice(0,8)+" · "+(labels[r.status]||r.status)+(r.response?" — "+r.response:"");box.appendChild(p);}
- }catch{box.textContent="Не удалось загрузить. Попробуй ещё раз.";}
-});
-</script>
-<script>
-let pendingPhotoDeletion=null;
-document.getElementById("deleteOwnPhoto").addEventListener("click",async()=>{
- const btn=document.getElementById("deleteOwnPhoto"),out=document.getElementById("deletePhotoStatus");
- const url=pendingPhotoDeletion||state.player?.profile_photo_url;
- if(btn.disabled)return;
- if(!url){out.textContent="В профиле нет фото.";return;}
- if(!pendingPhotoDeletion&&!window.confirm("Удалить текущее фото? Для новых боёв понадобится загрузить другое. Очки и аккаунт сохранятся."))return;
- pendingPhotoDeletion=url;btn.disabled=true;out.textContent="Удаляем…";
- try{const d=await call("delete_photo",{photo_url:url});
- if(state.player?.profile_photo_url===url){state.player.profile_photo_url=null;state.player.onboarding_completed=false;renderPlayer();}
- if(d.storage_removed){pendingPhotoDeletion=null;out.textContent="Текущее фото удалено. Кэш уже открытых страниц может обновиться не сразу.";}
- else out.textContent="Фото скрыто из профиля. Удаление файла ещё не подтверждено — нажми повторно.";
- }catch(e){out.textContent=String(e.message).includes("photo_changed")?"Фото изменилось. Обнови приложение и повтори.":"Удаление не подтверждено. Повтори или отправь обращение в помощь.";if(String(e.message).includes("photo_changed"))pendingPhotoDeletion=null;}
- finally{btn.disabled=false;}
-});
-</script><script>
-function renderRankedQueue(){
- const active=(state.feed||[]).some(b=>isOwnLiveBattle(b)&&b.mode!=="quick");
- const q=state.rankedQueue,panel=$("rankedQueuePanel");
- panel.hidden=active||!q||new Date(q.expires_at).getTime()<=Date.now();
- if(!panel.hidden)$("rankedQueueText").textContent= "Ищем соперника до "+new Date(q.expires_at).toLocaleString("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})+". Можно выйти — поиск продолжится.";
-}
-$("cancelRankedQueue").addEventListener("click",async()=>{
- const b=$("cancelRankedQueue");b.disabled=true;
- try{await call("cancel_ranked");state.rankedQueue=null;renderRankedQueue();$("matchStatus").textContent="Заявка снята. Уже начавшийся бой не отменяется.";await refresh();}
- catch{toast("Не удалось отменить. Попробуй ещё раз.");}finally{b.disabled=false;}
-});
-</script>
-<script>
-async function updateChannelReward(){
- const label=$("channelRewardStatus"),button=$("claimChannelRequest");
- try{const r=await call("channel_reward_status");button.disabled=!!r.claimed||!r.ready;
- label.textContent=r.claimed?"Бонус получен":!r.ready?"Задание подключается. Награда пока недоступна.":r.requested?"Готово. Бонус можно забрать.":"Подай заявку и забери бонус.";
- }catch{label.textContent="Не удалось проверить задание. Попробуй забрать награду позже.";}
-}
-$("claimChannelRequest").addEventListener("click",async()=>{
- const b=$("claimChannelRequest");b.disabled=true;
- try{const r=await call("claim_channel_request");
- if(r.pending){$("channelRewardStatus").textContent="Пока не видим заявку. Подай её и нажми «Забрать» ещё раз.";return;}
- toast(r.already?"Награда уже получена":"+150 Points");await refresh();await updateChannelReward();
- }catch{toast("Не удалось проверить заявку. Попробуй ещё раз.");}
- finally{b.disabled=false;}
-});
-const channelReadyTimer=setInterval(()=>{if(state.player){clearInterval(channelReadyTimer);updateChannelReward();}},1000);
-</script>
-<script>
-document.querySelectorAll('.groupInvite').forEach(a=>a.addEventListener('click',e=>{if(tg?.openTelegramLink){e.preventDefault();tg.openTelegramLink(a.href);}}));
-document.querySelector('.labShopLink').addEventListener('click',()=>openView('rewards'));
-</script></body>
+      <div id="modalBody"></div>
+    </dialog>
+    <dialog id="onboarding">
+      <div class="modal-top">
+        <span class="eyebrow">ТВОЁ МЕСТО НА АРЕНЕ</span
+        ><button id="onboardClose" class="close-button" aria-label="Закрыть">
+          ×
+        </button>
+      </div>
+      <h2>Готов выйти на бой?</h2>
+      <p class="muted">
+        Для участия нужно твоё фото. Голосовать можно уже сейчас.
+      </p>
+      <div class="gender-options">
+        <button data-gender="male">Мужской</button
+        ><button data-gender="female">Женский</button>
+      </div>
+      <label class="photo-picker"
+        ><img id="photoPreview" alt="Предпросмотр твоего фото" hidden /><span
+          id="photoPickerText"
+          >＋ Выбрать фото</span
+        ><input
+          id="photoInput"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          aria-label="Выбрать своё фото" /></label
+      ><label class="check-row"
+        ><input id="photoConsent" type="checkbox" /><span
+          >Это моё фото. Разрешаю показывать его игрокам и в беседах, где
+          участвую в боях.
+          <a href="rules.html" target="_blank" rel="noopener">Правила</a></span
+        ></label
+      ><button id="savePhoto" class="primary" disabled>
+        Выйти на арену ↗
+      </button>
+      <p id="photoFeedback" role="status" class="muted"></p>
+    </dialog>
+  </body>
 </html>

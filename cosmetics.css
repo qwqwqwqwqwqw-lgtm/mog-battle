@@ -1,0 +1,375 @@
+/* Existing collection styles, consolidated for the Arena release. */
+.facePhoto.cosmeticFrame {
+  overflow: hidden !important;
+}
+.facePhoto.cosmeticFrame:after {
+  inset: 2px !important;
+  border-radius: 10px !important;
+}
+.cosmeticFrame {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+}
+.cosmeticFrame:after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 2px solid transparent;
+  z-index: 3;
+}
+.frame-graphite:after {
+  border-color: #656873;
+  box-shadow: 0 0 12px #65687355;
+}
+.frame-ice:after {
+  border-color: #bfeaff;
+  box-shadow:
+    0 0 18px #8edfff99,
+    inset 0 0 8px #8edfff44;
+}
+.frame-rose:after {
+  border-color: #f0a3bd;
+  box-shadow: 0 0 18px #d78da688;
+}
+.frame-emerald:after {
+  border-color: #70f0bb;
+  box-shadow: 0 0 18px #38d89b99;
+}
+.frame-void:after {
+  border-color: #7e63cf;
+  box-shadow: 0 0 22px #6d4bd8aa;
+}
+.frame-obsidian:after {
+  border-color: #8b8d96;
+  box-shadow:
+    0 0 0 2px #17181c,
+    0 0 22px #b8bbc533;
+}
+.frame-bloodmoon:after {
+  border-color: #d24855;
+  box-shadow: 0 0 24px #c52d3dbb;
+}
+.frame-halo:after {
+  border-color: #f0d38b;
+  box-shadow:
+    0 0 8px #fff,
+    0 0 28px #e6b95dbb;
+}
+.frame-truepeak:after {
+  border-color: #fff;
+  box-shadow:
+    0 0 7px #fff,
+    0 0 22px #d9b4ff,
+    0 0 38px #87dfff;
+}
+.frame-prism:after {
+  border-color: #fff;
+  box-shadow:
+    8px 0 18px #74e8ff,
+    -8px 0 18px #fb7cd7,
+    0 8px 18px #ffe977;
+}
+.frame-celestial:after {
+  border-color: #f6d993;
+  box-shadow:
+    0 0 8px #fff,
+    0 0 28px #d9b8ff,
+    0 0 46px #82cfff;
+}
+.frame-top1:after {
+  border-color: #ffd86b;
+  box-shadow:
+    0 0 10px #fff,
+    0 0 34px #ffcb46;
+}
+.frame-top10:after {
+  border-color: #d9dde8;
+  box-shadow: 0 0 24px #d9dde888;
+}
+.bg-studio {
+  background: linear-gradient(145deg, #15161a, #08090b) !important;
+}
+.bg-silverfog {
+  background:
+    radial-gradient(circle at 15% 10%, #6d707b55, transparent 40%),
+    linear-gradient(145deg, #23252b, #0d0e11) !important;
+}
+.bg-crimson {
+  background:
+    radial-gradient(circle at 80% 0, #7c1f2d77, transparent 45%),
+    linear-gradient(145deg, #211015, #0b0b0e) !important;
+}
+.bg-noir {
+  background: linear-gradient(135deg, #21232a, #09090b 55%, #1a141d) !important;
+}
+.bg-neoncity {
+  background:
+    radial-gradient(circle at 15% 10%, #1c84a955, transparent 35%),
+    radial-gradient(circle at 90% 20%, #a3227555, transparent 38%), #0b0c11 !important;
+}
+.bg-eclipse {
+  background:
+    radial-gradient(
+      circle at 50% -30%,
+      #f1d393 0 4%,
+      #4b315e 15%,
+      transparent 36%
+    ),
+    linear-gradient(#121017, #070708) !important;
+}
+.bg-marble {
+  background: linear-gradient(
+    125deg,
+    #080808 0 35%,
+    #303036 36%,
+    #111 39%,
+    #444 41%,
+    #090909 44% 100%
+  ) !important;
+}
+.bg-aurora {
+  background:
+    radial-gradient(circle at 20% 0, #49d7b766, transparent 42%),
+    radial-gradient(circle at 80% 0, #9f71ff66, transparent 44%), #0a0c11 !important;
+}
+.name-glow {
+  text-shadow:
+    0 0 12px #f0b4d0,
+    0 0 24px #d78da6;
+}
+.name-royal {
+  background: linear-gradient(90deg, #fff0a3, #dca851, #fff4c9);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.name-chrome {
+  background: linear-gradient(180deg, #fff, #8e949f 46%, #fff 52%, #686e78);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.score-steel {
+  color: #c8ccd4 !important;
+  text-shadow: 0 0 8px #b9c0cf55;
+}
+.score-fire {
+  color: #ff9971 !important;
+  text-shadow: 0 0 12px #ff563c88;
+}
+.score-gold {
+  color: #f1d17d !important;
+  text-shadow: 0 0 12px #e6b85188;
+}
+.score-cosmic {
+  background: linear-gradient(90deg, #b7f2ff, #e4b4ff, #ffb7d6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent !important;
+}
+.cosmeticTitle {
+  display: inline-flex;
+  margin-top: 5px;
+  padding: 3px 7px;
+  border: 1px solid #3a3b43;
+  border-radius: 6px;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  color: #d9dbe2;
+}
+.frame-pslscan:after {
+  border-color: #d9f7ff;
+  box-shadow:
+    0 0 0 1px #79dfff88,
+    inset 0 0 18px #7ee5ff33;
+}
+.frame-facecard:after {
+  border: 2px solid #eee;
+  box-shadow:
+    inset 0 0 0 3px #111,
+    0 0 18px #ffffff55;
+}
+.frame-unfrauded:after {
+  border-color: #ff405d;
+  box-shadow: 0 0 18px #ff405d77;
+}
+.frame-outmog:after {
+  border-color: #ffdf6b;
+  box-shadow: 0 0 22px #ffb80088;
+}
+.frame-appeal:after {
+  border-color: #fff;
+  box-shadow:
+    0 0 10px #fff,
+    0 0 28px #c7a8ff;
+}
+.bg-thirds {
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 32.8%,
+      #ffffff24 33%,
+      #ffffff24 33.5%,
+      transparent 33.7%,
+      transparent 66%,
+      #ffffff24 66.2%,
+      #ffffff24 66.7%,
+      transparent 67%
+    ),
+    linear-gradient(180deg, #17181d, #0b0c0f) !important;
+}
+.bg-editorial {
+  background: linear-gradient(
+    125deg,
+    #ececec 0 2%,
+    #15161a 2% 48%,
+    #31323a 48% 49%,
+    #0d0e11 49%
+  ) !important;
+}
+.bg-morphlab {
+  background:
+    repeating-linear-gradient(0deg, #0d1114 0 15px, #21343a 16px),
+    linear-gradient(90deg, #0c0d10, #18242a) !important;
+}
+.bg-pslboard {
+  background: radial-gradient(
+    circle at 50% 40%,
+    #213a42,
+    #0b0c0f 62%
+  ) !important;
+}
+.bg-afterhours {
+  background: linear-gradient(135deg, #090a0d, #28111c 50%, #10131a) !important;
+}
+.frame-chromeface:after {
+  border: 3px solid #e8eef7;
+  box-shadow:
+    0 0 0 2px #454953,
+    0 0 18px #d3e8ff66,
+    inset 0 0 8px #fff8;
+}
+.frame-prism:after {
+  border: 3px solid transparent;
+  background: linear-gradient(130deg, #7cecff, #ed94ff, #fff3a6, #7cecff)
+    border-box;
+  mask:
+    linear-gradient(#fff 0 0) padding-box,
+    linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  box-shadow: 0 0 24px #da85f877;
+}
+.frame-celestial:after {
+  border: 3px double #ffe6a1;
+  box-shadow:
+    0 0 0 3px #a17b3f44,
+    0 0 23px #ffda7c99;
+}
+.bg-contactsheet {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 31%, #eee8 32% 33%),
+    repeating-linear-gradient(0deg, #13151b 0 38px, #b5bccb 39px 41px) !important;
+}
+.bg-marble {
+  background: repeating-linear-gradient(
+    130deg,
+    #090b10 0 23px,
+    #20232d 25px,
+    #b5bdcb 26px,
+    #17191f 28px,
+    #090b10 44px
+  ) !important;
+}
+.bg-aurora {
+  background:
+    radial-gradient(ellipse at 15% 20%, #45e4bd99, transparent 55%),
+    radial-gradient(ellipse at 85% 70%, #bc7cffaa, transparent 55%), #111525 !important;
+}
+.name-editorial {
+  font-family: Georgia, serif !important;
+  font-style: italic;
+  letter-spacing: 0.025em;
+  color: #f0ece4 !important;
+}
+.name-unfrauded {
+  color: #f1f1ed !important;
+  text-decoration: underline;
+  text-decoration-color: #e85965;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 2px;
+}
+.score-psl {
+  font-family: ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  color: #d9e1ea !important;
+  text-shadow: 0 1px 0 #667788;
+}
+.score-appeal {
+  color: #edd4a1 !important;
+  text-shadow: 0 0 10px #cb965544;
+  font-variant-numeric: tabular-nums;
+}
+.frame-pslscan:after {
+  border: 2px solid #c6d4da;
+  box-shadow:
+    0 0 0 4px #12171c,
+    inset 0 0 0 1px #e0edf4;
+  border-radius: inherit;
+}
+.bg-pslboard {
+  background:
+    radial-gradient(ellipse at 50% 0, #737d8877, transparent 65%), #0d1015 !important;
+}
+.cosmeticFrame:after {
+}
+.frame-chromeface:after {
+}
+.frame-prism:after {
+  border-color: #d4b7f4;
+}
+.frame-celestial:after {
+}
+.bg-marble,
+.bg-aurora,
+.bg-contactsheet {
+  background-size: 180% 180% !important;
+}
+.name-chrome,
+.title-founder,
+.title-ogmogger {
+  background: linear-gradient(
+    110deg,
+    #8e98a8,
+    #fff 35%,
+    #aab9cd 50%,
+    #fff 65%,
+    #8e98a8
+  );
+  background-size: 240% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent !important;
+}
+.title-founder {
+  background-image: linear-gradient(110deg, #b28a43, #fff0c3, #c59a4a, #fff3c8);
+}
+.intro-portal {
+  background:
+    radial-gradient(ellipse at center, #7055a466, transparent 65%), #10121b !important;
+  box-shadow: inset 0 0 36px #a4adf544;
+}
+.frame-chromeface:after,
+.frame-prism:after,
+.frame-celestial:after,
+.bg-marble,
+.bg-aurora,
+.bg-contactsheet,
+.name-chrome,
+.title-founder,
+.title-ogmogger,
+.intro-portal {
+}

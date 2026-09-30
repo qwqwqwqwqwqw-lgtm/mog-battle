@@ -1,0 +1,14 @@
+{
+  "name": "mogg-battle",
+  "version": "2.0.0",
+  "private": true,
+  "scripts": {
+    "check": "node --check app.js",
+    "test": "node tests/ui.cjs",
+    "format": "prettier --write app.js index.html rules.html style.css cosmetics.css supabase/functions tests"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "prettier": "3.6.2"
+  }
+}
