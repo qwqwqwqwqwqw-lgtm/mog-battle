@@ -6,7 +6,7 @@ Static UI is served by GitHub Pages. Telegram authentication, game mutations, St
 
 ## Product
 
-Vote without uploading a photo → claim FIRST LIGHT → add your own photo → invite a friend to a 60-second duel → share a real result. Ranked retains the existing five-vote quorum and rating system. NPCs are labelled; no synthetic votes are counted as people. Cosmetics change presentation only.
+Vote without uploading a photo → claim FIRST LIGHT → add your own photo → invite a friend to a 60-second duel → share a real result. Ranked retains the existing five-vote quorum and rating system. The arena opens on human pairs; NPC-vs-NPC filler is neither generated nor returned. Quick matchmaking waits for people. An optional practice button explicitly starts a non-rated game against a labelled virtual opponent; votes still come only from people. Cosmetics change presentation only.
 
 The paid full looks contain a frame, background and title. Delivery uses Telegram's verified successful-payment webhook. Request replays do not multiply rewards or purchases. A confirmed refund removes the corresponding Stars items. Existing player balances, ratings and inventory were preserved.
 

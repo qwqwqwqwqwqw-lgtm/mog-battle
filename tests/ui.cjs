@@ -75,8 +75,10 @@ const server = http.createServer((req, res) => {
       }
     }
     await demo.locator('[data-view="arena"]').click();
-    await demo.locator('[data-feed="practice"]').click();
     assert.equal(await demo.locator(".timer").textContent(), "Демо");
+    await demo.locator('[data-feed="practice"]').click();
+    assert.equal(await demo.locator(".battle-card").count(), 0);
+    assert(await demo.locator("#startPractice").isVisible());
     const page = await browser.newPage({
       viewport: { width: 390, height: 844 },
       reducedMotion: "reduce",
@@ -199,6 +201,20 @@ const server = http.createServer((req, res) => {
       ],
       drops: {},
     };
+    const filler = {
+      ...model.feed[0],
+      id: "00000000-0000-4000-8000-000000000011",
+      source: "npc_feed",
+      a: { ...model.feed[0].a, first_name: "NPC FILLER A", is_npc: true },
+      b: { ...model.feed[0].b, first_name: "NPC FILLER B", is_npc: true },
+    };
+    const practicePair = {
+      ...model.feed[0],
+      id: "00000000-0000-4000-8000-000000000012",
+      source: "npc",
+      a: { ...model.feed[0].a, first_name: "VIRTUAL OPPONENT", is_npc: true },
+    };
+    model.feed.unshift(filler, practicePair);
     const actions = [];
     let bought = false;
     let tapRequests = 0;
@@ -223,7 +239,7 @@ const server = http.createServer((req, res) => {
         model.daily.votes++;
         model.daily.welcome_ready = true;
         model.player.mogg_points += 2;
-        model.feed = [];
+        model.feed = [filler];
       } else if (body.action === "claim_game_reward") {
         model.inventory.push({ cosmetics: frame });
         model.daily.welcome_claimed = true;
@@ -243,6 +259,9 @@ const server = http.createServer((req, res) => {
           ok: true,
           url: "https://t.me/MoggBattleGameBot?startapp=duel_fixture",
         };
+      } else if (body.action === "open_matchmaking") {
+        assert.equal(body.mode, "quick");
+        result = { ok: true, matched: false, unavailable: true };
       } else if (body.action === "create_star_invoice") {
         assert.equal(body.terms_version, "2026-09-30");
         bought = true;
@@ -269,8 +288,37 @@ const server = http.createServer((req, res) => {
     await page.waitForSelector(".vote-button");
     assert(!(await page.locator("#onboarding").isVisible()));
     assert.equal(await page.evaluate(() => window.hacked), undefined);
+    assert(
+      await page
+        .locator('[data-feed="human"]')
+        .evaluate((x) => x.classList.contains("selected")),
+    );
+    assert(
+      !(await page.locator("#battleFeed").textContent()).includes("NPC FILLER"),
+    );
+    assert(
+      !(await page.locator("#battleFeed").textContent()).includes(
+        "VIRTUAL OPPONENT",
+      ),
+    );
+    await page.locator('[data-feed="practice"]').click();
+    assert(
+      (await page.locator("#battleFeed").textContent()).includes(
+        "VIRTUAL OPPONENT",
+      ),
+    );
+    assert(
+      !(await page.locator("#battleFeed").textContent()).includes("NPC FILLER"),
+    );
+    await page.locator('[data-feed="human"]').click();
     await page.locator(".vote-button").first().click();
     await page.waitForSelector("#claimWelcome");
+    assert.equal(
+      await page.locator(".battle-card").count(),
+      0,
+      "NPC filler returned after refresh",
+    );
+    assert(await page.locator("#emptyDuel").isVisible());
     await page.locator("#claimWelcome").click();
     await page.waitForSelector("#rewardCollection");
     await page.locator("#rewardCollection").click();
@@ -298,6 +346,23 @@ const server = http.createServer((req, res) => {
       ),
     );
     await page.locator("#modalClose").click();
+    await page.locator("#quickBtn").click();
+    await page.waitForFunction(() =>
+      document.querySelector("#matchStatus").textContent.includes("недоступна"),
+    );
+    assert.equal(
+      actions.find((x) => x.action === "open_matchmaking").opponent,
+      undefined,
+    );
+    await page.locator('[data-feed="practice"]').click();
+    await page.locator("#startPractice").click();
+    await page.waitForFunction(
+      () => document.querySelector("#quickBtn").disabled === false,
+    );
+    assert.equal(
+      actions.filter((x) => x.action === "open_matchmaking").at(-1).opponent,
+      "practice",
+    );
     await page.locator('[data-view="style"]').click();
     await page.locator('[data-store="shop"]').click();
     await page.locator('[data-try="' + set.id + '"]').click();
