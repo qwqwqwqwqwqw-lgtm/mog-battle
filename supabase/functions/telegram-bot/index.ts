@@ -9,7 +9,7 @@ const db = createClient(
 const TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const API = `https://api.telegram.org/bot${TOKEN}`;
 const MINI_APP_URL = "https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/";
-const MINI_APP_LAUNCH_URL = MINI_APP_URL + "?v=arena2.2";
+const MINI_APP_LAUNCH_URL = MINI_APP_URL + "?v=arena2.3";
 
 async function tg(method: string, body: any) {
   const r = await fetch(`${API}/${method}`, {

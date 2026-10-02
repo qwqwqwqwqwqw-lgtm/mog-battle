@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MOGG BATTLE — готовые посты</title>
+    <meta
+      name="description"
+      content="Три готовых картинки и тексты для знакомства с MOGG BATTLE."
+    />
+    <link rel="icon" href="brand.svg" />
+    <link rel="stylesheet" href="promo/promo.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="index.html">MOGG ↗</a
+        ><a
+          class="button outline"
+          href="https://t.me/MoggBattleGameBot?startapp=c_promokit"
+          >Открыть игру ↗</a
+        >
+      </header>
+      <section class="intro">
+        <span class="tag">ГОТОВЫЕ МАТЕРИАЛЫ</span>
+        <h1>Один пост.<br />Один понятный повод зайти.</h1>
+        <p>
+          Выбери картинку, скачай её и скопируй текст. Фото-дуэли, свой стиль
+          или бонус другу — три отдельных захода.
+        </p>
+      </section>
+      <nav aria-label="Выбрать материал">
+        <button class="selected" data-mode="duel">Фото-батл</button
+        ><button data-mode="style">Face card</button
+        ><button data-mode="referral">Рефералка</button>
+      </nav>
+      <section class="layout">
+        <div class="poster-wrap">
+          <article class="poster" id="poster" data-mode="duel">
+            <div class="poster-top">
+              MOGG BATTLE <span>TELEGRAM GAME ↗</span>
+            </div>
+            <span class="poster-label" id="posterLabel">ВЫЗОВ ПРИНЯТ?</span>
+            <h2 id="posterHeading">КТО КОГО<br />МОГНЁТ?</h2>
+            <div class="visual" aria-hidden="true">
+              <div class="face left">
+                <div class="head"></div>
+                <div class="shoulders"></div>
+                <span>ТВОЁ ФОТО</span>
+              </div>
+              <b class="vs">VS</b>
+              <div class="face right">
+                <div class="head"></div>
+                <div class="shoulders"></div>
+                <span>ФОТО ДРУГА</span>
+              </div>
+            </div>
+            <p class="poster-copy" id="posterCopy">
+              Вызови друга. Бой длится минуту.<br />Победителя выбирают голоса
+              людей.
+            </p>
+            <div class="poster-bottom">
+              <strong id="posterCTA">ВЫЗОВИ ДРУГА ↗</strong
+              ><span id="posterFooter">t.me/MoggBattleGameBot</span
+              ><small id="posterTerms"
+                >Играть бесплатно. Оформление — по желанию.</small
+              >
+            </div>
+          </article>
+        </div>
+        <div class="instructions">
+          <span class="tag">ПУБЛИКАЦИЯ БЕЗ ПОДГОТОВКИ</span>
+          <h2 id="materialTitle">Фото-батл</h2>
+          <p id="materialHint">
+            Подходит для первого знакомства с игрой. Картинка показывает
+            механику без выдуманных игроков и результатов.
+          </p>
+          <a class="button" id="download" href="promo/post-duel.png" download
+            >Скачать картинку · PNG ↗</a
+          ><label for="caption">Текст публикации</label
+          ><textarea id="caption" rows="9"></textarea
+          ><button class="button outline" id="copyCaption">
+            Скопировать текст
+          </button>
+          <p id="copyStatus" role="status"></p>
+          <p class="note" id="note">
+            Ссылка в тексте ведёт в игру. Для своего личного бонуса возьми
+            персональную ссылку в профиле.
+          </p>
+          <details>
+            <summary>Сценарий видео на 15 секунд</summary>
+            <ol>
+              <li>0–2 с: «Кто кого могнёт?» + два фото участников.</li>
+              <li>2–5 с: покажи настоящий вызов другу.</li>
+              <li>5–11 с: запись реального голосования, можно ускорить.</li>
+              <li>11–15 с: итог и «Вызови своего друга — ссылка в профиле».</li>
+            </ol>
+            <p>
+              Фото участников — с их согласия. Если голосов не было, покажи это
+              честно.
+            </p>
+          </details>
+        </div>
+      </section>
+      <footer>
+        Это материалы для публикаций. Внутриигровые Points используются на
+        оформление.
+      </footer>
+    </main>
+    <script src="promo/promo.js"></script>
+  </body>
+</html>

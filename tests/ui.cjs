@@ -429,6 +429,23 @@ const server = http.createServer((req, res) => {
       "story must include invitation link",
     );
     assert.equal(actions.filter((x) => x.action === "prepare_share").length, 1);
+    await page.locator("#modalClose").click();
+    await page.locator("#shareInvite").click();
+    assert.equal(
+      await page.locator("#personalInvite").inputValue(),
+      "https://t.me/MoggBattleGameBot?startapp=ref_1234567",
+    );
+    await page.locator("#sendReferral").click();
+    const referralShare = await page.evaluate(
+      () => window.telegramCalls.filter((x) => x.type === "link").at(-1).url,
+    );
+    const referralParams = new URL(referralShare).searchParams;
+    assert.equal(
+      referralParams.get("url"),
+      "https://t.me/MoggBattleGameBot?startapp=ref_1234567",
+    );
+    assert(referralParams.get("text").includes("обоим"));
+    assert(referralParams.get("text").includes("100"));
     assert.deepEqual(errors, []);
     console.log(
       "PASS: demo at 4 widths, photo-free first vote, welcome claim, consent + resized photo, invite, full set try-on, Stars checkout, inventory, batched taps, share card, escaped names.",
