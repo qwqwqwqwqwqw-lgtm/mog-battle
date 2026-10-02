@@ -90,7 +90,7 @@
     lastBattle: null,
     bundles: [],
     demo: !tg?.initData,
-    feedFilter: "all",
+    feedFilter: "human",
     kindFilter: "all",
     view: "arena",
     invite: null,
@@ -230,7 +230,7 @@
         request_timeout: "Сервер отвечает долго. Попробуй ещё раз.",
         onboarding_required: "Добавь своё фото перед участием.",
         photo_required: "Для боя нужно фото.",
-      invalid_photo: "Не удалось прочитать фото. Выбери другой снимок.",
+        invalid_photo: "Не удалось прочитать фото. Выбери другой снимок.",
         not_enough_points: "Пока не хватает Points.",
         no_energy: "Энергия закончилась. Она восстанавливается.",
         already_owned: "Этот предмет уже в коллекции.",
@@ -333,19 +333,24 @@
     renderLab();
   }
   function battleCard(b, isOwn = false) {
-    const label = practice(b)
-      ? "Тренировка · NPC"
-      : b.source === "friend"
-        ? "Дуэль друзей"
-        : b.mode === "quick"
-          ? "Быстрый бой"
-          : "Рейтинговый бой";
+    const label = state.demo
+      ? "Пример пары · демо"
+      : practice(b)
+        ? "Тренировочный бой"
+        : b.source === "friend"
+          ? "Дуэль друзей"
+          : b.mode === "quick"
+            ? "Быстрый бой"
+            : "Рейтинговый бой";
     const fighter = (p, index) =>
       `<div class="fighter ${p?.style?.profile_bg ? "bg-" + key(p.style.profile_bg) : ""}">${portrait(p)}<div class="fighter-info"><b class="${p?.style?.name_style ? "name-" + key(p.style.name_style) : ""}">${escape(name(p))}</b><span class="fighter-index">${index}</span></div><div class="fighter-title">${title(p) || "MOGG BATTLE"}</div></div>`;
     return `<article class="battle-card ${isOwn ? "own-battle" : ""}" data-battle="${escape(b.id)}"><div class="battle-meta"><span class="${practice(b) ? "practice" : ""}">${escape(label)}</span><span class="timer" ${state.demo ? "" : `data-ends="${escape(b.ends_at)}"`}>${state.demo ? "Демо" : timeLeft(b.ends_at)}</span></div><div class="faces">${fighter(b.a, "01")}${fighter(b.b, "02")}<span class="vs-label" aria-hidden="true">VS</span></div>${isOwn ? `<div class="own-note">${b.mode === "quick" ? "Твой бой идёт. Пригласи друзей выбрать победителя. Рейтинг сохраняется." : b.quorum_at ? "5 оценок собраны. Осталось финальное голосование." : "Ждём 5 оценок. Бой может идти до суток; рейтинг меняется только по голосам."}</div><div class="vote-row"><button class="secondary share-battle" data-id="${escape(b.id)}">Позвать голосовать ↗</button><button class="secondary revisit">Выбрать другие бои</button></div>` : `<div class="vote-row"><button class="vote-button" data-side="a" data-id="${escape(b.id)}">За ${escape(name(b.a))}</button><button class="vote-button" data-side="b" data-id="${escape(b.id)}">За ${escape(name(b.b))}</button></div><div class="battle-meta"><button class="report-button" data-report="${escape(b.id)}">Пожаловаться</button><button class="report-button" data-skip="${escape(b.id)}">Пропустить →</button></div>`}</article>`;
   }
   function renderFeed() {
-    const active = state.feed.filter(live),
+    const active = state.feed.filter(
+        (b) =>
+          live(b) && b.source !== "npc_feed" && !(b.a?.is_npc && b.b?.is_npc),
+      ),
       mine = active.filter(own);
     $("ownBattles").innerHTML = mine.length
       ? '<div class="own-heading"><b>Твой бой</b><span>На арене</span></div>' +
@@ -361,7 +366,11 @@
     candidates.sort((a, b) => Number(practice(a)) - Number(practice(b)));
     $("battleFeed").innerHTML = candidates.length
       ? battleCard(candidates[0])
-      : `<div class="empty"><span class="empty-symbol">↗</span><b>${state.feedFilter === "human" ? "Живые пары скоро появятся" : "Все доступные пары просмотрены"}</b><p>${state.feedFilter === "human" ? "Вызови друга: беседа сама соберёт первые голоса." : "Новые бои появятся здесь. А пока можно устроить дуэль с другом."}</p><button class="secondary" id="revisit">${skipped.size ? "Показать пропущенные" : "Проверить новые пары"}</button></div>`;
+      : state.feedFilter === "practice"
+        ? `<div class="empty"><span class="empty-symbol">VS</span><b>Твой тренировочный бой</b><p>Ты против виртуального соперника. Голосуют люди, рейтинг сохраняется.</p><button class="secondary" id="startPractice" ${matchBusy ? "disabled" : ""}>Начать тренировку</button></div>`
+        : `<div class="empty"><span class="empty-symbol">↗</span><b>Сейчас нет открытых боёв</b><p>Создай дуэль с другом и отправь ссылку в беседу. Первый бой начинается с вас.</p><button class="secondary" id="emptyDuel">Вызвать друга ↗</button><p><button class="report-button" id="revisit">${skipped.size ? "Показать пропущенные" : "Проверить новые пары"}</button></p></div>`;
+    $("emptyDuel")?.addEventListener("click", createDuel);
+    $("startPractice")?.addEventListener("click", () => startMatch("practice"));
     document
       .querySelectorAll("[data-side]")
       .forEach(
@@ -1019,14 +1028,26 @@
     clearTimeout(matchTimer);
     $("quickBtn").disabled = true;
     $("rankedBtn").disabled = true;
+    if ($("startPractice")) $("startPractice").disabled = true;
     $("matchStatus").textContent =
-      mode === "quick"
-        ? "Ищем соперника. При небольшом онлайне предложим тренировку с NPC."
-        : "Ищем игрока для рейтингового боя…";
-    let until = Date.now() + 100000;
+      mode === "practice"
+        ? "Готовим тренировку с виртуальным соперником…"
+        : mode === "quick"
+          ? "Ищем игрока для минутной дуэли…"
+          : "Ищем игрока для рейтингового боя…";
+    let until = Date.now() + 30000;
     async function search() {
       try {
-        const d = await call("open_matchmaking", { mode });
+        const d = await call("open_matchmaking", {
+          mode: mode === "practice" ? "quick" : mode,
+          ...(mode === "practice" ? { opponent: "practice" } : {}),
+        });
+        if (d.unavailable) {
+          $("matchStatus").textContent =
+            "Тренировка сейчас недоступна. Попробуй вызвать друга.";
+          finish();
+          return;
+        }
         if (d.votes_required) {
           $("matchStatus").textContent =
             "Перед следующим рейтинговым боем выбери победителя ещё в " +
@@ -1068,6 +1089,7 @@
       matchBusy = false;
       $("quickBtn").disabled = false;
       $("rankedBtn").disabled = false;
+      if ($("startPractice")) $("startPractice").disabled = false;
     }
     search();
   }
@@ -1107,16 +1129,17 @@
     $("friendBtn").disabled = true;
     try {
       const d = await call("create_duel");
-      track("share_duel");
       showModal(
         "ПЕРСОНАЛЬНЫЙ ВЫЗОВ",
         `<h2>Кто могнет кого?</h2><div class="invite-preview">${portrait(state.player)}</div><p>Отправь другу вызов. После принятия — минутный бой. Ссылка на голосование появится в игре.</p><button id="sendDuel" class="primary">Отправить вызов ↗</button><button id="copyDuel" class="secondary">Скопировать ссылку</button>`,
       );
-      $("sendDuel").onclick = () =>
+      $("sendDuel").onclick = () => {
+        track("share_duel");
         shareLink(
           name(state.player) + " вызывает тебя на MOGG-батл. Принимаешь?",
           d.url,
         );
+      };
       $("copyDuel").onclick = async () => {
         try {
           await navigator.clipboard.writeText(d.url);
@@ -1417,7 +1440,6 @@
   }
   async function shareCard(win = false) {
     if (!ensureProfile(() => shareCard(win))) return;
-    track(win ? "share_result" : "share_profile");
     showModal(
       "ТВОЯ КАРТОЧКА / ПОДЕЛИТЬСЯ",
       '<h2>Твой ход — в беседу</h2><p id="cardStatus" role="status">Готовим карточку с твоим фото…</p><div id="cardPreview"></div><button id="cardLink" class="secondary">Отправить ссылку ↗</button>',
@@ -1446,7 +1468,15 @@
         $("cardSend").disabled = true;
         try {
           const d = await prepare();
-          if (tg?.shareMessage && d.message_id) tg.shareMessage(d.message_id);
+          if (tg?.shareMessage && d.message_id)
+            tg.shareMessage(d.message_id, (sent) => {
+              if (sent) {
+                track(win ? "share_result" : "share_profile");
+                toast(
+                  "Карточка отправлена. Друг сможет зайти по кнопке в ней.",
+                );
+              }
+            });
           else shareLink(text, refURL());
         } catch (e) {
           toast(errorText(e));
@@ -1462,7 +1492,7 @@
         $("cardStory").disabled = true;
         try {
           const d = await prepare();
-          tg.shareToStory(d.image_url, { text });
+          tg.shareToStory(d.image_url, { text: text + "\n" + refURL() });
         } catch (e) {
           toast(errorText(e));
         } finally {
@@ -1561,7 +1591,7 @@
   $("guideBtn").onclick = () =>
     showModal(
       "БЫСТРЫЙ СТАРТ",
-      `<h2>Три шага к батлу</h2><div class="guide-step"><span>01 / ВЫБИРАЙ</span><h3>Два фото. Один голос.</h3><p>Голосуй сразу, без загрузки фото. За голос — 2 Points. За первый голос можно забрать рамку и ещё 100 Points.</p></div><div class="guide-step"><span>02 / ВЫЗЫВАЙ</span><h3>Друг или случайный соперник</h3><p>Для участия добавь своё фото. Быстрый бой длится минуту. При отсутствии живого соперника будет обозначенная тренировка с NPC. Голосуют люди. Если голосов нет, победитель не назначается.</p></div><div class="guide-step"><span>03 / ВЫДЕЛЯЙСЯ</span><h3>Собери свой стиль</h3><p>Points получай за задания, голоса и в LAB. В магазине — оформление за Points или Stars. Набор содержит рамку, фон и титул. Рейтинг зависит от голосов игроков.</p></div><p>Добавь бота в беседу: /battle — минутная дуэль; /ranked — рейтинговый вызов. Рейтинговый бой ждёт 5 оценок, затем 10 минут, максимум сутки. Перед следующим рейтинговым боем оцени 3 чужих пары.</p>`,
+      `<h2>Три шага к батлу</h2><div class="guide-step"><span>01 / ВЫБИРАЙ</span><h3>Два фото. Один голос.</h3><p>Голосуй сразу, без загрузки фото. За голос — 2 Points. За первый голос можно забрать рамку и ещё 100 Points.</p></div><div class="guide-step"><span>02 / ВЫЗЫВАЙ</span><h3>Друг или случайный соперник</h3><p>Для участия добавь своё фото. Быстрый бой длится минуту. В обычном поиске соперники — игроки. Тренировку с виртуальным соперником можно запустить отдельно. Голосуют люди. Если голосов нет, победитель не назначается.</p></div><div class="guide-step"><span>03 / ВЫДЕЛЯЙСЯ</span><h3>Собери свой стиль</h3><p>Points получай за задания, голоса и в LAB. В магазине — оформление за Points или Stars. Набор содержит рамку, фон и титул. Рейтинг зависит от голосов игроков.</p></div><p>Добавь бота в беседу: /battle — минутная дуэль; /ranked — рейтинговый вызов. Рейтинговый бой ждёт 5 оценок, затем 10 минут, максимум сутки. Перед следующим рейтинговым боем оцени 3 чужих пары.</p>`,
     );
 
   function applyData(d, initial = false) {
@@ -1710,19 +1740,19 @@
     state.feed = [
       {
         id: "demo-pair",
-        player_a: "npc-a",
-        player_b: "npc-b",
+        player_a: "demo-a",
+        player_b: "demo-b",
         a: {
           first_name: "ALEX",
-          is_npc: true,
+          is_demo: true,
           profile_photo_url: "npc/npc003.jpg",
         },
         b: {
           first_name: "NICK",
-          is_npc: true,
+          is_demo: true,
           profile_photo_url: "npc/npc005.jpg",
         },
-        source: "npc_feed",
+        source: "demo",
         mode: "quick",
         status: "active",
         ends_at: new Date(Date.now() + 86400000).toISOString(),
