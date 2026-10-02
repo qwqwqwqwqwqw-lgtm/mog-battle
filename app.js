@@ -1161,13 +1161,27 @@
   }
   $("friendBtn").onclick = createDuel;
   $("shareInvite").onclick = () => {
-    if (requireTelegram()) {
-      track("share_profile");
+    if (!requireTelegram()) return;
+    const url = refURL();
+    showModal(
+      "ПРИГЛАШЕНИЕ / +100 POINTS ОБОИМ",
+      `<h2>Позови друга на арену</h2><p>Фото-дуэль длится минуту. Победителя выбирают голоса людей.</p><p>Если новый друг зайдёт по твоей ссылке и создаст профиль со своим фото, вы оба получите по 100 Points на оформление. Одного перехода недостаточно. Points — игровые очки.</p><label for="personalInvite">Твоя персональная ссылка</label><input id="personalInvite" readonly value="${escape(url)}" style="width:100%;box-sizing:border-box"><button id="sendReferral" class="primary">Отправить приглашение ↗</button><button id="copyReferral" class="secondary">Скопировать ссылку</button>`,
+    );
+    $("sendReferral").onclick = () =>
       shareLink(
-        "Залетай на MOGG BATTLE: два фото, один выбор. Сможешь могнуть меня?",
-        refURL(),
+        "Давай фото-батл в Telegram? Вызываем друг друга, беседа выбирает победителя за минуту. Это моя рефка: после твоего первого профиля со своим фото нам обоим дадут по 100 игровых Points на оформление.",
+        url,
       );
-    }
+    $("copyReferral").onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        toast("Персональная ссылка скопирована");
+      } catch {
+        $("personalInvite").focus();
+        $("personalInvite").select();
+        toast("Скопируй выделенную ссылку вручную");
+      }
+    };
   };
   function uuidFromStart(value) {
     return /^[a-f0-9]{32}$/i.test(value)
