@@ -6,7 +6,7 @@ Static UI is served by GitHub Pages. Telegram authentication, game mutations, St
 
 ## Product
 
-Vote without uploading a photo → claim FIRST LIGHT → add your own photo → invite a friend to a 60-second duel → share a real result. Ranked retains the existing five-vote quorum and rating system. NPCs are labelled; no synthetic votes are counted as people. Cosmetics change presentation only.
+Vote without uploading a photo → claim FIRST LIGHT → add your own photo → invite a friend to a 60-second duel → share a real result. Ranked retains the existing five-vote quorum and rating system. The arena opens on human pairs; NPC-vs-NPC filler is neither generated nor returned. Quick matchmaking waits for people. An optional practice button explicitly starts a non-rated game against a labelled virtual opponent; votes still come only from people. Cosmetics change presentation only.
 
 The paid full looks contain a frame, background and title. Delivery uses Telegram's verified successful-payment webhook. Request replays do not multiply rewards or purchases. A confirmed refund removes the corresponding Stars items. Existing player balances, ratings and inventory were preserved.
 
@@ -48,3 +48,7 @@ Rollback: the frontend baseline is Git commit `57608915c23d7396491c5129e4fd676b8
 [Campaign and support queries](docs/metrics.sql).
 
 There is no promised player income, wallet connection or purchased placement in this release. Pricing and creative choices are hypotheses to validate with real human cohorts.
+
+## Ready-to-post promotion kit
+
+Open `promo.html` to download one of three 1080×1350 PNG posters and copy its matching caption. Referral captions require the player's own link from their profile. Generate and check posters with `node tests/promo.cjs` (Playwright browser required). Current launch approach is ordinary posts, short videos, genuine player referrals and creator partnerships; the original event-based plan is archived.

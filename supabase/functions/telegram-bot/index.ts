@@ -9,6 +9,7 @@ const db = createClient(
 const TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const API = `https://api.telegram.org/bot${TOKEN}`;
 const MINI_APP_URL = "https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/";
+const MINI_APP_LAUNCH_URL = MINI_APP_URL + "?v=arena2.3";
 
 async function tg(method: string, body: any) {
   const r = await fetch(`${API}/${method}`, {
@@ -807,6 +808,14 @@ Deno.serve(async (req) => {
         return new Response("ok");
       }
 
+      await tg("setChatMenuButton", {
+        chat_id: m.chat.id,
+        menu_button: {
+          type: "web_app",
+          text: "Играть",
+          web_app: { url: MINI_APP_LAUNCH_URL },
+        },
+      });
       const me = await tg("getMe", {});
       // Preserve referral attribution for previously shared /start links.
       const referralArg =
@@ -819,7 +828,7 @@ Deno.serve(async (req) => {
             text: "OPEN MOGG BATTLE",
             url: `https://t.me/${me.result.username}?startapp=ref_${referralMatch[1]}`,
           }
-        : { text: "OPEN MOGG BATTLE", web_app: { url: MINI_APP_URL } };
+        : { text: "OPEN MOGG BATTLE", web_app: { url: MINI_APP_LAUNCH_URL } };
       await send(
         m.chat.id,
         `⚔️ <b>MOGG BATTLE</b>\n\n` +

@@ -254,83 +254,6 @@ async function resolveStyles(db: any, players: any[]) {
   });
 }
 
-async function ensureNpcFeed(db: any, target = 5) {
-  const now = new Date();
-  const live = await db
-    .from("battles")
-    .select("id,player_a,player_b")
-    .eq("status", "active")
-    .eq("source", "npc_feed")
-    .gt("ends_at", now.toISOString())
-    .limit(12);
-  if (live.error) {
-    console.error("npc_feed_live", live.error);
-    return;
-  }
-
-  const need = Math.max(0, target - (live.data || []).length);
-  if (!need) return;
-
-  const nq = await db
-    .from("players")
-    .select("id,gender,mogg_score,profile_photo_url")
-    .eq("is_npc", true)
-    .eq("npc_active", true)
-    .not("profile_photo_url", "is", null)
-    .limit(100);
-  if (nq.error) {
-    console.error("npc_feed_players", nq.error);
-    return;
-  }
-
-  const all = nq.data || [];
-  const busy = new Set(
-    (live.data || []).flatMap((b: any) => [b.player_a, b.player_b]),
-  );
-  for (let i = 0; i < need; i++) {
-    let pool = all.filter((x: any) => !busy.has(x.id));
-    if (pool.length < 2) pool = all;
-    if (pool.length < 2) return;
-
-    const a = pool[Math.floor(Math.random() * pool.length)];
-    const same = pool
-      .filter((x: any) => x.id !== a.id && x.gender === a.gender)
-      .map((x: any) => ({
-        ...x,
-        _d: Math.abs(Number(x.mogg_score || 0) - Number(a.mogg_score || 0)),
-      }))
-      .sort((x: any, y: any) => x._d - y._d);
-    const near = same.filter((x: any) => x._d <= 700);
-    const choices = (near.length ? near : same).slice(
-      0,
-      Math.min(12, (near.length ? near : same).length),
-    );
-    const b = choices.length
-      ? choices[Math.floor(Math.random() * choices.length)]
-      : null;
-    if (!b) continue;
-
-    const ageMs = Math.floor(Math.random() * 18000);
-    const started = new Date(Date.now() - ageMs);
-    const ends = new Date(started.getTime() + 60000);
-    const ins = await db.from("battles").insert({
-      player_a: a.id,
-      player_b: b.id,
-      status: "active",
-      duration_seconds: 60,
-      started_at: started.toISOString(),
-      ends_at: ends.toISOString(),
-      source: "npc_feed",
-      mode: "quick",
-    });
-    if (ins.error) console.error("npc_feed_insert", ins.error);
-    else {
-      busy.add(a.id);
-      busy.add(b.id);
-    }
-  }
-}
-
 async function botLaunchLink(token: string, telegramId: number) {
   try {
     const r = await fetch(`https://api.telegram.org/bot${token}/getMe`);
@@ -631,18 +554,12 @@ Deno.serve(async (req) => {
       if (!pq.error) p = pq.data;
       const styledSelf = (await resolveStyles(db, [p]))[0];
 
-      let bq = await db.rpc("battle_feed_v2", { p_player: p.id });
+      const bq = await db.rpc("battle_feed_v2", { p_player: p.id });
       if (bq.error) throw bq.error;
-      const hasOtherHumanBattle = (bq.data || []).some(
-        (b: any) =>
-          b.source !== "npc_feed" && b.player_a !== p.id && b.player_b !== p.id,
+      // Old NPC-vs-NPC filler must never reach any client, including cached ones.
+      const feed = (await enrichFeed(db, bq.data || [])).filter(
+        (b: any) => b.source !== "npc_feed" && !(b.a?.is_npc && b.b?.is_npc),
       );
-      if (!hasOtherHumanBattle) {
-        await ensureNpcFeed(db, 2);
-        bq = await db.rpc("battle_feed_v2", { p_player: p.id });
-        if (bq.error) throw bq.error;
-      }
-      const feed = await enrichFeed(db, bq.data || []);
       const gate = await db.rpc("ranked_votes_needed_v2", { p_player: p.id });
       if (gate.error) throw gate.error;
       const recent = await db
@@ -1239,6 +1156,35 @@ Deno.serve(async (req) => {
         );
       }
 
+      // Virtual opponents are available only after an explicit practice click.
+      if (body.opponent === "practice" && battleMode === "quick") {
+        const nq = await db
+          .from("players")
+          .select("id,mogg_score")
+          .eq("is_npc", true)
+          .eq("npc_active", true)
+          .eq("gender", p.gender)
+          .not("profile_photo_url", "is", null)
+          .limit(80);
+        if (nq.error) throw nq.error;
+        const near = (nq.data || [])
+          .sort(
+            (a: any, b: any) =>
+              Math.abs(Number(a.mogg_score || 0) - Number(p.mogg_score || 0)) -
+              Math.abs(Number(b.mogg_score || 0) - Number(p.mogg_score || 0)),
+          )
+          .slice(0, 6);
+        if (!near.length)
+          return Response.json(
+            { ok: true, matched: false, unavailable: true, mode: "quick" },
+            { headers: cors },
+          );
+        return await createAtomic(
+          near[Math.floor(Math.random() * near.length)].id,
+          "quick",
+        );
+      }
+
       if (battleMode === "ranked") {
         const gate = await db.rpc("ranked_votes_needed_v2", { p_player: p.id });
         if (gate.error) throw gate.error;
@@ -1339,37 +1285,6 @@ Deno.serve(async (req) => {
       }
       if (own.data?.[0]) {
         const ownReq = own.data[0];
-        const waited = now - new Date(ownReq.created_at).getTime();
-        const npcDelay = battleMode === "quick" ? 8000 : 20000;
-        if (waited >= npcDelay) {
-          {
-            const nq = await db
-              .from("players")
-              .select("*")
-              .eq("is_npc", true)
-              .eq("npc_active", true)
-              .eq("gender", p.gender)
-              .not("profile_photo_url", "is", null)
-              .limit(80);
-            if (nq.error) throw nq.error;
-            const pool = (nq.data || [])
-              .map((x: any) => ({
-                ...x,
-                _diff: Math.abs(
-                  Number(x.mogg_score || 0) - Number(p.mogg_score || 0),
-                ),
-              }))
-              .filter((x: any) => battleMode === "quick" || x._diff <= 500)
-              .sort((a: any, b: any) => a._diff - b._diff);
-            const near = pool.slice(0, Math.min(6, pool.length));
-            const npc = near.length
-              ? near[Math.floor(Math.random() * near.length)]
-              : null;
-            if (npc) {
-              return await createAtomic(npc.id, battleMode, ownReq.id);
-            }
-          }
-        }
         return Response.json(
           { ok: true, matched: false, request: ownReq, mode: battleMode },
           { headers: cors },

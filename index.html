@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="cosmetics.css?v=arena2" />
     <link rel="stylesheet" href="style.css?v=arena2" />
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
-    <script src="app.js?v=arena2.1" defer></script>
+    <script src="app.js?v=arena2.3" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">К игре</a>
@@ -57,7 +57,7 @@
         <div class="arena-title">
           <div>
             <span class="eyebrow">MOGG BATTLE / АРЕНА</span>
-            <h1>Два фото.<br /><em>Один выбор.</em></h1>
+            <h1>Вызови друга.<br /><em>Беседа решит.</em></h1>
           </div>
           <span class="arena-symbol" aria-hidden="true"
             >VS<span>01 / 02</span></span
@@ -70,7 +70,9 @@
             Случайный бой <span>⚡</span>
           </button>
         </div>
-        <p class="arena-note">Дуэль длится минуту. Победителя выбирают люди.</p>
+        <p class="arena-note">
+          Фото-дуэль в Telegram: ваши фото, голоса друзей, результат за минуту.
+        </p>
         <div id="inviteBanner" hidden></div>
         <div id="ownBattles"></div>
         <div class="section-heading">
@@ -78,8 +80,7 @@
           <span id="feedLabel" class="pill">+2 Points за голос</span>
         </div>
         <div class="feed-filters" role="group" aria-label="Фильтр боёв">
-          <button class="selected" data-feed="all">Все</button
-          ><button data-feed="human">Игроки</button
+          <button class="selected" data-feed="human">Игроки</button
           ><button data-feed="practice">Тренировка</button>
         </div>
         <div id="battleFeed" aria-live="polite">
@@ -223,9 +224,10 @@
         <div id="rankReward" class="panel"></div>
         <div class="invite-card">
           <span class="eyebrow">ВМЕСТЕ ИНТЕРЕСНЕЕ</span>
-          <h2>Позови свою команду</h2>
+          <h2>По 100 Points тебе и другу</h2>
           <p>
-            Персональная ссылка. 100 Points за друга после создания его профиля.
+            Новый друг открывает твою ссылку и создаёт профиль со своим фото —
+            оба получаете по 100 Points на оформление. Это игровые очки.
           </p>
           <button id="shareInvite" class="secondary">
             Пригласить друзей ↗
