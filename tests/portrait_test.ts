@@ -10,7 +10,7 @@ Deno.test(
   "portrait renders a cropped photo with the purchased frame and title",
   async () => {
     const source = await Deno.readFile(
-      new URL("../npc/npc001.jpg", import.meta.url),
+      new URL("../tests/fixtures/portrait.jpg", import.meta.url),
     );
     const originalFetch = globalThis.fetch;
     globalThis.fetch = () => Promise.resolve(new Response(source));
@@ -50,7 +50,7 @@ Deno.test(
       const rendered = await decoratedPhoto(db, {
         telegram_id: 123,
         profile_photo_url:
-          "https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/npc/npc001.jpg",
+          "https://qwqwqwqwqwqw-lgtm.github.io/mog-battle/tests/fixtures/portrait.jpg",
         equipped_frame: "frame-id",
         equipped_title: "title-id",
       });

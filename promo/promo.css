@@ -1,6 +1,6 @@
 :root {
   color-scheme: dark;
-  --lime: #d9ff67;
+  --lime: #b8adff;
   --text: #f1f1e8;
   --muted: #a0a799;
 }
@@ -9,7 +9,7 @@
 }
 body {
   margin: 0;
-  background: #101211;
+  background: #0c0c0e;
   color: var(--text);
   font:
     16px/1.5 Arial,
@@ -39,7 +39,7 @@ header {
   display: block;
   background: var(--lime);
   border: 1px solid var(--lime);
-  color: #101211;
+  color: #0c0c0e;
   padding: 14px 18px;
   border-radius: 10px;
   text-decoration: none;
@@ -88,7 +88,7 @@ nav button {
 }
 nav .selected {
   background: var(--lime);
-  color: #101211;
+  color: #0c0c0e;
 }
 .layout {
   display: grid;
@@ -101,14 +101,14 @@ nav .selected {
   aspect-ratio: 4/5;
   overflow: hidden;
   border-radius: 14px;
-  background: #101211;
+  background: #0c0c0e;
   outline: 1px solid #323730;
 }
 .poster {
   width: 1080px;
   height: 1350px;
   padding: 70px;
-  background: #101211;
+  background: #0c0c0e;
   color: var(--text);
   position: absolute;
   transform-origin: top left;
@@ -164,7 +164,7 @@ nav .selected {
 }
 .face.right {
   transform: rotate(5deg);
-  border-color: #ffb27b;
+  border-color: #d9d5ef;
   background: #30241d;
 }
 .head {
@@ -185,7 +185,7 @@ nav .selected {
 }
 .right .head,
 .right .shoulders {
-  background: #ffb27b;
+  background: #d9d5ef;
 }
 .face span {
   position: absolute;
@@ -193,7 +193,7 @@ nav .selected {
   left: 0;
   right: 0;
   text-align: center;
-  color: #101211;
+  color: #0c0c0e;
   font-size: 23px;
   font-weight: 900;
   z-index: 1;
@@ -217,7 +217,7 @@ nav .selected {
 .poster-bottom strong {
   display: block;
   background: var(--lime);
-  color: #101211;
+  color: #0c0c0e;
   text-align: center;
   border-radius: 20px;
   font-size: 35px;
