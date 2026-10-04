@@ -57,9 +57,14 @@ const server = http.createServer((req, res) => {
     await demo.waitForSelector(".battle-card");
     assert(await demo.locator("#demoBanner").isVisible());
     assert(!(await demo.locator("#onboarding").isVisible()));
+    assert.equal(
+      await demo.locator(".portrait img, #miniAvatar img").count(),
+      0,
+      "preview loaded a generated or missing portrait",
+    );
     for (const width of [320, 390, 768, 1200]) {
       await demo.setViewportSize({ width, height: 844 });
-      for (const view of ["arena", "tasks", "style", "profile"]) {
+      for (const view of ["arena", "rating", "tasks", "profile"]) {
         await demo.locator('[data-view="' + view + '"]').click();
         assert(
           await demo.evaluate(
@@ -76,9 +81,9 @@ const server = http.createServer((req, res) => {
     }
     await demo.locator('[data-view="arena"]').click();
     assert.equal(await demo.locator(".timer").textContent(), "Демо");
-    await demo.locator('[data-feed="practice"]').click();
-    assert.equal(await demo.locator(".battle-card").count(), 0);
-    assert(await demo.locator("#startPractice").isVisible());
+    assert.equal(await demo.locator('[data-feed="practice"]').count(), 0);
+    assert.equal(await demo.locator('img[src*="npc/"]').count(), 0);
+    assert.equal(await demo.locator('[data-view="rating"]').count(), 1);
     const page = await browser.newPage({
       viewport: { width: 390, height: 844 },
       reducedMotion: "reduce",
@@ -163,6 +168,16 @@ const server = http.createServer((req, res) => {
         tap_power: 1,
         style: {},
       },
+      partner_tasks: [
+        {
+          id: "partner-id",
+          slug: "fixture",
+          title: "FIXTURE PARTNER",
+          username: "fixture_channel",
+          reward_points: 100,
+          claimed: false,
+        },
+      ],
       inventory: [],
       daily: {
         visited: true,
@@ -189,13 +204,13 @@ const server = http.createServer((req, res) => {
           a: {
             id: A,
             first_name: "<img src=x onerror=window.hacked=1>",
-            profile_photo_url: origin + "/npc/npc001.jpg",
+            profile_photo_url: origin + "/tests/fixtures/portrait.jpg",
             style: {},
           },
           b: {
             id: B,
             first_name: "NICK",
-            profile_photo_url: origin + "/npc/npc005.jpg",
+            profile_photo_url: origin + "/tests/fixtures/portrait.jpg",
             style: {},
           },
         },
@@ -217,6 +232,7 @@ const server = http.createServer((req, res) => {
     };
     model.feed.unshift(filler, practicePair);
     const actions = [];
+    let partnerSubscribed = false;
     let bought = false;
     let tapRequests = 0;
     await page.route("https://telegram.org/js/telegram-web-app.js", (r) =>
@@ -236,6 +252,31 @@ const server = http.createServer((req, res) => {
               .map((c) => ({ cosmetics: c })),
           );
         result = { ok: true, ...model };
+      } else if (body.action === "leaderboard") {
+        result = {
+          ok: true,
+          players:
+            body.gender === "female"
+              ? []
+              : [
+                  {
+                    id: A,
+                    first_name: "<img src=x onerror=window.hacked=1>",
+                    gender: "male",
+                    mogg_score: 1200,
+                    style: {},
+                  },
+                ],
+        };
+      } else if (body.action === "claim_partner") {
+        assert.equal(body.slug, "fixture");
+        assert.equal(body.reward_points, undefined);
+        if (!partnerSubscribed) result = { error: "partner_not_subscribed" };
+        else {
+          model.player.mogg_points += 100;
+          model.partner_tasks[0].claimed = true;
+          result = { ok: true, points: 100 };
+        }
       } else if (body.action === "vote") {
         model.daily.votes++;
         model.daily.welcome_ready = true;
@@ -254,7 +295,8 @@ const server = http.createServer((req, res) => {
         assert.equal(body.photo_consent, true);
         assert.equal(body.mime, "image/jpeg");
         assert(Buffer.from(body.base64, "base64").byteLength < 5 * 1024 * 1024);
-        model.player.profile_photo_url = origin + "/npc/npc001.jpg";
+        model.player.profile_photo_url =
+          origin + "/tests/fixtures/portrait.jpg";
       } else if (body.action === "create_duel") {
         result = {
           ok: true,
@@ -302,16 +344,6 @@ const server = http.createServer((req, res) => {
         "VIRTUAL OPPONENT",
       ),
     );
-    await page.locator('[data-feed="practice"]').click();
-    assert(
-      (await page.locator("#battleFeed").textContent()).includes(
-        "VIRTUAL OPPONENT",
-      ),
-    );
-    assert(
-      !(await page.locator("#battleFeed").textContent()).includes("NPC FILLER"),
-    );
-    await page.locator('[data-feed="human"]').click();
     await page.locator(".vote-button").first().click();
     await page.waitForSelector("#claimWelcome");
     assert.equal(
@@ -335,7 +367,7 @@ const server = http.createServer((req, res) => {
     await page.locator('[data-gender="male"]').click();
     await page
       .locator("#photoInput")
-      .setInputFiles(path.join(root, "npc/npc001.jpg"));
+      .setInputFiles(path.join(root, "tests/fixtures/portrait.jpg"));
     assert(await page.locator("#savePhoto").isDisabled());
     await page.locator("#photoConsent").check();
     await page.locator("#savePhoto").click();
@@ -347,6 +379,7 @@ const server = http.createServer((req, res) => {
       ),
     );
     await page.locator("#modalClose").click();
+    await page.locator(".ranked-details summary").click();
     await page.locator("#quickBtn").click();
     await page.waitForFunction(() =>
       document.querySelector("#matchStatus").textContent.includes("недоступна"),
@@ -355,39 +388,55 @@ const server = http.createServer((req, res) => {
       actions.find((x) => x.action === "open_matchmaking").opponent,
       undefined,
     );
-    await page.locator('[data-feed="practice"]').click();
-    await page.locator("#startPractice").click();
-    await page.waitForFunction(
-      () => document.querySelector("#quickBtn").disabled === false,
+    await page.locator('[data-view="rating"]').click();
+    await page.waitForSelector(".rank-row");
+    assert.equal(await page.locator(".rank-row").count(), 1);
+    assert.equal(await page.evaluate(() => window.hacked), undefined);
+    await page.locator('[data-rating="female"]').click();
+    await page.waitForSelector("#leaderboard .empty");
+    assert(
+      actions.some((x) => x.action === "leaderboard" && x.gender === "female"),
+    );
+    await page.locator('[data-view="tasks"]').click();
+    assert(await page.locator("#lab").isHidden());
+    await page.locator('[data-partner-open="fixture"]').click();
+    assert(
+      (await page.evaluate(() => window.telegramCalls)).some(
+        (x) => x.url === "https://t.me/fixture_channel",
+      ),
+    );
+    await page.locator('[data-partner-claim="fixture"]').click();
+    await page.waitForFunction(() =>
+      document
+        .querySelector("#partner-fixture")
+        .textContent.includes("Подписка пока не найдена"),
     );
     assert.equal(
-      actions.filter((x) => x.action === "open_matchmaking").at(-1).opponent,
-      "practice",
+      model.player.mogg_points,
+      102,
+      "failed membership awarded points",
     );
-    await page.locator('[data-view="style"]').click();
-    await page.locator('[data-store="shop"]').click();
-    await page.locator('[data-try="' + set.id + '"]').click();
-    assert(
-      await page
-        .locator(".try-hero.bg-midnight .title-nightmogger")
-        .isVisible(),
+    partnerSubscribed = true;
+    await page.locator('[data-partner-claim="fixture"]').click();
+    await page.waitForFunction(
+      () => document.querySelector('[data-partner-claim="fixture"]').disabled,
     );
-    await page.locator("#tryPurchase").click();
-    assert(await page.locator("#confirmPurchase").isDisabled());
-    await page.locator("#purchaseConsent").check();
-    await page.locator("#confirmPurchase").click();
     await page.waitForFunction(() =>
-      document.querySelector("#inventory").textContent.includes("MIDNIGHT"),
+      document
+        .querySelector('[data-partner-claim="fixture"]')
+        .textContent.includes("Получено"),
     );
-    assert.equal(await page.locator("#inventory .item").count(), 4);
-    await page.locator('[data-view="tasks"]').click();
-    await page.locator("#lab summary").click();
-    await page.evaluate(() => {
-      for (let i = 0; i < 5; i++) document.querySelector("#tapBtn").click();
-    });
-    await page.waitForTimeout(700);
-    assert.equal(tapRequests, 1, "taps were sent individually");
-    assert.equal(actions.find((x) => x.action === "tap_batch").count, 5);
+    assert.equal(model.player.mogg_points, 202);
+    assert.equal(model.player.mogg_score, 0, "partner bonus changed rating");
+    assert.equal(actions.filter((x) => x.action === "claim_partner").length, 2);
+    await page.locator('[data-view="profile"]').click();
+    await page.locator("#collectionBtn").click();
+    assert(await page.locator("#styleView").isVisible());
+    assert.equal(
+      await page.locator('[data-buy="' + set.id + '"]').count(),
+      0,
+      "Stars offer is still displayed",
+    );
     await page.locator('[data-view="profile"]').click();
     await page.locator("#shareProfile").click();
     await page.waitForSelector("#cardSend");
@@ -448,7 +497,7 @@ const server = http.createServer((req, res) => {
     assert(referralParams.get("text").includes("100"));
     assert.deepEqual(errors, []);
     console.log(
-      "PASS: demo at 4 widths, photo-free first vote, welcome claim, consent + resized photo, invite, full set try-on, Stars checkout, inventory, batched taps, share card, escaped names.",
+      "PASS: demo at 4 widths, photo-free first vote, welcome claim, consent + resized photo, invite, leaderboard filters, verified partner claims, Points-only wardrobe, share card, escaped names.",
     );
   } finally {
     await browser.close();

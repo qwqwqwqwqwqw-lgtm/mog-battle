@@ -1,6 +1,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2.117.2";
 import { validatePng, cleanupCards } from "../_shared/portrait.ts";
 import { decodePhoto } from "../_shared/raster.ts";
+import { verifyPartnerMembership } from "../_shared/partners.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -486,6 +487,87 @@ Deno.serve(async (req) => {
       if (!up.error) p = up.data;
     }
 
+    if (body.action === "create_star_invoice") {
+      return Response.json(
+        { error: "purchases_disabled" },
+        { status: 409, headers: cors },
+      );
+    }
+    if (body.action === "open_matchmaking" && body.opponent === "practice") {
+      return Response.json(
+        { error: "practice_disabled" },
+        { status: 409, headers: cors },
+      );
+    }
+    if (body.action === "leaderboard") {
+      let top = db
+        .from("players")
+        .select(
+          "id,first_name,gender,mogg_score,battles_played,profile_photo_url,equipped_frame,equipped_title",
+        )
+        .eq("is_npc", false)
+        .not("profile_photo_url", "is", null)
+        .not("photo_consent_at", "is", null)
+        .gt("battles_played", 0)
+        .gt("mogg_score", 0)
+        .order("mogg_score", { ascending: false })
+        .order("id")
+        .limit(30);
+      if (["male", "female"].includes(body.gender))
+        top = top.eq("gender", body.gender);
+      const rows = await top;
+      if (rows.error) throw rows.error;
+      return Response.json(
+        { ok: true, players: await resolveStyles(db, rows.data || []) },
+        { headers: cors },
+      );
+    }
+    if (body.action === "claim_partner") {
+      const slug = String(body.slug || "");
+      if (!/^[a-z0-9][a-z0-9_-]{0,39}$/.test(slug))
+        throw new Error("partner_inactive");
+      const campaign = await db
+        .from("partner_campaigns")
+        .select("*")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (campaign.error) throw campaign.error;
+      const c = campaign.data;
+      if (
+        !c ||
+        !c.is_active ||
+        new Date(c.starts_at).getTime() > Date.now() ||
+        (c.ends_at && new Date(c.ends_at).getTime() <= Date.now())
+      )
+        throw new Error("partner_inactive");
+      const existing = await db
+        .from("partner_claims")
+        .select("reward_points")
+        .eq("campaign_id", c.id)
+        .eq("player_id", p.id)
+        .maybeSingle();
+      if (existing.error) throw existing.error;
+      if (existing.data)
+        return Response.json(
+          { ok: true, replayed: true, points: existing.data.reward_points },
+          { headers: cors },
+        );
+      if (
+        !(await verifyPartnerMembership(
+          token,
+          c.username,
+          Number(p.telegram_id),
+        ))
+      )
+        throw new Error("partner_not_subscribed");
+      const claim = await db.rpc("claim_partner_points_v1", {
+        p_player: p.id,
+        p_campaign: c.id,
+      });
+      if (claim.error) throw claim.error;
+      return Response.json({ ok: true, ...claim.data }, { headers: cors });
+    }
+
     if (body.action === "support_submit") {
       if (
         ![
@@ -558,7 +640,7 @@ Deno.serve(async (req) => {
       if (bq.error) throw bq.error;
       // Old NPC-vs-NPC filler must never reach any client, including cached ones.
       const feed = (await enrichFeed(db, bq.data || [])).filter(
-        (b: any) => b.source !== "npc_feed" && !(b.a?.is_npc && b.b?.is_npc),
+        (b: any) => b.source !== "npc_feed" && !b.a?.is_npc && !b.b?.is_npc,
       );
       const gate = await db.rpc("ranked_votes_needed_v2", { p_player: p.id });
       if (gate.error) throw gate.error;
@@ -578,11 +660,29 @@ Deno.serve(async (req) => {
         .eq("player_id", p.id)
         .order("obtained_at", { ascending: false });
       if (inv.error) throw inv.error;
-      const sponsors = await db
-        .from("sponsor_channels")
-        .select("username,title,reward_score")
+      const campaigns = await db
+        .from("partner_campaigns")
+        .select("id,slug,title,username,reward_points")
         .eq("is_active", true)
-        .eq("is_required", true);
+        .lte("starts_at", new Date().toISOString())
+        .or(`ends_at.is.null,ends_at.gt.${new Date().toISOString()}`)
+        .order("sort_order")
+        .limit(3);
+      if (campaigns.error) throw campaigns.error;
+      const partnerClaims = campaigns.data?.length
+        ? await db
+            .from("partner_claims")
+            .select("campaign_id")
+            .eq("player_id", p.id)
+            .in(
+              "campaign_id",
+              campaigns.data.map((c: any) => c.id),
+            )
+        : { data: [], error: null };
+      if (partnerClaims.error) throw partnerClaims.error;
+      const claimedPartners = new Set(
+        (partnerClaims.data || []).map((c: any) => c.campaign_id),
+      );
       const catalog =
         body.include_catalog === false
           ? { data: null, error: null }
@@ -648,7 +748,10 @@ Deno.serve(async (req) => {
             ? { shop: catalog.data, bundles: bundles.data || [] }
             : {}),
           daily: daily.data,
-          sponsors: sponsors.data || [],
+          partner_tasks: (campaigns.data || []).map((c: any) => ({
+            ...c,
+            claimed: claimedPartners.has(c.id),
+          })),
           drops: {
             current_tier: tier,
             available_tiers: available,
@@ -1156,35 +1259,6 @@ Deno.serve(async (req) => {
         );
       }
 
-      // Virtual opponents are available only after an explicit practice click.
-      if (body.opponent === "practice" && battleMode === "quick") {
-        const nq = await db
-          .from("players")
-          .select("id,mogg_score")
-          .eq("is_npc", true)
-          .eq("npc_active", true)
-          .eq("gender", p.gender)
-          .not("profile_photo_url", "is", null)
-          .limit(80);
-        if (nq.error) throw nq.error;
-        const near = (nq.data || [])
-          .sort(
-            (a: any, b: any) =>
-              Math.abs(Number(a.mogg_score || 0) - Number(p.mogg_score || 0)) -
-              Math.abs(Number(b.mogg_score || 0) - Number(p.mogg_score || 0)),
-          )
-          .slice(0, 6);
-        if (!near.length)
-          return Response.json(
-            { ok: true, matched: false, unavailable: true, mode: "quick" },
-            { headers: cors },
-          );
-        return await createAtomic(
-          near[Math.floor(Math.random() * near.length)].id,
-          "quick",
-        );
-      }
-
       if (battleMode === "ranked") {
         const gate = await db.rpc("ranked_votes_needed_v2", { p_player: p.id });
         if (gate.error) throw gate.error;
@@ -1428,82 +1502,6 @@ Deno.serve(async (req) => {
       });
       if (r.error) throw r.error;
       return Response.json({ ok: true, player: r.data }, { headers: cors });
-    }
-
-    if (body.action === "create_star_invoice") {
-      const cosmeticId = String(body.cosmetic_id || "");
-      const cq = await db
-        .from("cosmetics")
-        .select("*")
-        .eq("id", cosmeticId)
-        .single();
-      if (cq.error) throw cq.error;
-      const c = cq.data;
-      if (Number(c.price_stars || 0) <= 0)
-        return Response.json(
-          { error: "not_for_stars" },
-          { status: 400, headers: cors },
-        );
-      const own = await db
-        .from("player_inventory")
-        .select("id")
-        .eq("player_id", p.id)
-        .eq("cosmetic_id", c.id)
-        .maybeSingle();
-      if (own.data)
-        return Response.json(
-          { error: "already_owned" },
-          { status: 409, headers: cors },
-        );
-      if (c.limited_total) {
-        const count = await db
-          .from("player_inventory")
-          .select("*", { count: "exact", head: true })
-          .eq("cosmetic_id", c.id);
-        if ((count.count || 0) >= Number(c.limited_total))
-          return Response.json(
-            { error: "sold_out" },
-            { status: 409, headers: cors },
-          );
-      }
-      if (body.terms_version !== "2026-09-30")
-        throw new Error("purchase_terms_required");
-      const purchaseId = crypto.randomUUID();
-      const payload = `cosm:${purchaseId}`;
-      const pr = await db.from("star_purchases").insert({
-        id: purchaseId,
-        player_id: p.id,
-        cosmetic_id: c.id,
-        invoice_payload: payload,
-        stars: Number(c.price_stars),
-        status: "pending",
-        terms_version: body.terms_version,
-      });
-      if (pr.error) throw pr.error;
-      const tr = await fetch(
-        `https://api.telegram.org/bot${token}/createInvoiceLink`,
-        {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            title: c.name.slice(0, 32),
-            description:
-              `MOGG BATTLE · ${String(c.rarity).toUpperCase()} ${c.kind}`.slice(
-                0,
-                255,
-              ),
-            payload,
-            currency: "XTR",
-            prices: [{ label: c.name, amount: Number(c.price_stars) }],
-          }),
-        },
-      );
-      const tj = await tr.json();
-      if (!tj.ok) throw new Error(tj.description || "invoice_failed");
-      return Response.json(
-        { ok: true, invoice_url: tj.result },
-        { headers: cors },
-      );
     }
 
     if (body.action === "equip") {

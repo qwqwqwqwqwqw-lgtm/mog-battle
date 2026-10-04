@@ -91,6 +91,9 @@
     bundles: [],
     demo: !tg?.initData,
     feedFilter: "human",
+    partnerTasks: [],
+    leaderboard: [],
+    ratingFilter: "all",
     kindFilter: "all",
     view: "arena",
     invite: null,
@@ -134,6 +137,7 @@
     return true;
   }
   function safePhoto(url) {
+    if (typeof url !== "string" || !url.trim()) return "";
     try {
       const u = new URL(url, location.href);
       if (u.protocol !== "https:" && u.origin !== location.origin) return "";
@@ -282,7 +286,8 @@
     });
 
   function openView(view) {
-    if (!["arena", "tasks", "style", "profile"].includes(view)) view = "arena";
+    if (!["arena", "rating", "tasks", "style", "profile"].includes(view))
+      view = "arena";
     state.view = view;
     document
       .querySelectorAll(".view")
@@ -301,6 +306,7 @@
         : "smooth",
     });
     if (view === "style") track("shop_open");
+    if (view === "rating") loadRating();
   }
   document
     .querySelectorAll("[data-view]")
@@ -317,7 +323,13 @@
     $("miniAvatar").innerHTML = photo
       ? `<img src="${escape(photo)}" alt="">`
       : escape(name(p).charAt(0));
-    $("miniPoints").textContent = fmt(p.mogg_points) + " P";
+    $("miniPoints").textContent = fmt(p.mogg_score) + " RP";
+    $("myRating").innerHTML =
+      `<div><span class="eyebrow">ТВОЙ РЕЙТИНГ</span><strong>${fmt(p.mogg_score)}<small>RP</small></strong><span class="rating-rank">${escape(rankLabel(p))}</span></div><button id="ratingBattle" class="primary">На арену ↗</button>`;
+    $("ratingBattle").onclick = () => {
+      openView("arena");
+      startMatch("ranked");
+    };
     $("taskPoints").innerHTML = fmt(p.mogg_points) + "<span>Points</span>";
     $("shopPoints").textContent = fmt(p.mogg_points) + " Points";
     const st = p.style || {};
@@ -331,6 +343,7 @@
     $("refCount").textContent =
       "Друзей с готовым профилем: " + fmt(p.referral_count);
     renderLab();
+    renderPartners();
   }
   function battleCard(b, isOwn = false) {
     const label = state.demo
@@ -347,10 +360,7 @@
     return `<article class="battle-card ${isOwn ? "own-battle" : ""}" data-battle="${escape(b.id)}"><div class="battle-meta"><span class="${practice(b) ? "practice" : ""}">${escape(label)}</span><span class="timer" ${state.demo ? "" : `data-ends="${escape(b.ends_at)}"`}>${state.demo ? "Демо" : timeLeft(b.ends_at)}</span></div><div class="faces">${fighter(b.a, "01")}${fighter(b.b, "02")}<span class="vs-label" aria-hidden="true">VS</span></div>${isOwn ? `<div class="own-note">${b.mode === "quick" ? "Твой бой идёт. Пригласи друзей выбрать победителя. Рейтинг сохраняется." : b.quorum_at ? "5 оценок собраны. Осталось финальное голосование." : "Ждём 5 оценок. Бой может идти до суток; рейтинг меняется только по голосам."}</div><div class="vote-row"><button class="secondary share-battle" data-id="${escape(b.id)}">Позвать голосовать ↗</button><button class="secondary revisit">Выбрать другие бои</button></div>` : `<div class="vote-row"><button class="vote-button" data-side="a" data-id="${escape(b.id)}">За ${escape(name(b.a))}</button><button class="vote-button" data-side="b" data-id="${escape(b.id)}">За ${escape(name(b.b))}</button></div><div class="battle-meta"><button class="report-button" data-report="${escape(b.id)}">Пожаловаться</button><button class="report-button" data-skip="${escape(b.id)}">Пропустить →</button></div>`}</article>`;
   }
   function renderFeed() {
-    const active = state.feed.filter(
-        (b) =>
-          live(b) && b.source !== "npc_feed" && !(b.a?.is_npc && b.b?.is_npc),
-      ),
+    const active = state.feed.filter((b) => live(b) && !practice(b)),
       mine = active.filter(own);
     $("ownBattles").innerHTML = mine.length
       ? '<div class="own-heading"><b>Твой бой</b><span>На арене</span></div>' +
@@ -361,16 +371,13 @@
     );
     if (state.feedFilter === "human")
       candidates = candidates.filter((b) => !practice(b));
-    if (state.feedFilter === "practice")
-      candidates = candidates.filter(practice);
+    if (state.feedFilter === "ranked")
+      candidates = candidates.filter((b) => b.mode !== "quick");
     candidates.sort((a, b) => Number(practice(a)) - Number(practice(b)));
     $("battleFeed").innerHTML = candidates.length
       ? battleCard(candidates[0])
-      : state.feedFilter === "practice"
-        ? `<div class="empty"><span class="empty-symbol">VS</span><b>Твой тренировочный бой</b><p>Ты против виртуального соперника. Голосуют люди, рейтинг сохраняется.</p><button class="secondary" id="startPractice" ${matchBusy ? "disabled" : ""}>Начать тренировку</button></div>`
-        : `<div class="empty"><span class="empty-symbol">↗</span><b>Сейчас нет открытых боёв</b><p>Создай дуэль с другом и отправь ссылку в беседу. Первый бой начинается с вас.</p><button class="secondary" id="emptyDuel">Вызвать друга ↗</button><p><button class="report-button" id="revisit">${skipped.size ? "Показать пропущенные" : "Проверить новые пары"}</button></p></div>`;
+      : `<div class="empty"><span class="empty-symbol">↗</span><b>Сейчас нет открытых боёв</b><p>Создай дуэль с другом и отправь ссылку в беседу. Первый бой начинается с вас.</p><button class="secondary" id="emptyDuel">Вызвать друга ↗</button><p><button class="report-button" id="revisit">${skipped.size ? "Показать пропущенные" : "Проверить новые пары"}</button></p></div>`;
     $("emptyDuel")?.addEventListener("click", createDuel);
-    $("startPractice")?.addEventListener("click", () => startMatch("practice"));
     document
       .querySelectorAll("[data-side]")
       .forEach(
@@ -480,14 +487,6 @@
           value: d.battles || 0,
           goal: 1,
           reward: 80,
-        },
-        {
-          key: "taps",
-          icon: "✳",
-          title: "Сделай 30 тапов в LAB",
-          value: d.taps || 0,
-          goal: 30,
-          reward: 40,
         },
       ];
     $("missions").innerHTML = missions
@@ -688,28 +687,17 @@
     return `<b class="intro-${k}">${escape(c.name)}</b>`;
   }
   function renderShop() {
-    const owned = new Set(state.inventory.map((x) => x.cosmetics?.id)),
-      sets = state.shop.filter(
-        (c) => c.collection === "sets" && Number(c.price_stars) > 0,
-      );
-    $("sets").innerHTML = sets
-      .map((c) => {
-        const group = c.code.includes("chrome")
-          ? "chrome-set"
-          : c.code.includes("apex")
-            ? "apex-set"
-            : "";
-        return `<article class="set-card"><div class="set-showroom ${group}">${portrait(state.player, c)}<div class="set-words"><span class="eyebrow">MOGG / FULL LOOK</span><h3>${escape(c.name).replace(" ", "<br>")}</h3><span class="set-parts">Рамка + фон + титул<br>Один набор. Цельный образ.</span></div></div><div class="set-bottom"><button class="secondary" data-try="${escape(c.id)}">Примерить</button><button class="primary" data-buy="${escape(c.id)}" ${owned.has(c.id) ? "disabled" : ""}>${owned.has(c.id) ? "В коллекции" : fmt(c.price_stars) + " Stars"}</button></div></article>`;
-      })
-      .join("");
+    const owned = new Set(state.inventory.map((x) => x.cosmetics?.id));
+    $("sets").innerHTML = "";
     let items = state.shop.filter(
       (c) =>
         !["sets", "set_items", "first_steps", "top1", "top10"].includes(
           c.collection,
         ) &&
         !["reaction", "victory_card"].includes(c.kind) &&
-        ((c.is_purchasable && Number(c.price_points) > 0) ||
-          Number(c.price_stars) > 0),
+        c.is_purchasable &&
+        Number(c.price_points) > 0 &&
+        Number(c.price_stars || 0) === 0,
     );
     if (state.kindFilter === "other")
       items = items.filter(
@@ -730,7 +718,7 @@
   }
   function itemCard(c, isOwned = false, inventory = false) {
     const equipped = state.player?.[field[c.kind]] === c.id;
-    return `<article class="item"><div class="item-preview">${preview(c)}</div><b class="item-name">${escape(c.name)}</b><span class="item-kind">${escape(kindName[c.kind] || "Стиль")}${Number(c.price_stars) > 0 ? " · Stars" : ""}</span><div class="item-actions"><button data-try="${escape(c.id)}">Примерить</button>${inventory ? `<button class="${equipped ? "equipped" : ""}" data-equip="${escape(c.id)}" ${["reaction", "victory_card"].includes(c.kind) ? "disabled" : ""}>${["reaction", "victory_card"].includes(c.kind) ? "Архивный предмет" : equipped ? "Снять" : "Надеть"}</button>` : `<button class="purchase" data-buy="${escape(c.id)}" ${isOwned ? "disabled" : ""}>${isOwned ? "В коллекции" : Number(c.price_stars) > 0 ? fmt(c.price_stars) + " Stars" : fmt(c.price_points) + " Points"}</button>`}</div></article>`;
+    return `<article class="item"><div class="item-preview">${preview(c)}</div><b class="item-name">${escape(c.name)}</b><span class="item-kind">${escape(kindName[c.kind] || "Стиль")}</span><div class="item-actions"><button data-try="${escape(c.id)}">Примерить</button>${inventory ? `<button class="${equipped ? "equipped" : ""}" data-equip="${escape(c.id)}" ${["reaction", "victory_card"].includes(c.kind) ? "disabled" : ""}>${["reaction", "victory_card"].includes(c.kind) ? "Архивный предмет" : equipped ? "Снять" : "Надеть"}</button>` : `<button class="purchase" data-buy="${escape(c.id)}" ${isOwned ? "disabled" : ""}>${isOwned ? "В коллекции" : fmt(c.price_points) + " Points"}</button>`}</div></article>`;
   }
   function renderInventory() {
     $("ownedCount").textContent = state.inventory.length;
@@ -806,7 +794,7 @@
     for (const item of [c, ...parts]) p.style[item.kind] = item;
     showModal(
       "ПРИМЕРКА / " + (kindName[c.kind] || "СТИЛЬ"),
-      `<h2>${escape(c.name)}</h2><div class="try-hero ${p.style.profile_bg ? "bg-" + key(p.style.profile_bg) : ""}">${portrait(p)}<h3 class="${p.style.name_style ? "name-" + key(p.style.name_style) : ""}">${escape(name(p))}</h3>${title(p)}${parts.length ? '<div class="bundle-parts">Рамка · фон · титул</div>' : ""}</div><p>Так оформление выглядит с твоим фото. Примерка бесплатна.</p><button id="tryPurchase" class="primary">${state.inventory.some((x) => x.cosmetics.id === id) ? "Открыть коллекцию" : Number(c.price_stars) > 0 ? "Купить за " + fmt(c.price_stars) + " Stars" : Number(c.price_points) > 0 ? "Купить за " + fmt(c.price_points) + " Points" : "На арену"}</button>`,
+      `<h2>${escape(c.name)}</h2><div class="try-hero ${p.style.profile_bg ? "bg-" + key(p.style.profile_bg) : ""}">${portrait(p)}<h3 class="${p.style.name_style ? "name-" + key(p.style.name_style) : ""}">${escape(name(p))}</h3>${title(p)}${parts.length ? '<div class="bundle-parts">Рамка · фон · титул</div>' : ""}</div><p>Так оформление выглядит с твоим фото. Примерка бесплатна.</p><button id="tryPurchase" class="primary">${state.inventory.some((x) => x.cosmetics.id === id) ? "Открыть коллекцию" : Number(c.price_points) > 0 ? "Купить за " + fmt(c.price_points) + " Points" : "На арену"}</button>`,
     );
     $("tryPurchase").onclick = () => {
       if (state.inventory.some((x) => x.cosmetics.id === id)) {
@@ -830,42 +818,8 @@
       return;
     }
     if (Number(c.price_stars) > 0) {
-      showModal(
-        "ПОКУПКА / TELEGRAM STARS",
-        `<h2>${escape(c.name)}</h2><div class="try-hero">${preview(c)}</div><p>${bundleParts(c).length ? "В наборе: рамка, фон и титул. Все три предмета останутся в твоей коллекции." : "Предмет останется в твоей коллекции."} Цена: ${fmt(c.price_stars)} Stars.</p><label class="check-row"><input id="purchaseConsent" type="checkbox"><span>Прочитал <a href="rules.html#purchases" target="_blank" rel="noopener">условия покупки и возвратов</a>.</span></label><button id="confirmPurchase" class="primary" disabled>Перейти к оплате · ${fmt(c.price_stars)} Stars</button><p id="purchaseStatus" role="status"></p>`,
-      );
-      $("purchaseConsent").onchange = () =>
-        ($("confirmPurchase").disabled = !$("purchaseConsent").checked);
-      $("confirmPurchase").onclick = async () => {
-        $("confirmPurchase").disabled = true;
-        try {
-          const d = await call("create_star_invoice", {
-            cosmetic_id: id,
-            terms_version: "2026-09-30",
-          });
-          track("invoice_open");
-          tg.openInvoice(d.invoice_url, (status) => {
-            if (status === "paid") {
-              closeModal();
-              toast("Оплата принята. Проверяем доставку…");
-              waitForPurchase(id);
-            } else if (status === "failed") {
-              $("purchaseStatus").textContent =
-                "Платёж не прошёл. Можно попробовать ещё раз.";
-              $("confirmPurchase").disabled = false;
-            } else {
-              $("purchaseStatus").textContent =
-                status === "pending"
-                  ? "Telegram обрабатывает платёж. Предмет появится после подтверждения."
-                  : "Оплата отменена. Списание не подтверждено.";
-              $("confirmPurchase").disabled = false;
-            }
-          });
-        } catch (e) {
-          $("purchaseStatus").textContent = errorText(e);
-          $("confirmPurchase").disabled = false;
-        }
-      };
+      toast("Этот предмет доступен только в уже полученной коллекции");
+      return;
     } else {
       try {
         await flushTaps();
@@ -985,7 +939,7 @@
       canvas.width = Math.max(1, Math.round(image.naturalWidth * ratio));
       canvas.height = Math.max(1, Math.round(image.naturalHeight * ratio));
       const context = canvas.getContext("2d");
-      context.fillStyle = "#101211";
+      context.fillStyle = "#0c0c0e";
       context.fillRect(0, 0, canvas.width, canvas.height);
       context.drawImage(image, 0, 0, canvas.width, canvas.height);
       return canvas.toDataURL("image/jpeg", 0.88).split(",")[1];
@@ -1401,12 +1355,12 @@
     ctx.fillStyle =
       { midnight: "#221d32", liquidchrome: "#252b34", goldroom: "#302719" }[
         key(p.style?.profile_bg)
-      ] || "#101211";
+      ] || "#0c0c0e";
     ctx.fillRect(0, 0, 900, 1200);
-    ctx.fillStyle = "#d9ff67";
-    ctx.font = "900 49px Arial";
+    ctx.fillStyle = "#b8adff";
+    ctx.font = "600 49px Oswald, sans-serif";
     ctx.fillText("MOGG BATTLE", 60, 95);
-    ctx.fillStyle = "#9ca78f";
+    ctx.fillStyle = "#99999f";
     ctx.font = "20px monospace";
     ctx.fillText(win ? "THIS ROUND IS MINE." : "MAKE YOUR MOVE.", 60, 138);
     const photo = safePhoto(p.profile_photo_url);
@@ -1425,7 +1379,7 @@
     const color =
       { afterhours: "#c9a3ff", chromeclub: "#dbe5ee", apex: "#eec973" }[
         key(p.style?.frame)
-      ] || "#d9ff67";
+      ] || "#b8adff";
     ctx.strokeStyle = color;
     ctx.lineWidth = 8;
     ctx.beginPath();
@@ -1440,14 +1394,14 @@
     ctx.fillStyle = color;
     ctx.font = "700 29px Arial";
     ctx.fillText(p.style?.title?.name || rankLabel(p), 60, 1001);
-    ctx.fillStyle = "#d9ff67";
+    ctx.fillStyle = "#b8adff";
     ctx.font = "900 39px Arial";
     ctx.fillText(
       win ? "Я ЗАБРАЛ ЭТОТ БАТЛ." : "СМОЖЕШЬ МОГНУТЬ МЕНЯ?",
       60,
       1085,
     );
-    ctx.fillStyle = "#9ca78f";
+    ctx.fillStyle = "#99999f";
     ctx.font = "20px monospace";
     ctx.fillText("@MoggBattleGameBot", 60, 1142);
     return c.toDataURL("image/png");
@@ -1605,7 +1559,7 @@
   $("guideBtn").onclick = () =>
     showModal(
       "БЫСТРЫЙ СТАРТ",
-      `<h2>Три шага к батлу</h2><div class="guide-step"><span>01 / ВЫБИРАЙ</span><h3>Два фото. Один голос.</h3><p>Голосуй сразу, без загрузки фото. За голос — 2 Points. За первый голос можно забрать рамку и ещё 100 Points.</p></div><div class="guide-step"><span>02 / ВЫЗЫВАЙ</span><h3>Друг или случайный соперник</h3><p>Для участия добавь своё фото. Быстрый бой длится минуту. В обычном поиске соперники — игроки. Тренировку с виртуальным соперником можно запустить отдельно. Голосуют люди. Если голосов нет, победитель не назначается.</p></div><div class="guide-step"><span>03 / ВЫДЕЛЯЙСЯ</span><h3>Собери свой стиль</h3><p>Points получай за задания, голоса и в LAB. В магазине — оформление за Points или Stars. Набор содержит рамку, фон и титул. Рейтинг зависит от голосов игроков.</p></div><p>Добавь бота в беседу: /battle — минутная дуэль; /ranked — рейтинговый вызов. Рейтинговый бой ждёт 5 оценок, затем 10 минут, максимум сутки. Перед следующим рейтинговым боем оцени 3 чужих пары.</p>`,
+      `<h2>Три шага к батлу</h2><div class="guide-step"><span>01 / ВЫБИРАЙ</span><h3>Два фото. Один голос.</h3><p>Голосуй сразу, без загрузки фото. За голос — 2 Points. За первый голос можно забрать рамку и ещё 100 Points.</p></div><div class="guide-step"><span>02 / ВЫЗЫВАЙ</span><h3>Друг или случайный соперник</h3><p>Для участия добавь своё фото. Быстрый бой длится минуту. В обычном поиске соперники — игроки. Голосуют люди. Если голосов нет, победитель не назначается.</p></div><div class="guide-step"><span>03 / ВЫДЕЛЯЙСЯ</span><h3>Собери свой стиль</h3><p>Points получай за задания, голоса и подписки на каналы партнёров. В коллекции — оформление профиля за игровые очки. Рейтинг зависит от голосов игроков.</p></div><p>Добавь бота в беседу: /battle — минутная дуэль; /ranked — рейтинговый вызов. Рейтинговый бой ждёт 5 оценок, затем 10 минут, максимум сутки. Перед следующим рейтинговым боем оцени 3 чужих пары.</p>`,
     );
 
   function applyData(d, initial = false) {
@@ -1616,6 +1570,7 @@
     if (d.bundles) state.bundles = d.bundles;
     state.inventory = d.inventory || [];
     state.daily = d.daily || {};
+    state.partnerTasks = d.partner_tasks || [];
     state.drops = d.drops || {};
     state.rankedQueue = d.ranked_queue || null;
     state.lastBattle = d.last_battle || null;
@@ -1627,6 +1582,7 @@
     renderInventory();
     renderRankReward();
     renderLastBattle();
+    if (state.view === "rating") loadRating(true);
     if (
       !initial &&
       old !== lastResult &&
@@ -1673,12 +1629,14 @@
     if (state.demo) {
       demo();
       ready = true;
+      if (state.view === "rating") loadRating(true);
       booting = false;
       return;
     }
     try {
       applyData(await call("me"), true);
       ready = true;
+      if (state.view === "rating") loadRating(true);
       $("connection").hidden = true;
       await handleStart();
       schedulePoll();
@@ -1709,16 +1667,119 @@
       openTelegram(e.currentTarget.href);
     }
   };
+  function renderPartners() {
+    const tasks = state.partnerTasks;
+    $("partnerTasks").innerHTML = tasks.length
+      ? tasks
+          .map(
+            (t, i) =>
+              `<article class="partner-task ${t.claimed ? "completed" : ""}"><div class="partner-task-top"><span class="partner-monogram">${escape(t.title.slice(0, 1).toUpperCase())}</span><div><span class="eyebrow">PARTNER / ${String(i + 1).padStart(2, "0")}</span><h3>${escape(t.title)}</h3><span class="muted">@${escape(t.username)}</span></div><span class="partner-reward">+${fmt(t.reward_points)}<small>POINTS</small></span></div><div class="partner-task-actions"><a class="secondary" href="https://t.me/${escape(t.username)}" data-partner-open="${escape(t.slug)}">Открыть канал ↗</a><button class="primary" data-partner-claim="${escape(t.slug)}" ${t.claimed ? "disabled" : ""}>${t.claimed ? "Получено ✓" : "Проверить подписку"}</button></div><p class="partner-feedback muted" id="partner-${escape(t.slug)}" role="status"></p></article>`,
+          )
+          .join("")
+      : '<div class="partner-empty"><span class="eyebrow">FIRST DROP / COMING NEXT</span><b>Место для новых имён.</b><p>Здесь появятся каналы партнёров и бонусы за подписку. Пока забирай ежедневные награды ниже.</p></div>';
+    document.querySelectorAll("[data-partner-open]").forEach(
+      (b) =>
+        (b.onclick = (e) => {
+          e.preventDefault();
+          openTelegram(b.href);
+        }),
+    );
+    document.querySelectorAll("[data-partner-claim]").forEach(
+      (b) =>
+        (b.onclick = async () => {
+          if (!requireTelegram()) return;
+          const feedback = $("partner-" + b.dataset.partnerClaim);
+          b.disabled = true;
+          feedback.textContent = "Проверяем подписку…";
+          try {
+            const d = await call("claim_partner", {
+              slug: b.dataset.partnerClaim,
+            });
+            await refresh();
+            toast(
+              d.replayed
+                ? "Бонус уже получен"
+                : `+${fmt(d.points)} Points · бонус получен`,
+            );
+          } catch (e) {
+            if (feedback.isConnected)
+              feedback.textContent =
+                {
+                  partner_not_subscribed:
+                    "Подписка пока не найдена. Подпишись и проверь ещё раз.",
+                  partner_verification_unavailable:
+                    "Проверка временно недоступна. Бонус не списан — попробуй позже.",
+                  partner_inactive: "Это предложение уже завершилось.",
+                }[e.message] || errorText(e);
+            if (b.isConnected) b.disabled = false;
+          }
+        }),
+    );
+  }
+  let ratingLoading = false,
+    ratingLoadedAt = 0;
+  function renderLeaderboard() {
+    $("leaderboard").innerHTML = state.leaderboard.length
+      ? state.leaderboard
+          .map(
+            (p, i) =>
+              `<article class="rank-row ${p.id === state.player?.id ? "rank-self" : ""}"><span class="rank-position">${String(i + 1).padStart(2, "0")}</span>${portrait(p)}<div class="rank-person"><b>${escape(name(p))}</b><span>${escape(rank(p))}${p.id === state.player?.id ? " · это ты" : ""}</span></div><strong>${fmt(p.mogg_score)}<small>RP</small></strong></article>`,
+          )
+          .join("")
+      : '<div class="empty"><span class="empty-symbol">↗</span><b>Первое место ждёт.</b><p>Заверши рейтинговый батл, чтобы попасть в топ.</p></div>';
+  }
+  async function loadRating(force = false) {
+    if (state.demo) {
+      renderLeaderboard();
+      return;
+    }
+    if (
+      !ready ||
+      ratingLoading ||
+      (!force && Date.now() - ratingLoadedAt < 15000)
+    )
+      return;
+    ratingLoading = true;
+    $("refreshRating").disabled = true;
+    $("leaderboard").setAttribute("aria-busy", "true");
+    try {
+      const d = await call("leaderboard", { gender: state.ratingFilter });
+      state.leaderboard = d.players || [];
+      ratingLoadedAt = Date.now();
+      renderLeaderboard();
+    } catch (e) {
+      $("leaderboard").innerHTML =
+        '<div class="empty"><b>Не удалось обновить топ</b><p>Попробуй ещё раз кнопкой «Обновить».</p></div>';
+    } finally {
+      ratingLoading = false;
+      $("refreshRating").disabled = false;
+      $("leaderboard").removeAttribute("aria-busy");
+    }
+  }
+  $("refreshRating").onclick = () => loadRating(true);
+  document.querySelectorAll("[data-rating]").forEach(
+    (b) =>
+      (b.onclick = async () => {
+        if (ratingLoading) return;
+        state.ratingFilter = b.dataset.rating;
+        document
+          .querySelectorAll("[data-rating]")
+          .forEach((x) => x.classList.toggle("selected", x === b));
+        await loadRating(true);
+      }),
+  );
+  $("collectionBtn").onclick = () => openView("style");
+
   function demo() {
     const c = (id, code, name, kind, stars, visual) => ({
       id,
       code,
       name,
       kind,
-      price_stars: stars,
-      price_points: 0,
+      price_stars: 0,
+      price_points: stars,
       is_purchasable: true,
-      collection: "sets",
+      collection: "preview",
       visual_key: visual,
     });
     state.shop = [
@@ -1749,7 +1810,7 @@
       energy: 100,
       max_energy: 100,
       style: {},
-      profile_photo_url: "npc/npc001.jpg",
+      profile_photo_url: null,
     };
     state.feed = [
       {
@@ -1759,12 +1820,12 @@
         a: {
           first_name: "ALEX",
           is_demo: true,
-          profile_photo_url: "npc/npc003.jpg",
+          profile_photo_url: null,
         },
         b: {
           first_name: "NICK",
           is_demo: true,
-          profile_photo_url: "npc/npc005.jpg",
+          profile_photo_url: null,
         },
         source: "demo",
         mode: "quick",
@@ -1774,13 +1835,14 @@
     ];
     state.daily = { streak: 1, claimed: [] };
     $("demoBanner").hidden = false;
+    renderLeaderboard();
     renderPlayer();
     renderFeed();
     renderDaily();
     renderShop();
     renderInventory();
     renderRankReward();
-    $("feedLabel").textContent = "Демо-пара";
+    $("feedLabel").textContent = "Пример интерфейса";
     document.querySelectorAll("[data-ends]").forEach((x) => {
       x.removeAttribute("data-ends");
       x.textContent = "Демо";
@@ -1790,9 +1852,9 @@
     tg.ready();
     tg.expand();
     try {
-      tg.setHeaderColor("#101211");
-      tg.setBackgroundColor("#101211");
-      tg.setBottomBarColor?.("#101211");
+      tg.setHeaderColor("#0c0c0e");
+      tg.setBackgroundColor("#0c0c0e");
+      tg.setBottomBarColor?.("#0c0c0e");
     } catch {}
     const safe = () => {
       document.documentElement.style.setProperty(
