@@ -1,0 +1,225 @@
+/* MOGG BATTLE — clean, photo-first interface */
+:root {
+  color-scheme: dark;
+  --bg: #111113;
+  --panel: #19191c;
+  --line: #303035;
+  --text: #f4f1ed;
+  --muted: #a4a0a5;
+  --lime: #b8a7ff;
+  --orange: #f1a88c;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: -0.01em;
+}
+.app {
+  max-width: 460px;
+  padding: calc(16px + var(--safe-top)) 18px calc(100px + var(--safe-bottom));
+}
+.topbar {
+  margin-bottom: 28px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid #29292e;
+}
+.wordmark {
+  font-size: 22px;
+  letter-spacing: -1.2px;
+  font-weight: 850;
+}
+.brand-square {
+  background: var(--lime);
+  color: #17151e;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+}
+.account-chip {
+  padding: 5px 10px 5px 6px;
+  background: #1b1b1f;
+  border-color: #2d2d32;
+  font-size: 11px;
+}
+.arena-title {
+  display: block;
+  margin: 0 0 19px;
+}
+.arena-title .eyebrow {
+  display: block;
+  margin: 0 0 10px;
+  font-size: 10px;
+  letter-spacing: 1.1px;
+  color: #b9aaff;
+}
+.arena-title h1 {
+  margin: 0;
+  font-size: clamp(43px, 12vw, 58px);
+  font-weight: 760;
+  letter-spacing: -2.8px;
+  line-height: .98;
+}
+.hero-dot { color: var(--lime); }
+.hero-caption {
+  max-width: 285px;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #b6b2ba;
+  letter-spacing: -.15px;
+}
+.arena-actions {
+  display: grid;
+  grid-template-columns: 1.12fr .88fr;
+  gap: 9px;
+}
+.primary, .secondary {
+  min-height: 48px;
+  border-radius: 12px;
+  padding: 13px 14px;
+  font-size: 13px;
+  font-weight: 680;
+  letter-spacing: -.1px;
+  transition: transform .16s ease, background .18s ease, border-color .18s ease;
+}
+.primary {
+  background: var(--lime);
+  border: 1px solid var(--lime);
+  color: #17151e;
+}
+.secondary {
+  background: #1b1b20;
+  border: 1px solid #34343a;
+  color: var(--text);
+}
+.primary:active, .secondary:active, .vote-button:active {
+  transform: scale(.975);
+}
+.arena-note {
+  margin: 9px 0 28px;
+  font-size: 11px;
+  color: #8f8b94;
+}
+.section-heading {
+  margin: 0 0 13px;
+  align-items: center;
+}
+.section-heading h2 {
+  font-size: 16px;
+  letter-spacing: -.35px;
+  font-weight: 680;
+}
+.feed-filters, #groupLink, .ranked-details, #tasksView, .dock [data-view="tasks"] {
+  display: none !important;
+}
+.dock {
+  width: min(430px, calc(100% - 24px));
+  grid-template-columns: repeat(3, 1fr);
+  bottom: calc(9px + max(env(safe-area-inset-bottom), var(--safe-bottom)));
+  padding: 6px;
+  background: #1a1a1eeF;
+  border: 1px solid #34343a;
+  border-radius: 17px;
+  box-shadow: 0 8px 30px #0005;
+}
+.dock button {
+  gap: 4px;
+  padding: 8px 5px;
+  color: #96919d;
+  font-size: 10px;
+}
+.dock button.selected {
+  color: var(--text);
+  background: #2a2734;
+}
+.dock button.selected svg { stroke: var(--lime); }
+.dock svg { width: 19px; height: 19px; }
+.battle-card {
+  border: 0;
+  border-radius: 15px;
+  overflow: hidden;
+  background: transparent;
+}
+.battle-meta {
+  padding: 9px 1px 10px;
+  font-family: inherit;
+  font-size: 10px;
+  color: #9a96a0;
+}
+.battle-meta .timer { color: var(--lime); }
+.faces { gap: 7px; padding: 0; }
+.fighter {
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #222126;
+}
+.fighter .portrait { border-radius: 0; }
+.fighter-info {
+  bottom: 8px;
+  padding: 26px 10px 6px;
+  background: linear-gradient(transparent, #08080be8);
+}
+.fighter-info b {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: -.25px;
+}
+.fighter-index { display: none; }
+.fighter-title { display: none; }
+.vs-label {
+  width: 31px;
+  height: 31px;
+  border: 3px solid var(--bg);
+  background: #f4f1ed;
+  color: #17151e;
+  font-family: inherit;
+  font-weight: 800;
+  font-size: 9px;
+}
+.vote-row { gap: 7px; margin-top: 8px; }
+.vote-button {
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid #37343e;
+  background: #201f25;
+  font-size: 12px;
+  font-weight: 650;
+}
+.vote-button:hover { background: #302b3e; border-color: #6f6395; }
+.battle-card > .battle-meta:last-child {
+  padding: 9px 0 0;
+  border: 0;
+}
+.empty {
+  padding: 20px 0 24px;
+  border-top: 1px solid #2b2a30;
+  border-radius: 0;
+  background: transparent;
+  text-align: left;
+}
+.empty b { font-size: 19px; letter-spacing: -.4px; }
+.empty p { margin-top: 6px; max-width: 270px; color: var(--muted); font-size: 13px; }
+.empty .report-button { margin-top: 14px; }
+.page-title { margin-bottom: 23px; }
+.page-title .eyebrow { color: #b9aaff; }
+.page-title h1 { font-weight: 750; letter-spacing: -1.8px; }
+.my-rating, .panel, .group-card, .welcome-card, .daily-summary {
+  box-shadow: none;
+}
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible {
+  outline-color: var(--lime);
+}
+.view { animation: clean-enter .22s ease-out; }
+@keyframes clean-enter {
+  from { opacity: .65; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
