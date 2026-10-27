@@ -376,7 +376,7 @@
     candidates.sort((a, b) => Number(practice(a)) - Number(practice(b)));
     $("battleFeed").innerHTML = candidates.length
       ? battleCard(candidates[0])
-      : `<div class="empty"><span class="empty-symbol">↗</span><b>Сейчас нет открытых боёв</b><p>Создай дуэль с другом и отправь ссылку в беседу. Первый бой начинается с вас.</p><button class="secondary" id="emptyDuel">Вызвать друга ↗</button><p><button class="report-button" id="revisit">${skipped.size ? "Показать пропущенные" : "Проверить новые пары"}</button></p></div>`;
+      : `<div class="empty"><b>Пока тихо.</b><p>Создай первый батл и позови друга.</p><button class="report-button" id="revisit">${skipped.size ? "Показать пропущенные" : "Обновить батлы"}</button></div>`;
     $("emptyDuel")?.addEventListener("click", createDuel);
     document
       .querySelectorAll("[data-side]")
@@ -1085,7 +1085,7 @@
       const d = await call("create_duel");
       showModal(
         "ПЕРСОНАЛЬНЫЙ ВЫЗОВ",
-        `<h2>Кто могнет кого?</h2><div class="invite-preview">${portrait(state.player)}</div><p>Отправь другу вызов. После принятия — минутный бой. Ссылка на голосование появится в игре.</p><button id="sendDuel" class="primary">Отправить вызов ↗</button><button id="copyDuel" class="secondary">Скопировать ссылку</button>`,
+        `<h2>Кого вызываешь?</h2><div class="invite-preview">${portrait(state.player)}</div><p>Друг примет вызов — и начнётся фото-батл. Отправь ссылку в чат.</p><button id="sendDuel" class="primary">Отправить другу</button><button id="copyDuel" class="secondary">Скопировать ссылку</button>`,
       );
       $("sendDuel").onclick = () => {
         track("share_duel");
