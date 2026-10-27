@@ -1,0 +1,36 @@
+/* Launch simplification: keep the existing identity, remove the over-designed feel. */
+.arena-title {
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.arena-title h1 {
+  font-size: clamp(54px, 15vw, 72px);
+  line-height: 0.94;
+  letter-spacing: -2px;
+  margin-top: 6px;
+}
+.hero-caption {
+  margin-top: 10px;
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.arena-actions {
+  grid-template-columns: 1.15fr 1fr;
+  gap: 9px;
+}
+.arena-actions .primary,
+.arena-actions .secondary {
+  min-height: 49px;
+  font-size: 12px;
+}
+.arena-note {
+  margin: 10px 0 23px;
+  font-size: 11px;
+}
+.section-heading h2 {
+  font-size: 16px;
+}
+.eyebrow {
+  letter-spacing: 1px;
+}
