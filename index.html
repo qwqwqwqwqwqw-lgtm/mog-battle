@@ -25,6 +25,7 @@
     <link rel="stylesheet" href="cosmetics.css?v=rating3" />
     <link rel="stylesheet" href="style.css?v=rating3" />
     <link rel="stylesheet" href="editorial.css?v=rating3" />
+    <link rel="stylesheet" href="launch-simple.css?v=1" />
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <script src="app.js?v=rating3" defer></script>
   </head>
@@ -57,31 +58,29 @@
       <section id="arenaView" class="view active" aria-label="Арена">
         <div class="arena-title">
           <div>
-            <span class="eyebrow">FACE CARD / COMMUNITY VOTING</span>
+            
             <h1>
               MOGG<span>BATTLE<span class="hero-dot">.</span></span>
             </h1>
-            <p class="hero-caption">Твой кадр. Твой ранг. Их выбор.</p>
+            <p class="hero-caption">Фото-батлы с друзьями.</p>
           </div>
-          <span class="arena-symbol" aria-hidden="true"
-            >↗<span>MAKE<br />YOUR MOVE</span></span
-          >
+          
         </div>
         <div class="arena-actions">
-          <button id="rankedBtn" class="primary">
-            На рейтинг <span>↗</span></button
-          ><button id="friendBtn" class="secondary">
-            Вызвать друга <span>+</span>
+          <button id="friendBtn" class="primary">
+            Сыграть с другом <span>↗</span></button
+          ><button id="rankedBtn" class="secondary">
+            Найти батл <span>+</span>
           </button>
         </div>
         <p class="arena-note">
-          Рейтинг по голосам игроков. Дуэли с друзьями — за минуту.
+          Голосуй за участников или вызови друга. Играть можно бесплатно.
         </p>
         <div id="inviteBanner" hidden></div>
         <div id="ownBattles"></div>
         <div class="section-heading">
           <h2>Выбери победителя</h2>
-          <span id="feedLabel" class="pill">+2 Points за голос</span>
+          <span id="feedLabel" class="pill">+2 очка за голос</span>
         </div>
         <div class="feed-filters" role="group" aria-label="Фильтр боёв">
           <button class="selected" data-feed="human">Все батлы</button
@@ -117,9 +116,9 @@
       </section>
       <section id="ratingView" class="view" aria-label="Рейтинг">
         <div class="page-title">
-          <span class="eyebrow">THE COMMUNITY / THE RANKING</span>
-          <h1>HALL OF<br /><span class="lime">MOGG.</span></h1>
-          <p>Топ игроков по результатам рейтинговых батлов.</p>
+          <span class="eyebrow">РЕЙТИНГ</span>
+          <h1>ТОП<br /><span class="lime">ИГРОКОВ.</span></h1>
+          <p>Кто чаще выигрывает реальные батлы.</p>
         </div>
         <div id="myRating" class="my-rating"></div>
         <div
@@ -149,9 +148,9 @@
       </section>
       <section id="tasksView" class="view" aria-label="Задания">
         <div class="page-title">
-          <span class="eyebrow">BONUS CLUB / YOUR NEXT MOVE</span>
-          <h1>BONUS<br /><span class="lime">CLUB.</span></h1>
-          <p>Задания, партнёры и бонусы на твой стиль.</p>
+          <span class="eyebrow">БОНУСЫ</span>
+          <h1>БОНУСЫ<span class="lime">.</span></h1>
+          <p>Задания и очки на оформление.</p>
         </div>
         <div class="daily-summary">
           <div>
@@ -214,7 +213,7 @@
       </section>
       <section id="styleView" class="view" aria-label="Магазин и коллекция">
         <div class="page-title">
-          <span class="eyebrow">THE WARDROBE / YOUR LOOK</span>
+          <span class="eyebrow">ОФОРМЛЕНИЕ</span>
           <h1>Будь заметнее<span class="lime">.</span></h1>
           <p>Оформление видно в профиле и карточках боя.</p>
         </div>
@@ -252,7 +251,7 @@
       </section>
       <section id="profileView" class="view" aria-label="Профиль">
         <div class="page-title">
-          <span class="eyebrow">ТВОЯ FACE CARD</span>
+          <span class="eyebrow">ПРОФИЛЬ</span>
           <h1>Твой профиль<span class="lime">.</span></h1>
         </div>
         <div id="profileHero" class="profile-hero"></div>
@@ -288,7 +287,7 @@
           >
         </div>
       </section>
-      <footer class="footer">MOGG BATTLE <span>MAKE YOUR MOVE.</span></footer>
+      <footer class="footer">MOGG BATTLE <span>Фото-батлы с друзьями.</span></footer>
     </main>
     <nav class="dock" aria-label="Разделы">
       <button data-view="arena" class="selected" aria-current="page">
@@ -296,19 +295,19 @@
           <path
             d="m4 4 16 16M20 4 4 20M3 8l5-5M16 21l5-5M3 16l5 5M16 3l5 5"
           /></svg
-        ><span>Арена</span>
+        ><span>Батлы</span>
       </button>
       <button data-view="rating">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             d="M8 3h8v7a4 4 0 0 1-8 0zM8 5H4v3a4 4 0 0 0 4 4M16 5h4v3a4 4 0 0 1-4 4M12 14v6M8 21h8"
           /></svg
-        ><span>Рейтинг</span>
+        ><span>Топ</span>
       </button>
       <button data-view="tasks">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h3" /></svg
-        ><span>Задания</span>
+        ><span>Бонусы</span>
       </button>
       <button data-view="profile">
         <svg viewBox="0 0 24 24" aria-hidden="true">
