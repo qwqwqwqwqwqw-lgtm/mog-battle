@@ -223,3 +223,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visibl
     scroll-behavior: auto !important;
   }
 }
+
+/* Keep the first-time choice singular: challenge a friend. */
+#rankedBtn { display: none !important; }
+.arena-actions { grid-template-columns: 1fr; }
+#miniPoints { display: none !important; }
+.account-chip { min-width: 38px; justify-content: center; padding: 5px; }
