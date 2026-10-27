@@ -1768,7 +1768,10 @@
         await loadRating(true);
       }),
   );
-  $("collectionBtn").onclick = () => openView("style");
+  $("collectionBtn").onclick = () => {
+    openView("style");
+    showOwned();
+  };
 
   function demo() {
     const c = (id, code, name, kind, stars, visual) => ({
