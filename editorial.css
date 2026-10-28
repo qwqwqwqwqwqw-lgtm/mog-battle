@@ -981,3 +981,75 @@ dialog p {
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Player rating is visible from the profile, not only inside the leaderboard. */
+.profile-rating-card {
+  margin: 14px 0 18px;
+  padding: 18px;
+  border: 1px solid #40394d;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #201d28, #17171b 72%);
+}
+.profile-rating-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.profile-rating-head strong {
+  display: block;
+  margin-top: 3px;
+  font-family: Oswald, Arial, sans-serif;
+  font-size: clamp(38px, 11vw, 50px);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -1px;
+}
+.profile-rating-head strong small {
+  margin-left: 7px;
+  color: var(--lime);
+  font: 700 11px Manrope, Arial, sans-serif;
+  letter-spacing: .8px;
+}
+.profile-rank-pill {
+  padding: 7px 10px;
+  border: 1px solid #514766;
+  border-radius: 999px;
+  color: var(--lime);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.profile-rating-caption {
+  margin: 8px 0 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.profile-rating-actions {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 8px;
+}
+.profile-rating-actions button {
+  min-height: 42px;
+  font-size: 11px;
+}
+.profile-rating-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.rank-guide-list { margin-top: 16px; }
+.rank-current-label {
+  display: inline-block;
+  margin-left: 6px;
+  color: var(--lime);
+  font-size: 9px;
+  letter-spacing: .04em;
+}
+@media (max-width: 360px) {
+  .profile-rating-card { padding: 14px; }
+  .profile-rating-actions { grid-template-columns: 1fr; }
+}
