@@ -324,12 +324,10 @@
       ? `<img src="${escape(photo)}" alt="">`
       : escape(name(p).charAt(0));
     $("miniPoints").textContent = fmt(p.mogg_score) + " RP";
-    $("myRating").innerHTML =
-      `<div><span class="eyebrow">ТВОЙ РЕЙТИНГ</span><strong>${fmt(p.mogg_score)}<small>RP</small></strong><span class="rating-rank">${escape(rankLabel(p))}</span></div><button id="ratingBattle" class="primary">На арену ↗</button>`;
-    $("ratingBattle").onclick = () => {
-      openView("arena");
-      startMatch("ranked");
-    };
+    renderMyRating();
+    $("profileRating").innerHTML =
+      `<div class="profile-rating-head"><div><span class="eyebrow">ТВОЙ РЕЙТИНГ</span><strong>${fmt(p.mogg_score)}<small>RP</small></strong></div><span class="profile-rank-pill">${escape(rank(p))}</span></div><p class="profile-rating-caption">${Number(p.battles_played || 0) === 0 ? "Сыграй первый рейтинговый батл, чтобы начать путь в лиге." : fmt(p.battles_played) + " боёв · " + fmt(p.battles_won) + " побед"}</p><div class="profile-rating-actions"><button class="primary" data-open-rating>Смотреть рейтинг ↗</button><button class="secondary" data-rank-guide>Все ранги</button></div><p class="profile-rating-note">RP определяет место в рейтинге. MOG Points — валюта магазина.</p>`;
+
     $("taskPoints").innerHTML = fmt(p.mogg_points) + "<span>Points</span>";
     $("shopPoints").textContent = fmt(p.mogg_points) + " Points";
     const st = p.style || {};
@@ -1271,14 +1269,22 @@
       }
     };
   }
-  $("rankGuide").onclick = () => {
+  function showRankGuide() {
     const p = state.player || {},
       r = ranks[p.gender] || ranks.male;
     showModal(
       "ЛИГИ / MOGG BATTLE",
-      `<h2>Твой путь</h2><p>Ранг — игровой результат голосований. Он не является объективной оценкой внешности.</p>${r.map((n, i) => `<div class="rank-row ${rank(p) === n ? "current" : ""}"><b>${n}</b><span>${fmt(cuts[i])}${i === 12 ? "+" : "–" + fmt(cuts[i + 1] - 1)}</span></div>`).join("")}`,
+      `<h2>Твой путь</h2><p>Текущий ранг выделен. RP растёт за результаты рейтинговых батлов; Points используются в магазине.</p><div class="rank-guide-list">${r.map((n, i) => `<div class="rank-row ${rank(p) === n ? "current" : ""}"><b>${n}${rank(p) === n ? ' <span class="rank-current-label">ТВОЙ РАНГ</span>' : ""}</b><span>${fmt(cuts[i])}${i === 12 ? "+" : "–" + fmt(cuts[i + 1] - 1)} RP</span></div>`).join("")}</div>`,
     );
-  };
+  }
+  document.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    if (target?.closest("[data-rank-guide]")) {
+      showRankGuide();
+      return;
+    }
+    if (target?.closest("[data-open-rating]")) openView("rating");
+  });
 
   $("dailyBtn").onclick = async () => {
     if (!ensureProfile(() => $("dailyBtn").click())) return;
@@ -1718,6 +1724,18 @@
   }
   let ratingLoading = false,
     ratingLoadedAt = 0;
+  function renderMyRating() {
+    const p = state.player || {};
+    const place = state.ratingFilter === "all"
+      ? state.leaderboard.findIndex((player) => player.id === p.id) + 1
+      : 0;
+    $("myRating").innerHTML =
+      `<div><span class="eyebrow">ТВОЙ РЕЙТИНГ</span><strong>${fmt(p.mogg_score)}<small>RP</small></strong><span class="rating-rank">${escape(rankLabel(p))}${place > 0 ? " · место #" + place : ""}</span></div><button id="ratingBattle" class="primary">Рейтинговый батл ↗</button>`;
+    $("ratingBattle").onclick = () => {
+      openView("arena");
+      startMatch("ranked");
+    };
+  }
   function renderLeaderboard() {
     $("leaderboard").innerHTML = state.leaderboard.length
       ? state.leaderboard
@@ -1727,6 +1745,7 @@
           )
           .join("")
       : '<div class="empty"><span class="empty-symbol">↗</span><b>Первое место ждёт.</b><p>Заверши рейтинговый батл, чтобы попасть в топ.</p></div>';
+    renderMyRating();
   }
   async function loadRating(force = false) {
     if (state.demo) {
