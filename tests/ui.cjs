@@ -79,6 +79,19 @@ const server = http.createServer((req, res) => {
           });
       }
     }
+    await demo.locator('[data-view="profile"]').click();
+    await demo.locator("#profileRating").waitFor();
+    assert.match(await demo.locator("#profileRating").textContent(), /RP/);
+    await demo.locator("[data-open-rating]").click();
+    assert.equal(
+      await demo.locator("#ratingView").evaluate((el) => el.classList.contains("active")),
+      true,
+    );
+    await demo.locator('[data-view="profile"]').click();
+    await demo.locator("[data-rank-guide]").first().click();
+    await demo.locator("#modal[open]").waitFor();
+    assert.equal(await demo.locator(".rank-guide-list .rank-row").count(), 13);
+    await demo.locator("#modalClose").click();
     await demo.locator('[data-view="arena"]').click();
     assert.equal(await demo.locator(".timer").textContent(), "Демо");
     assert.equal(await demo.locator('[data-feed="practice"]').count(), 0);
